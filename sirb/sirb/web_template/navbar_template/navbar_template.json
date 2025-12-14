@@ -1,0 +1,26 @@
+{
+ "__islocal": true,
+ "__unsaved": 1,
+ "creation": "2025-11-19 12:53:25.814914",
+ "docstatus": 0,
+ "doctype": "Web Template",
+ "fields": [
+  {
+   "__islocal": 1,
+   "__unsaved": 1,
+   "fieldname": "field1",
+   "fieldtype": "Data",
+   "label": "Label",
+   "reqd": 0
+  }
+ ],
+ "idx": 0,
+ "modified": "2025-11-19 12:53:25.814914",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "navbar template",
+ "owner": "Administrator",
+ "standard": 1,
+ "template": "",
+ "type": "Navbar"
+}

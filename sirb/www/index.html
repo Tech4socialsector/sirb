@@ -1,0 +1,12 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<h1>{% if logged_in %} {{owner|capitalize}}'s {%endif%}SIRB home</h1>
+
+{% if not logged_in%}
+<p>Non logged in information here.</p>
+<p><a href="/login" class="btn btn-primary btn-large">Login to continue</a></p>
+{%else%}
+<p><a href="{{redirect}}" class="btn btn-primary btn-large">View pending actions</a></p>
+{%endif%}
+{%endblock%}

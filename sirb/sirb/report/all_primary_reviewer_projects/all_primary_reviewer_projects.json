@@ -1,0 +1,71 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [
+  {
+   "fieldname": "student_id",
+   "fieldtype": "Link",
+   "label": "Student Record",
+   "options": "Student",
+   "width": 0
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "label": "Student's Name",
+   "width": 0
+  },
+  {
+   "fieldname": "project_title",
+   "fieldtype": "Data",
+   "label": "Project title",
+   "width": 0
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Link",
+   "label": "Project Record",
+   "options": "Project",
+   "width": 0
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Project status",
+   "width": 0
+  }
+ ],
+ "creation": "2025-12-11 12:54:46.400709",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letterhead": null,
+ "modified": "2025-12-11 12:54:46.400709",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "All Primary Reviewer Projects",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "select s.name as student_name, p.title as title, p.name as project_name, p.status as status from tabStudent as s join `tabStudent Project` as sp join\ntabProject as p on s.name = sp.parent and sp.project = p.name  where p.status=\"Awaiting Faculty mentor approval\"",
+ "ref_doctype": "Project",
+ "report_name": "All Primary Reviewer Projects",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Faculty Mentor"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Anchor"
+  }
+ ],
+ "timeout": 0
+}

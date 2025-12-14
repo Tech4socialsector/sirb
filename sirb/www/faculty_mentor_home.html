@@ -1,0 +1,99 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<h2>Student mentees: </h2>
+    {% if not students %}
+        No student mentees assigned yet.
+    {%else%}
+        {% for s in students%}
+            <hr>
+            <h3>{{s["student"].display_full_name|capitalize}}</h3>
+            {% for project in s["projects"]%}
+                <p><b>Project Title: </b>{{project.title}}</p>
+                <p><b>Project Status: </b>{{project.status}}</p>
+                <p>
+                    <p><a href="/project/{{project.name}}" class="btn btn-primary">View/Modify Project Details</a>
+                    &nbsp;&nbsp;
+                    <button class="btn btn-primary" onClick="set_project_status({{project.name}}, 'Awaiting reviewer assignment');return false">Approve project & request reviewer assignment</button></p>
+                    {{project.status}}
+                    {%if project.status == "Awaiting Faculty mentor approval"%}
+                    <form id="feedback_form">
+                        <b>Enter feedback: </b><br/>
+                        <p><textarea name="feedback" rows="6"  placeholder="Enter your feedback for the student project here"></textarea></p>
+                        <button class="btn btn-primary" onClick="submit_mentor_feedback({{project.name}});return false">Provide student feedback</button>
+                    </form>
+                    
+                    {%endif%}
+                </p>
+                <hr>
+            {%endfor%}
+        {%endfor%}
+    {%endif%}
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script>
+
+    async function mentor_approve_project(project_id) {
+        console.log(project_id)
+        // Send data to the backend via AJAX
+        $.ajax({
+            url: '/api/method/sirb.api.mentor_approve_project',  // Custom API endpoint
+            method: 'POST',
+            data: {
+                project_id: project_id, 
+            },
+            success: function(response) {
+                alert("Project approved successfully.");
+                window.location.replace("/anchor_home");
+            },
+            error: function(error) {
+                $('#response').html('Error: ' + error.responseText);
+            }
+        });        
+    };
+
+    async function submit_mentor_feedback(project_id) {
+        //console.log(project_id)
+        // Send data to the backend via AJAX
+        form = document.getElementById("feedback_form");
+        fd = new FormData(form);
+        feedback = fd.get("feedback")       
+        $.ajax({
+            url: '/api/method/sirb.api.submit_mentor_feedback',  // Custom API endpoint
+            method: 'POST',
+            data: {
+                project_id: project_id,
+                feedback: feedback,
+                faculty_id: {{faculty_id}}
+            },
+            success: function(response) {
+                alert("Feedback submitted successfully.");
+                window.location.replace("/faculty_mentor_home");
+            },
+            error: function(error) {
+                $('#response').html('Error: ' + error.responseText);
+            }
+        });        
+    };
+    async function set_project_status(project_id, status) {
+        console.log(project_id)
+        // Send data to the backend via AJAX
+        $.ajax({
+            url: '/api/method/sirb.api.set_project_status',  // Custom API endpoint
+            method: 'POST',
+            data: {
+                project_id: project_id,
+                status: status
+            },
+            success: function(response) {
+                alert("Mentor approval processed successfully.");
+                window.location.replace("/faculty_mentor_home");
+            },
+            error: function(error) {
+                $('#response').html('Error: ' + error.responseText);
+            }
+        });
+    }      
+
+</script>
+{% endblock %}

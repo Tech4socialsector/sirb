@@ -1,0 +1,54 @@
+{
+ "content": "[{\"id\":\"shortcut_1\",\"type\":\"shortcut\",\"data\":{\"name\":\"Student\",\"label\":\"My Student Profile\",\"link_to\":\"Student\",\"doc_view\":\"List\",\"type\":\"DocType\"}},{\"id\":\"shortcut_2\",\"type\":\"shortcut\",\"data\":{\"name\":\"Project\",\"label\":\"My Projects\",\"link_to\":\"Project\",\"doc_view\":\"List\",\"type\":\"DocType\"}}]",
+ "creation": "2025-01-20 10:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "user",
+ "indicator_color": "blue",
+ "is_hidden": 0,
+ "label": "Student Workspace",
+ "links": [],
+ "modified": "2025-01-20 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "Student Workspace",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "roles": [
+  {
+   "role": "Student"
+  }
+ ],
+ "sequence_id": 0.0,
+ "shortcuts": [
+  {
+   "doc_view": "List",
+   "label": "My Student Profile",
+   "link_to": "Student",
+   "name": "Student",
+   "parent": "Student Workspace",
+   "parentfield": "shortcuts",
+   "parenttype": "Workspace",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "My Projects",
+   "link_to": "Project",
+   "name": "Project",
+   "parent": "Student Workspace",
+   "parentfield": "shortcuts",
+   "parenttype": "Workspace",
+   "type": "DocType"
+  }
+ ],
+ "title": "Student Workspace"
+}
+

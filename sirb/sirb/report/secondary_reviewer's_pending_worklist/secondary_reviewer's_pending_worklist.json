@@ -19,7 +19,7 @@
    "fieldname": "project_name",
    "fieldtype": "Link",
    "label": "Project Record",
-   "options": "Project",
+   "options": "IRB Project",
    "width": 0
   },
   {
@@ -37,7 +37,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2025-12-02 17:59:14.489872",
+ "modified": "2026-01-05 17:24:43.098341",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Secondary Reviewer's pending worklist",
@@ -49,7 +49,7 @@
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "Faculty Mentor"
+   "role": "Faculty Member"
   },
   {
    "role": "Administrator"

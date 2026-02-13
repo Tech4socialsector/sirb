@@ -25,7 +25,7 @@
    "fieldname": "project_name",
    "fieldtype": "Link",
    "label": "Project Record",
-   "options": "Project",
+   "options": "IRB Project",
    "width": 0
   },
   {
@@ -43,19 +43,19 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2025-12-11 11:24:03.835813",
+ "modified": "2026-01-05 17:26:50.884718",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Mentor's pending worklist",
  "owner": "Administrator",
  "prepared_report": 0,
  "query": "select s.name as student_name, p.title as title, p.name as project_name, p.status as status from tabStudent as s join `tabStudent Project` as sp join\ntabProject as p on s.name = sp.parent and sp.project = p.name  where p.status=\"Awaiting Faculty mentor approval\"",
- "ref_doctype": "Project",
+ "ref_doctype": "IRB Project",
  "report_name": "Mentor's pending worklist",
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "Faculty Mentor"
+   "role": "Faculty Member"
   },
   {
    "role": "Administrator"

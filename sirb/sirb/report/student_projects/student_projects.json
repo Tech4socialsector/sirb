@@ -1,0 +1,54 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [
+  {
+   "fieldname": "project_id",
+   "fieldtype": "Link",
+   "label": "Project ID",
+   "options": "IRB Project",
+   "width": 0
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Project Title",
+   "width": 0
+  },
+  {
+   "fieldname": "project_status",
+   "fieldtype": "Data",
+   "label": "Project IRB Status",
+   "width": 0
+  }
+ ],
+ "creation": "2025-12-18 09:57:40.024676",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letterhead": null,
+ "modified": "2026-01-05 17:25:19.302265",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "Student Projects",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "IRB Project",
+ "report_name": "Student Projects",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Student"
+  },
+  {
+   "role": "Administrator"
+  }
+ ],
+ "timeout": 0
+}

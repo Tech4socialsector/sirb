@@ -1,0 +1,113 @@
+{
+ "actions": [],
+ "creation": "2025-12-24 17:02:06.812519",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_6xbv",
+  "lft",
+  "rgt",
+  "is_group",
+  "old_parent",
+  "parent_academic_organizational_unit",
+  "ao_name",
+  "ao_type",
+  "ao_code"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_6xbv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "label": "Old Parent",
+   "options": "Academic Organizational Unit"
+  },
+  {
+   "fieldname": "parent_academic_organizational_unit",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Parent Academic Organizational Unit",
+   "options": "Academic Organizational Unit"
+  },
+  {
+   "fieldname": "ao_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Academic Organization Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "ao_type",
+   "fieldtype": "Select",
+   "label": "Academic Organization Type",
+   "options": "University\nCampus\nSchool\nDepartment\nProgramme",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ao_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "label": "Academic Organization Code",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_tree": 1,
+ "links": [],
+ "modified": "2026-01-27 09:51:28.592984",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "Academic Organizational Unit",
+ "nsm_parent_field": "parent_academic_organizational_unit",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "show_preview_popup": 1,
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "ao_name"
+}

@@ -1,88 +1,49 @@
 {
  "actions": [],
- "autoname": "autoincrement",
+ "autoname": "format:{program}{#####}",
  "creation": "2025-11-07 09:52:37.299585",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "user_information_section",
+  "system_user",
   "full_name",
-  "display_full_name",
-  "section_break_mcaj",
-  "projects",
-  "section_break_dqph",
-  "is_published",
-  "route",
-  "amended_from"
+  "student_id"
  ],
  "fields": [
-  {
-   "fieldname": "section_break_dqph",
-   "fieldtype": "Section Break",
-   "label": "Internal Info"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_published",
-   "fieldtype": "Check",
-   "label": "is_published"
-  },
-  {
-   "fieldname": "route",
-   "fieldtype": "Data",
-   "label": "route"
-  },
-  {
-   "fieldname": "full_name",
-   "fieldtype": "Link",
-   "label": "Email",
-   "options": "User"
-  },
   {
    "fieldname": "user_information_section",
    "fieldtype": "Section Break",
    "label": "User Information"
   },
   {
-   "fieldname": "display_full_name",
+   "fieldname": "student_id",
+   "fieldtype": "Data",
+   "label": "Student ID"
+  },
+  {
+   "fieldname": "full_name",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Full Name",
    "read_only": 1
   },
   {
-   "fieldname": "amended_from",
+   "fieldname": "system_user",
    "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Student",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "section_break_mcaj",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "projects",
-   "fieldtype": "Table",
-   "label": "Projects",
-   "options": "Student Project"
+   "label": "System User",
+   "options": "User"
   }
  ],
  "grid_page_length": 50,
- "has_web_view": 1,
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
- "is_published_field": "is_published",
- "is_submittable": 1,
  "links": [],
- "modified": "2025-12-03 17:49:21.712173",
+ "modified": "2026-01-27 09:50:39.258103",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Student",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -144,9 +105,7 @@
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "show_preview_popup": 1,
- "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "title_field": "display_full_name"
+ "states": []
 }

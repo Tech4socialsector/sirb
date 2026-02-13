@@ -1,0 +1,61 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"XJHCbeTmgz\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Unapproved Projects</span>\",\"col\":12}},{\"id\":\"fgHqCdZ5ff\",\"type\":\"paragraph\",\"data\":{\"text\":\"This section gives you access to all the unapproved projects assigned to you against each of your roles. Click on the count on each of the cards below to view the list of projects pending against each of the roles. In each of the reports, you can further click on the project details or the customer details column to view/edit the customer and project details.\",\"col\":12}},{\"id\":\"I-i2iHJRJh\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Mentor's action pending\",\"col\":5}},{\"id\":\"56IwBiHc5N\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"All Mentor Projects\",\"col\":4}},{\"id\":\"XER1CVCDje\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Primary reviewer's action pending\",\"col\":5}},{\"id\":\"R1x372j7OC\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"All primary reviewer projects\",\"col\":4}},{\"id\":\"Ow0owRadyt\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Secondary reviewer's action pending\",\"col\":5}},{\"id\":\"mt2calLqMy\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"All secondary reviewer projects\",\"col\":4}}]",
+ "creation": "2025-12-02 17:29:30.854665",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "list",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "IRB Projects",
+ "links": [],
+ "modified": "2025-12-31 17:47:18.663915",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "IRB Projects",
+ "number_cards": [
+  {
+   "label": "Primary reviewer's action pending",
+   "number_card_name": "Pending Primary Reviewer Projects"
+  },
+  {
+   "label": "All Mentor Projects",
+   "number_card_name": "Mentor Projects"
+  },
+  {
+   "label": "All primary reviewer projects",
+   "number_card_name": "Primary Reviewer's Projects"
+  },
+  {
+   "label": "Mentor's action pending",
+   "number_card_name": "Pending Mentor Projects"
+  },
+  {
+   "label": "Secondary reviewer's action pending",
+   "number_card_name": "Pending Secondary Reviewer Projects"
+  },
+  {
+   "label": "All secondary reviewer projects",
+   "number_card_name": "Secondary Reviewer's Projects"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "IRB Reviewer"
+  },
+  {
+   "role": "Faculty Member"
+  }
+ ],
+ "sequence_id": 24.2,
+ "shortcuts": [],
+ "title": "IRB Projects"
+}

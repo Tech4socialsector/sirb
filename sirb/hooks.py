@@ -27,7 +27,8 @@ app_license = "mit"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/sirb/css/sirb.css"
 # app_include_js = "/assets/sirb/js/sirb.js"
-# app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
+app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
+
 
 # include js, css files in header of web template
 # web_include_css = "/assets/sirb/css/sirb.css"
@@ -84,7 +85,7 @@ app_license = "mit"
 # ------------
 
 # before_install = "sirb.install.before_install"
-after_install = "sirb.install.after_install"
+# after_install = "sirb.install.after_install"
 
 # Uninstallation
 # ------------
@@ -145,6 +146,7 @@ after_install = "sirb.install.after_install"
 # 		"on_trash": "method"
 # 	}
 # }
+
 
 # Scheduled Tasks
 # ---------------
@@ -232,19 +234,17 @@ after_install = "sirb.install.after_install"
 # Authentication and authorization
 # --------------------------------
 
-auth_hooks = [
-	"sirb.auth.map_user"
-]
+#auth_hooks = [
+#]
 
-#on_login = "sirb.auth.map_user"
 
 # Fixtures
 # --------
 # List of fixtures to be imported when app is installed
 
-fixtures = [
-	"Workspace"
-]
+# fixtures = [
+# 	"Workspace"
+# ]
 
 
 # Automatically update python controller files with type annotations for this app.

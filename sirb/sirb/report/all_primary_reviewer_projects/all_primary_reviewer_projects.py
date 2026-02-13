@@ -29,7 +29,7 @@ def execute(filters=None):
 			"fieldname": "project_name",
 			"label": "Project Record (Click to view)",
 			"fieldtype": "Link",
-			"options": "Project"
+			"options": "IRB Project"
 		},
 		{
 			"fieldname": "project_status",
@@ -40,10 +40,11 @@ def execute(filters=None):
 	doc = get_logged_in_doc("Primary Reviewer")
 	if doc:
 		data = frappe.db.sql(
-			f'''select s.name as student_id, s.display_full_name as student_name, p.title as project_title, p.name as project_name, p.status as project_status from tabStudent as s join `tabStudent Project` 
-			as sp join tabProject as p join tabFaculty as f on s.name = sp.parent and 
-			sp.project = p.name  and p.primary_reviewer=f.name and f.full_name="{doc.full_name}" and
-			p.status != "Approved"''', as_dict=1
+			f'''select s.name as student_id, s.full_name as student_name, p.title as project_title, p.name as project_name, 
+			p.status as project_status from tabStudent as s join `tabStudent Project Mapping` 
+			as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student and 
+			sp.irb_project = p.name  and p.primary_reviewer=f.name and f.system_user="{doc.system_user}" and
+			p.status != "Approved" and sp.status="active"''', as_dict=1
 		)
 	else:
 		data = []

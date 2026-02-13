@@ -1,43 +1,60 @@
+// Global Desk script
+// your_app/public/js/logout_cleaner.js
+// $(document).on('logout', function() {
+//     // Clear all frappe-specific local storage
+//     console.log("!!")
+//     Object.keys(localStorage).forEach(key => {
+//         if (key.includes('frappe')) {
+//             console.log("clearing ", key)
+//             localStorage.removeItem(key);
+//         }
+//     });
+    
+//     // Clear session storage as well
+//     sessionStorage.clear();
+// });
+// your_app/public/js/force_cleanup.js
+// your_app/public/js/force_cleanup.js
 
-$(document).ready(function(){
-    // Roles that should NOT see the global search bar
-    console.log("Hi!");
+(function() {
+    // console.log("!!!")
+    // try {
+    //     localStorage.removeItem("current_page");
+    //     localStorage.removeItem("route_history");
+    // } catch (e) {}    
+    if (!frappe.boot || !frappe.boot.user) return;
 
-    // const blocked_roles = ["Student", "Faculty Mentor", "Primary Reviewer", "Secondary Reviewer", "Anchor"];
+    const roles = frappe.boot.user.roles || [];
+    // const targetRole = "Anchor";
 
-    // const current_user = frappe.boot?.user?.name;
-    // console.log(current_user);
-    // alert(current_user);
-    // if (current_user == "Administrator") {
-    //     const selectors = [
-    //         ".navbar .search-bar",
-    //         ".navbar .global-search",
-    //         ".navbar .search-box",
-    //         ".navbar .dropdown-search"
-    //     ];
+    // Only hide for target role, not admins/system managers
+    if (roles.includes("Administrator") || roles.includes("System Manager")) return;
 
-    //     selectors.forEach(sel => {
-    //         const el = document.querySelector(sel);
-    //         if (el) el.style.display = "block";
-    //     });        
-    //     return;
-    // }
+    // Function to hide the search bar
+    function hideSearchBar() {
+        // Option 1: CSS injection (Most reliable for immediate hide)
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .search-bar, 
+            .navbar-search, 
+            #navbar-search {
+                display: none !important;
+            }
+            /* Hide the Help Dropdown (?) */
+            .nav-item.dropdown-help { display: none !important; }
+        `;
+        document.head.appendChild(style);
 
-    // const user_roles = frappe.boot.user.roles || [];
+        // Option 2: DOM Removal (As a backup once the navbar loads)
+        frappe.ui.toolbar.setup_search = function() {
+            return; // Overrides the search setup function to do nothing
+        };
+    }
 
-    // if (user_roles.some(r => blocked_roles.includes(r))) {
+    // Try hiding immediately in case it's already in the DOM
+    hideSearchBar();
 
-    //     // All known selectors for the search bar in v14–v15
-    //     const selectors = [
-    //         ".navbar .search-bar",
-    //         ".navbar .global-search",
-    //         ".navbar .search-box",
-    //         ".navbar .dropdown-search"
-    //     ];
-
-    //     selectors.forEach(sel => {
-    //         const el = document.querySelector(sel);
-    //         if (el) el.style.display = "none";
-    //     });
-    // }
-});
+    // Set up MutationObserver to catch dynamic navbar injection
+    const observer = new MutationObserver(() => hideSearchBar());
+    observer.observe(document.body, { childList: true, subtree: true });
+})();

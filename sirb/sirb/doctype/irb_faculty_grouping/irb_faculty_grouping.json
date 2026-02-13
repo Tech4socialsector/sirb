@@ -1,0 +1,35 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-26 18:32:42.067414",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "faculty_member"
+ ],
+ "fields": [
+  {
+   "fieldname": "faculty_member",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Faculty Member",
+   "options": "Faculty Academic Organizational Unit"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-26 21:28:45.860760",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "IRB Faculty Grouping",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

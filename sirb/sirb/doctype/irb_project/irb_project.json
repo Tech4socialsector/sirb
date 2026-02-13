@@ -1,0 +1,2224 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-11-10 09:08:03.118401",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_details_tab",
+  "introduction_section",
+  "title",
+  "proposal",
+  "abstract",
+  "column_break_amrn",
+  "topic",
+  "irb_unit",
+  "project_domain",
+  "consent_required",
+  "consent_form_attachment",
+  "section_break_keqe",
+  "mentor_comments_to_reviewers",
+  "project_status_section",
+  "status",
+  "reviewers_section",
+  "primary_reviewer",
+  "secondary_reviewer",
+  "faculty_mentor",
+  "animal_ethics_questionnaire_tab",
+  "section_break_lrlc",
+  "research_type",
+  "replacement_reduction_and_refinement_pledge",
+  "correctness_and_completeness_pledge",
+  "nheq_s1",
+  "vertebrate",
+  "invertebrate",
+  "speciescommon_name",
+  "number_of_animals_to_be_used",
+  "toggle_nheq_s1",
+  "nheq_s1_addons",
+  "nheq_s1_sc",
+  "nheq_s1_mf",
+  "nheq_s1_rf",
+  "nheq_s1_prn",
+  "nheq_s1_srn",
+  "nheq_s1_fc",
+  "nheq_s2",
+  "proposed_source_of_animals",
+  "name_of_source",
+  "animal_housing",
+  "toggle_nheq_s2",
+  "nheq_s2_addons",
+  "nheq_s2_sc",
+  "nheq_s2_mf",
+  "nheq_s2_rf",
+  "nheq_s2_prn",
+  "nheq_s2_srn",
+  "nheq_s2_fc",
+  "nheq_s3",
+  "stress_yes_no",
+  "precautions",
+  "manipulative_experiments_select",
+  "stree_reduction",
+  "what_will_be_done_with_the_live_animal_at_the_end_of_the_lab",
+  "disposal_method",
+  "toggle_nheq_s3",
+  "nheq_s3_addons",
+  "nheq_s3_sc",
+  "nheq_s3_mf",
+  "nheq_s3_rf",
+  "nheq_s3_prn",
+  "nheq_s3_srn",
+  "nheq_s3_fc",
+  "nheq_s4",
+  "study_site",
+  "taxa_name",
+  "num_plants_animals",
+  "native_select",
+  "toggle_nheq_s4",
+  "nheq_s4_addons",
+  "nheq_s4_sc",
+  "nheq_s4_mf",
+  "nheq_s4_rf",
+  "nheq_s4_prn",
+  "nheq_s4_srn",
+  "nheq_s4_fc",
+  "nheq_s5",
+  "sensitive_areas",
+  "ecological_data",
+  "potential_impacts",
+  "safe_and_ethical_collection",
+  "toggle_nheq_s5",
+  "nheq_s5_addons",
+  "nheq_s5_sc",
+  "nheq_s5_mf",
+  "nheq_s5_rf",
+  "nheq_s5_prn",
+  "nheq_s5_srn",
+  "nheq_s5_fc",
+  "nheq_s6",
+  "professional_interaction_and_confidentiality",
+  "consent",
+  "toggle_nheq_s6",
+  "nheq_s6_addons",
+  "nheq_s6_sc",
+  "nheq_s6_mf",
+  "nheq_s6_rf",
+  "nheq_s6_prn",
+  "nheq_s6_srn",
+  "nheq_s6_fc",
+  "human_ethics_questionnaire_tab",
+  "heq_s1",
+  "state_your_project_question",
+  "toggle_heq_s1",
+  "heq_s1_addons",
+  "heq_s1_sc",
+  "heq_s1_mf",
+  "heq_s1_rf",
+  "heq_s1_prn",
+  "heq_s1_srn",
+  "heq_s1_fc",
+  "heq_s2",
+  "project_context",
+  "toggle_heq_s2",
+  "heq_s2_addons",
+  "heq_s2_sc",
+  "heq_s2_mf",
+  "heq_s2_rf",
+  "heq_s2_prn",
+  "heq_s2_srn",
+  "heq_s2_fc",
+  "heq_s3",
+  "project_subjects",
+  "toggle_heq_s3",
+  "heq_s3_addons",
+  "heq_s3_sc",
+  "heq_s3_mf",
+  "heq_s3_rf",
+  "heq_s3_prn",
+  "heq_s3_srn",
+  "heq_s3_fc",
+  "heq_s4",
+  "approaching_participants",
+  "toggle_heq_s4",
+  "heq_s4_addons",
+  "heq_4_sc",
+  "heq_4_mf",
+  "heq_4_rf",
+  "heq_4_prn",
+  "heq_4_srn",
+  "heq_4_fc",
+  "heq_s5",
+  "participant_age_range",
+  "toggle_heq_s5",
+  "heq_s5_addons",
+  "heq_5_srn",
+  "heq_5_sc",
+  "heq_5_mf",
+  "heq_s5_rf",
+  "heq_s5_prn",
+  "heq_s5_srn",
+  "heq_s5_fc",
+  "heq_s6",
+  "minor_participants",
+  "toggle_heq_s6",
+  "heq_s6_addons",
+  "heq_s6_sc",
+  "heq_s6_mf",
+  "heq_s6_rf",
+  "heq_s6_prn",
+  "heq_s6_srn",
+  "heq_s6_fc",
+  "heq_s7",
+  "html_jthe",
+  "posco_certification",
+  "toggle_heq_s7",
+  "heq_s7_addons",
+  "heq_s7_sc",
+  "heq_s7_mf",
+  "heq_s7_rf",
+  "heq_s7_prn",
+  "heq_s7_srn",
+  "heq_s7_fc",
+  "heq_s8",
+  "sensitive_population_field",
+  "toggle_heq_s8",
+  "heq_s8_addons",
+  "heq_s8_sc",
+  "heq_s8_mf",
+  "heq_s8_rf",
+  "heq_s8_prn",
+  "heq_s8_srn",
+  "heq_s8_fc",
+  "heq_s9",
+  "study_tools_field",
+  "toggle_heq_s9",
+  "heq_s9_addons",
+  "heq_s9_sc",
+  "heq_s9_mf",
+  "heq_s9_rf",
+  "heq_s9_prn",
+  "heq_s9_srn",
+  "heq_s9_fc",
+  "heq_s10",
+  "sensitive_material_field",
+  "toggle_heq_s10",
+  "heq_s10_addons",
+  "heq_s10_sc",
+  "heq_s10_mf",
+  "heq_s10_rf",
+  "heq_s10_prn",
+  "heq_s10_srn",
+  "heq_s10_fc",
+  "heq_s11",
+  "html_dgjh",
+  "subject_location",
+  "toggle_heq_s11",
+  "heq_s11_addons",
+  "heq_s11_sc",
+  "heq_s11_mf",
+  "heq_s11_rf",
+  "heq_s11_prn",
+  "heq_s11_srn",
+  "heq_s11_fc",
+  "heq_s12",
+  "foreseeable_risks",
+  "toggle_heq_s12",
+  "heq_s12_addons",
+  "heq_s12_sc",
+  "heq_s12_mf",
+  "heq_s12_rf",
+  "heq_s12_prn",
+  "heq_s12_srn",
+  "heq_s12_fc",
+  "heq_s13",
+  "personal_risks",
+  "toggle_heq_s13",
+  "heq_s13_addons",
+  "heq_s13_sc",
+  "heq_s13_mf",
+  "heq_s13_rf",
+  "heq_s13_prn",
+  "heq_s13_srn",
+  "heq_s13_fc",
+  "heq_s14",
+  "participant_trust",
+  "toggle_heq_s14",
+  "heq_s14_addons",
+  "heq_s14_sc",
+  "heq_s14_mf",
+  "heq_s14_rf",
+  "heq_s14_prn",
+  "heq_s14_srn",
+  "heq_s14_fc",
+  "heq_s15",
+  "informed_consent_text_for_adults",
+  "informed_consent_text_for_old_age_population",
+  "toggle_heq_s15",
+  "heq_s15_addons",
+  "heq_s15_sc",
+  "heq_s15_mf",
+  "heq_s15_rf",
+  "heq_s15_prn",
+  "heq_s15_srn",
+  "heq_s15_fc",
+  "heq_s16",
+  "will_data_be_gathered_through_digital_means",
+  "toggle_heq_s16",
+  "heq_s16_addons",
+  "heq_s16_sc",
+  "heq_s16_mf",
+  "heq_s16_rf",
+  "heq_s16_prn",
+  "heq_s16_srn",
+  "heq_s16_fc",
+  "heq_s17",
+  "need_for_such_data",
+  "toggle_heq_s17",
+  "heq_s17_addons",
+  "heq_s17_sc",
+  "heq_s17_mf",
+  "heq_s17_rf",
+  "heq_s17_prn",
+  "heq_s17_srn",
+  "heq_s17_fc",
+  "heq_s18",
+  "how_will_consent_be_obtained_for_this",
+  "toggle_heq_s18",
+  "heq_s18_addons",
+  "heq_s18_sc",
+  "heq_s18_",
+  "heq_s18_rf",
+  "heq_s18_prn",
+  "heq_s18_srn",
+  "heq_s18_fc",
+  "heq_s19",
+  "how_will_you_take_final_consent_for_this_data",
+  "toggle_heq_s19",
+  "heq_s19_addons",
+  "heq_s19_sc",
+  "heq_s19_mf",
+  "heq_s19_rf",
+  "heq_s19_prn",
+  "heq_s19_srn",
+  "heq_s19_fc",
+  "heq_s20",
+  "how_will_you_protect_the_confidentiality_of_such_data",
+  "toggle_heq_s20",
+  "heq_s20_addons",
+  "heq_s20_sc",
+  "heq_s20_mf",
+  "heq_s20_rf",
+  "heq_s20_prn",
+  "heq_s20_srn",
+  "heq_s20_fc",
+  "heq_s21",
+  "third_party_storage",
+  "how_will_you_ensure_data_confidentiality_anonymity_and_security",
+  "toggle_heq_s21",
+  "heq_s21_addons",
+  "heq_s21_sc",
+  "heq_s21_mf",
+  "heq_s21_rf",
+  "heq_s21_prn",
+  "heq_s21_srn",
+  "heq_s21_fc"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Small Text",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Title",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "topic",
+   "fieldtype": "Small Text",
+   "label": "Topic",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "abstract",
+   "fieldtype": "Small Text",
+   "label": "Abstract"
+  },
+  {
+   "fieldname": "proposal",
+   "fieldtype": "Attach",
+   "label": "Proposal",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "introduction_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "consent_required",
+   "fieldtype": "Check",
+   "label": "Consent Form Required?",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "section_break_lrlc",
+   "fieldtype": "Section Break",
+   "label": "Animal Ethics Questionnaire Section"
+  },
+  {
+   "default": "Awaiting proposal completion by student",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Awaiting proposal completion by student\nAwaiting Faculty mentor approval\nAwaiting student correction for mentor feedback\nAwaiting primary reviewer comments\nAwaiting secondary reviewer comments\nAwaiting reviewer feedback to student\nAwaiting student correction for reviewer feedback\nProvisionally approved\nAwaiting final approval\nApproved",
+   "read_only": 1,
+   "read_only_depends_on": "eval:frappe.user != \"Administrator\""
+  },
+  {
+   "fieldname": "reviewers_section",
+   "fieldtype": "Section Break",
+   "label": "Mentor and Reviewers"
+  },
+  {
+   "fieldname": "primary_reviewer",
+   "fieldtype": "Link",
+   "label": "Primary Reviewer",
+   "options": "Faculty",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "secondary_reviewer",
+   "fieldtype": "Link",
+   "label": "Secondary Reviewer",
+   "options": "Faculty",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "column_break_amrn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "project_status_section",
+   "fieldtype": "Section Break",
+   "label": "Project Status"
+  },
+  {
+   "depends_on": "eval: doc.consent_required",
+   "fieldname": "consent_form_attachment",
+   "fieldtype": "Attach",
+   "label": "Consent form attachment",
+   "mandatory_depends_on": "eval: doc.consent_required",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "basic_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Basic details"
+  },
+  {
+   "fieldname": "irb_unit",
+   "fieldtype": "Link",
+   "label": "IRB Unit",
+   "options": "IRB Unit"
+  },
+  {
+   "fieldname": "human_ethics_questionnaire_tab",
+   "fieldtype": "Tab Break",
+   "label": "Human Ethics Questionnaire"
+  },
+  {
+   "default": "0",
+   "fieldname": "vertebrate",
+   "fieldtype": "Check",
+   "label": "Animal Type - Vertebrate"
+  },
+  {
+   "default": "0",
+   "fieldname": "invertebrate",
+   "fieldtype": "Check",
+   "label": "Animal Type - Invertebrate"
+  },
+  {
+   "fieldname": "speciescommon_name",
+   "fieldtype": "Small Text",
+   "label": "Name of the taxa used",
+   "permlevel": 1
+  },
+  {
+   "description": "(for vertebrates, please give exact number. For invertebrates, an approximate number is sufficient)",
+   "fieldname": "number_of_animals_to_be_used",
+   "fieldtype": "Int",
+   "label": "Number to be used",
+   "permlevel": 1
+  },
+  {
+   "description": "Please mention where and how will they be released",
+   "fieldname": "what_will_be_done_with_the_live_animal_at_the_end_of_the_lab",
+   "fieldtype": "Small Text",
+   "label": "What will be done with the live animal at the end of the lab?"
+  },
+  {
+   "description": "(Note: applicable to both vertebrates and invertebrates)",
+   "fieldname": "disposal_method",
+   "fieldtype": "Small Text",
+   "label": "If animals are sacrificed in the lab, how will they be disposed"
+  },
+  {
+   "fieldname": "proposed_source_of_animals",
+   "fieldtype": "Small Text",
+   "label": "Proposed source of animals"
+  },
+  {
+   "depends_on": "eval:doc.aeq_required == 1",
+   "fieldname": "name_of_source",
+   "fieldtype": "Small Text",
+   "label": "If animals are bought from outside, name of the source"
+  },
+  {
+   "fieldname": "faculty_mentor",
+   "fieldtype": "Link",
+   "label": "Faculty Mentor",
+   "options": "Faculty"
+  },
+  {
+   "fieldname": "project_domain",
+   "fieldtype": "Select",
+   "label": "Project Domain",
+   "options": "Humans\nNon Human Species"
+  },
+  {
+   "fieldname": "animal_ethics_questionnaire_tab",
+   "fieldtype": "Tab Break",
+   "label": "Non Human Ethics Questionnaire"
+  },
+  {
+   "description": "[Note: In case of an intervention study/participatory project: Please state the purpose of the intervention or the participatory project] [Word limit: 200]",
+   "fieldname": "state_your_project_question",
+   "fieldtype": "Small Text",
+   "label": "State your project question"
+  },
+  {
+   "description": "Explain the context of your study using 6 to 9 keywords. The keywords would include, State, district, defining characteristics of the respondents* (2 to 3 keywords), broad domain of your project** (2 to 3 keywords). Explain what their defining characteristics are with respect to their demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students etc.** Use appropriate keywords that explain the broad domain of the project. For example, informal labour, migration, mental health, sustainable agriculture, ecology, mining, farmers movement, groundwater, drinking water, urban ecology etc.",
+   "fieldname": "project_context",
+   "fieldtype": "Small Text",
+   "label": "Context of study"
+  },
+  {
+   "description": "[Note: Explain what their defining characteristics are with respect to their demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students etc.] [Word limit: 200 words]",
+   "fieldname": "project_subjects",
+   "fieldtype": "Small Text",
+   "label": "Who are your subjects/participants for this project?"
+  },
+  {
+   "description": "[Note: E.g., in class, door to door solicitation, through email or social media platform, etc. Word limit: 300]",
+   "fieldname": "approaching_participants",
+   "fieldtype": "Small Text",
+   "label": "Describe how will you identify and approach your potential subjects/participants?"
+  },
+  {
+   "description": "[Word limit: 50 words]",
+   "fieldname": "participant_age_range",
+   "fieldtype": "Small Text",
+   "label": "What is the expected age range of your research subjects/participants?"
+  },
+  {
+   "default": "0",
+   "fieldname": "minor_participants",
+   "fieldtype": "Check",
+   "label": "Will any of them be minors (i.e., below the age of 18 years"
+  },
+  {
+   "fieldname": "html_jthe",
+   "fieldtype": "HTML",
+   "options": "<b>Certification of Awareness of Legal Obligations (POCSO Act, 2012):</b>\n<p>\nIf your research involves children (persons below 18 years of age), you are required to be aware of and comply with the provisions of the Protection of Children from Sexual Offences (POCSO) Act, 2012.</p>\n<p><b>Please confirm the following:</b></p>\n<ul>\n<li>I hereby certify that I have read, understood, and will comply with the provisions of the POCSO Act, 2012.\n</li><li>I understand my mandatory reporting obligations under the Act in the event that I become aware of any instance of child abuse or exploitation during the course of my research.</li></ul>",
+   "set_only_once": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "posco_certification",
+   "fieldtype": "Check",
+   "label": "<b>Yes, I certify that I have read and understood the POCSO Act, 2012.</b>"
+  },
+  {
+   "description": "[Note: If yes, please explain what specific challenges and needs your participants may have. This does not include minors] [Word limit: 100 words]",
+   "fieldname": "sensitive_population_field",
+   "fieldtype": "Small Text",
+   "label": "Does your project involve any sensitive populations such as people with special needs, disabilities etc?"
+  },
+  {
+   "description": "For the current study what tools will you be using to communicate/engage with your project participants/collect data/ pilot the intervention? (eg. Interviews, FGDs, observation, surveys, telephonic interviews, online tools such as google form, chat apps, video platforms, social media or other technology) [Word limit: 300]",
+   "fieldname": "study_tools_field",
+   "fieldtype": "Small Text",
+   "label": "What study tools will you use?"
+  },
+  {
+   "description": "    10. In case of intervention projects, if you plan to develop and use any materials, tools, or modules as part of the intervention, do any of these contain content that could be considered sensitive, potentially distressing, or ethically/legally risky (e.g., topics related to violence, trauma, sexuality, mental health etc.)? Please elaborate a)how you will assess and review such materials for appropriateness before they are introduced to participants b) who will be responsible for vetting or approving the content (e.g., experts, ethics committees, institutional authorities), and what criteria will be used in this process?] \n[Note: Please mark N/A if not applicable to you] [Word limit: 300]",
+   "fieldname": "sensitive_material_field",
+   "fieldtype": "Small Text",
+   "label": "Do any of your material contain content that could be considered sensitive?"
+  },
+  {
+   "fieldname": "html_dgjh",
+   "fieldtype": "HTML",
+   "options": "For each kind of subject/participant involved in your study, please reflect on the following questions"
+  },
+  {
+   "description": "[Note: a) In case of an intervention project, please mention where will you be piloting/implementing the intervention b) In case of a participatory action project, please mention where you will conduct the participatory activities with your participants c) Please mention whether the data will be collected within homes, outside their home, prison, Anganwadis, hospitals, old-age homes, schools, etc. d) If the exact location is not known, some rough idea about where the data collection would happen.]  [Word limit: 200]",
+   "fieldname": "subject_location",
+   "fieldtype": "Small Text",
+   "label": "What are the locations where you will collect data?"
+  },
+  {
+   "description": "What are some of the foreseeable risks and discomforts related to your topic for each kind of subject/participant in your project? [Note: Kindly write if the topic itself is sensitive in nature. For example- topics on sexual reproductive health, mental health, discrimination etc. or the topic could be politically sensitive, conducted within conflict zones etc.] [Word limit: 200]",
+   "fieldname": "foreseeable_risks",
+   "fieldtype": "Small Text",
+   "label": "Foreseeable risks"
+  },
+  {
+   "description": "What are the potential physical, emotional or any other kinds of risks to you in      your field project? How will you ensure you minimize those risks?  \n[Word limit: 150]",
+   "fieldname": "personal_risks",
+   "fieldtype": "Small Text",
+   "label": "What are the potential risks to you?"
+  },
+  {
+   "description": "How will you gain trust and confidence of the subjects/participants and ensure that their participation is entirely voluntary? \n\n[Note: In case recruitment is conducted through or in collaboration with an organization please additionally describe how you will: clearly separate your role as a researcher from the organization's interests, and address potential pressures, perceived obligations, or conflicts of interest that could affect participants\u2019 freedom to decline or withdraw.] [Word limit: 300]",
+   "fieldname": "participant_trust",
+   "fieldtype": "Small Text",
+   "label": "How will you gain the trust and consent of participants?"
+  },
+  {
+   "description": "Please write down below the verbatim/written text that you will use to seek the informed consent from youth/ adults involved in your study for their voluntary participation\n\n[Please write down separate consent, if needed, for different categories of participants with different levels of risk involved in your study. For eg. Sex- workers, prisoners, people in conflict zones] [Word limit: 200]",
+   "fieldname": "informed_consent_text_for_adults",
+   "fieldtype": "Small Text",
+   "label": "Informed consent text for adults"
+  },
+  {
+   "description": "Please write down below the verbatim/written text that you will use to seek the informed consent from old-age population  involved in your study for their voluntary participation [Word limit: 200]",
+   "fieldname": "informed_consent_text_for_old_age_population",
+   "fieldtype": "Small Text",
+   "label": "Informed consent text for old age population"
+  },
+  {
+   "description": "Will data be gathered through photographic, audio or video recording devices, including online platforms?\n\n[Note: that if you have promised confidentiality to your subjects, you cannot photograph or video or record them without taking steps to ensure that their confidentiality is maintained]",
+   "fieldname": "will_data_be_gathered_through_digital_means",
+   "fieldtype": "Select",
+   "label": "Will data be gathered through digital means?",
+   "options": "Yes\nNo"
+  },
+  {
+   "description": "As we respect confidentiality and anonymity of the participants, why are photographs/audio- video recordings or the use of online/app tools needed for your project? Kindly reflect on what burden these tools/recordings will put on the participants?\n\n[Note: If your project involves a technological intervention, please explain the kind of content that will be shared on these technological platforms. If it involves capturing audio, photographs or video recordings (including of people, spaces, or sites), please reflect on what will be recorded and photographed and why, and whether the visual material  (e.g., photos of buildings, landmarks, or interiors) could inadvertently reveal the identity or location of participants or communities you seek to protect)] [Word limit: 400]",
+   "fieldname": "need_for_such_data",
+   "fieldtype": "Small Text",
+   "label": "Need for such data"
+  },
+  {
+   "description": "How will you obtain consent from  your subjects/participants to be recorded (audio, photo, or video or use of online/app tools)? Provide the   verbatim/text you will use to ask for consent (oral or written) for their interview/discussion to be recorded.\n\n[Note: Reflect on how you will handle situations where individuals who are not your primary research participants (e.g., passersby, family members, children) may be incidentally captured in recordings or photos. What steps will you take to obtain consent or ensure ethical representation in such cases? If you are capturing environmental or contextual footage (e.g., public spaces, homes, hospitals, disaster sites) where people in distress, poverty, or poor health may be visible, how will you ensure their dignity, privacy, and anonymity are respected in documentation, analysis, and dissemination?]",
+   "fieldname": "how_will_consent_be_obtained_for_this",
+   "fieldtype": "Small Text",
+   "label": "How will preliminary consent be obtained for this?"
+  },
+  {
+   "description": "Even if you take prior consent from the subjects/participants, if and how will you go back to the participants  for their subsequent consent when you finalize on using some parts of the audio, photo, or video in any of your project dissemination [poster/report], outreach activities, or outputs?\n\n[Note: Please reflect beyond storing your data in a password protected computers] [Word limit: 200]",
+   "fieldname": "how_will_you_take_final_consent_for_this_data",
+   "fieldtype": "Small Text",
+   "label": "How will you take final consent for this data?"
+  },
+  {
+   "description": "How will you protect the confidentiality of information collected through these devices? [Note: Please reflect beyond storing your data in a password protected computers] [Word limit: 200]",
+   "fieldname": "how_will_you_protect_the_confidentiality_of_such_data",
+   "fieldtype": "Small Text",
+   "label": "How will you protect the confidentiality of such data?"
+  },
+  {
+   "default": "0",
+   "description": "Will the data or other information be shared/stored by any third party? (such as prior health records, electoral data etc.)",
+   "fieldname": "third_party_storage",
+   "fieldtype": "Check",
+   "label": "Will such data be stored/shared with a third party?"
+  },
+  {
+   "description": "E.g., participants\u2019 mobile numbers stored by an online platform/app; identity information/data stored by the app; participants required to install Instagram with identity disclosed etc. [Note: If your organization will be providing the data as a file, student should fill a data sharing statement signed by the student and organization.  The document should be appended to the project report and submitted to the mentor on the completion of the project. It should contain the name of the provider and recipient, description of data, security and confidentiality measures, ownership, duration of access, terms of re-use and termination conditions.] [Word limit: 200].",
+   "fieldname": "how_will_you_ensure_data_confidentiality_anonymity_and_security",
+   "fieldtype": "Small Text",
+   "label": "How will you ensure data confidentiality, anonymity, and security?"
+  },
+  {
+   "fieldname": "heq_s1",
+   "fieldtype": "Section Break",
+   "label": "Project Question"
+  },
+  {
+   "fieldname": "heq_s1_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s1_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s1_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s1_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s1_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s2",
+   "fieldtype": "Section Break",
+   "label": "Project Context"
+  },
+  {
+   "fieldname": "heq_s2_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s2_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s2_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s2_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s2_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s2_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s3",
+   "fieldtype": "Section Break",
+   "label": "Project participants"
+  },
+  {
+   "fieldname": "heq_s3_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s3_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s3_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s3_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s3_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s3_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s4",
+   "fieldtype": "Section Break",
+   "label": "Approaching the participants"
+  },
+  {
+   "fieldname": "heq_s5",
+   "fieldtype": "Section Break",
+   "label": "Participant Age Range"
+  },
+  {
+   "fieldname": "heq_s6",
+   "fieldtype": "Section Break",
+   "label": "Minors Check"
+  },
+  {
+   "fieldname": "heq_s7",
+   "fieldtype": "Section Break",
+   "label": "Minors Declaration"
+  },
+  {
+   "fieldname": "heq_s8",
+   "fieldtype": "Section Break",
+   "label": "Sensitive Population"
+  },
+  {
+   "fieldname": "heq_s9",
+   "fieldtype": "Section Break",
+   "label": "Study Tools"
+  },
+  {
+   "fieldname": "heq_s10",
+   "fieldtype": "Section Break",
+   "label": "Sensitive materials"
+  },
+  {
+   "fieldname": "heq_s11",
+   "fieldtype": "Section Break",
+   "label": "Participants location"
+  },
+  {
+   "fieldname": "heq_s12",
+   "fieldtype": "Section Break",
+   "label": "Participant risks"
+  },
+  {
+   "fieldname": "heq_s13",
+   "fieldtype": "Section Break",
+   "label": "Personal Risks"
+  },
+  {
+   "fieldname": "heq_s14",
+   "fieldtype": "Section Break",
+   "label": "Approach to participants"
+  },
+  {
+   "fieldname": "heq_s15",
+   "fieldtype": "Section Break",
+   "label": "Informed Consent"
+  },
+  {
+   "fieldname": "heq_s16",
+   "fieldtype": "Section Break",
+   "label": "Audio, Photographic and Video Data"
+  },
+  {
+   "fieldname": "heq_s17",
+   "fieldtype": "Section Break",
+   "label": "Need for audio, photographic or video data"
+  },
+  {
+   "fieldname": "heq_s18",
+   "fieldtype": "Section Break",
+   "label": "Consent for audio, photographic or video data"
+  },
+  {
+   "fieldname": "heq_s19",
+   "fieldtype": "Section Break",
+   "label": "Final Consent for audio, photographic or video data"
+  },
+  {
+   "fieldname": "heq_s20",
+   "fieldtype": "Section Break",
+   "label": "Confidentiality of audio, photographic or video data"
+  },
+  {
+   "fieldname": "heq_s21",
+   "fieldtype": "Section Break",
+   "label": "Third party storage of such data"
+  },
+  {
+   "fieldname": "heq_4_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_4_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_4_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_4_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_4_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_4_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_5_srn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "heq_5_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_5_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s5_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s5_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s5_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s5_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s6_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s6_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s6_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s6_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s6_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s6_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s7_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s7_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s7_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s7_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s7_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s7_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s8_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s8_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s8_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s8_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s8_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s8_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s9_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s9_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s9_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s9_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s9_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s9_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s10_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s10_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s10_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s10_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s10_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s10_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s11_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s11_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s11_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s11_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s11_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s11_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s12_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s12_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s12_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s12_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s12_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s12_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s13_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s13_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s13_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s13_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s13_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s13_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s14_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s14_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s14_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s14_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s14_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s14_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s15_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s15_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s15_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s15_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s15_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s15_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s16_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s16_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s16_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s16_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s16_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s16_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s17_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s17_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s17_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s17_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s17_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s17_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s18_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s18_",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s18_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s18_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s18_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s18_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s19_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s19_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s19_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s19_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s19_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s19_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s20_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s20_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s20_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s20_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s20_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s20_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s21_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "heq_s21_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "heq_s21_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s21_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "heq_s21_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "heq_s21_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "heq_s1_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "heq_s1_addons",
+   "fieldtype": "Section Break",
+   "label": "Project Question - Review"
+  },
+  {
+   "fieldname": "heq_s2_addons",
+   "fieldtype": "Section Break",
+   "label": "Project Context - Review"
+  },
+  {
+   "fieldname": "heq_s3_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s4_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s5_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s6_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s7_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s8_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s9_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s10_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s11_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s12_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s13_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s14_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s15_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s16_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s17_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s18_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s19_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s20_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "heq_s21_addons",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "toggle_heq_s1",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s2",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s3",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s4",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s5",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s6",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s7",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review section"
+  },
+  {
+   "fieldname": "toggle_heq_s8",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s9",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s10",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s11",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s12",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s13",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s14",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s15",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s16",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s17",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s18",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s19",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s20",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_heq_s21",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "section_break_keqe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "mentor_comments_to_reviewers",
+   "fieldtype": "Small Text",
+   "label": "Mentor comments to reviewers",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "research_type",
+   "fieldtype": "Select",
+   "label": "Research Type",
+   "options": "Lab based experiments\nField-based research (plants, animals included)"
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Lab based experiments'",
+   "fieldname": "nheq_s1",
+   "fieldtype": "Section Break",
+   "label": "Animal Type and Number"
+  },
+  {
+   "fieldname": "nheq_s1_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s1_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "nheq_s1_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "nheq_s1_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s1_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Lab based experiments'",
+   "fieldname": "nheq_s2",
+   "fieldtype": "Section Break",
+   "label": "Source of Animals"
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Lab based experiments'",
+   "fieldname": "nheq_s3",
+   "fieldtype": "Section Break",
+   "label": "Animal Stress"
+  },
+  {
+   "fieldname": "stress_yes_no",
+   "fieldtype": "Select",
+   "label": "Will the vertebrate animals be subjected to stress (biotic or abiotic)",
+   "options": "Yes\nNo\nNot Applicable"
+  },
+  {
+   "fieldname": "precautions",
+   "fieldtype": "Small Text",
+   "label": "If animals are exposed to stress, then what precautions are taken to ameliorate animal suffering"
+  },
+  {
+   "fieldname": "manipulative_experiments_select",
+   "fieldtype": "Select",
+   "label": "Are you performing manipulative experiments with invertebrates?",
+   "options": "Yes\nNo\nNot Applicable"
+  },
+  {
+   "fieldname": "stree_reduction",
+   "fieldtype": "Small Text",
+   "label": "Please describe the experimental protocol, the duration of stress (acute or chronic) and what is done to ameliorate stress?"
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "fieldname": "nheq_s4",
+   "fieldtype": "Section Break",
+   "label": "Basic Details"
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "fieldname": "nheq_s5",
+   "fieldtype": "Section Break",
+   "label": "Sensitive Areas"
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "fieldname": "nheq_s6",
+   "fieldtype": "Section Break",
+   "label": "Interaction with people"
+  },
+  {
+   "fieldname": "nheq_s1_addons",
+   "fieldtype": "Section Break",
+   "label": "Review"
+  },
+  {
+   "fieldname": "toggle_nheq_s1",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_nheq_s2",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_nheq_s3",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_nheq_s4",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_nheq_s5",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_nheq_s6",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "nheq_s1_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s2_addons",
+   "fieldtype": "Section Break",
+   "label": "Review"
+  },
+  {
+   "fieldname": "nheq_s2_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s2_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s2_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "nheq_s2_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "nheq_s2_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s2_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "nheq_s3_addons",
+   "fieldtype": "Section Break",
+   "label": "Review"
+  },
+  {
+   "fieldname": "nheq_s3_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s3_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s3_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "nheq_s3_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "nheq_s3_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s3_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "nheq_s4_addons",
+   "fieldtype": "Section Break",
+   "label": "Review"
+  },
+  {
+   "fieldname": "nheq_s4_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s4_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s4_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "nheq_s4_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "nheq_s4_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s4_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "nheq_s5_addons",
+   "fieldtype": "Section Break",
+   "label": "Review"
+  },
+  {
+   "fieldname": "nheq_s5_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s5_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s5_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "nheq_s5_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "nheq_s5_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s5_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "nheq_s6_addons",
+   "fieldtype": "Section Break",
+   "label": "Review"
+  },
+  {
+   "fieldname": "nheq_s6_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s6_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s6_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer Feedback",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "nheq_s6_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary Reviewer Notes",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "nheq_s6_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s6_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "animal_housing",
+   "fieldtype": "Small Text",
+   "label": "How and where will the animals be housed "
+  },
+  {
+   "fieldname": "study_site",
+   "fieldtype": "Small Text",
+   "label": "Site(s) where the study will take place."
+  },
+  {
+   "fieldname": "taxa_name",
+   "fieldtype": "Small Text",
+   "label": "Name(s) of the taxa used in the study"
+  },
+  {
+   "fieldname": "num_plants_animals",
+   "fieldtype": "Int",
+   "label": "Approximate number of animals/plants to be studied"
+  },
+  {
+   "description": "Note: introduction of non-native species is not allowed)",
+   "fieldname": "native_select",
+   "fieldtype": "Select",
+   "label": "Is the animal/plant native to that ecosystem?",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "0",
+   "description": "I will follow replacement, reduction and refinement whenever using live organisms for my experiments.",
+   "fieldname": "replacement_reduction_and_refinement_pledge",
+   "fieldtype": "Check",
+   "label": "Replacement, reduction and refinement pledge"
+  },
+  {
+   "default": "0",
+   "description": "I declare that the information that I have provided on the form is correct and complete. I also pledge that I will not change any of the forms, procedures and protocols used in this study without seeking approval from the IRB.",
+   "fieldname": "correctness_and_completeness_pledge",
+   "fieldtype": "Check",
+   "label": "Correctness and completeness pledge"
+  },
+  {
+   "fieldname": "sensitive_areas",
+   "fieldtype": "Small Text",
+   "label": "Indicate whether the project involves visiting any sensitive, restricted, or regulated areas."
+  },
+  {
+   "fieldname": "ecological_data",
+   "fieldtype": "Small Text",
+   "label": "Describe the type of ecological data to be collected",
+   "options": "(e.g., species observations, habitat measurements, water/soil samples). "
+  },
+  {
+   "description": "Discuss potential impacts of data collection on the ecosystem as well as on other peoples\u2019 interactions with the ecosystem. Describe measures taken to minimize or mitigate ecological and social impacts.",
+   "fieldname": "potential_impacts",
+   "fieldtype": "Small Text",
+   "label": "Potential impacts"
+  },
+  {
+   "description": "If your research involves manipulating habitats, interaction with wildlife or collection of a biological specimen, describe your qualifications and skills for conducting these activities safely and ethically.",
+   "fieldname": "safe_and_ethical_collection",
+   "fieldtype": "Small Text",
+   "label": "Safe and ethical collection"
+  },
+  {
+   "fieldname": "professional_interaction_and_confidentiality",
+   "fieldtype": "Small Text",
+   "label": "Professional Interaction and confidentiality",
+   "options": "If the project involves interactions with other people, such as interview surveys or stakeholder meetings, please provide information on the steps taken to ensure that these interactions are conducted in a professional and sensitive manner, and how you propose to protect the confidentiality of the responses provided by subjects"
+  },
+  {
+   "description": "If data collection involves interaction with people, will consent be taken?  (you are required to fill consent form)",
+   "fieldname": "consent",
+   "fieldtype": "Select",
+   "label": "Consent",
+   "options": "Yes\nNo"
+  }
+ ],
+ "grid_page_length": 50,
+ "hide_toolbar": 1,
+ "links": [],
+ "modified": "2026-02-11 17:42:36.859762",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "IRB Project",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Student",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Faculty Mentor",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Primary IRB Reviewer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Secondary IRB Reviewer",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "show_preview_popup": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "translated_doctype": 1
+}

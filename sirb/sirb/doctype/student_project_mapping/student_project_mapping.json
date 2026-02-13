@@ -1,34 +1,42 @@
 {
  "actions": [],
  "autoname": "autoincrement",
- "creation": "2025-11-07 10:40:31.160683",
+ "creation": "2025-11-12 11:10:27.353793",
  "doctype": "DocType",
+ "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "system_user",
-  "full_name"
+  "student",
+  "irb_project",
+  "status"
  ],
  "fields": [
   {
-   "fieldname": "full_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Full Name",
-   "read_only": 1
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "label": "Student",
+   "options": "Student"
   },
   {
-   "fieldname": "system_user",
+   "fieldname": "irb_project",
    "fieldtype": "Link",
-   "label": "System User",
-   "options": "User"
+   "label": "IRB Project",
+   "options": "IRB Project"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "active\ninactive"
   }
  ],
  "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-26 18:54:31.545257",
+ "modified": "2026-01-26 16:36:35.935854",
  "modified_by": "Administrator",
  "module": "Sirb",
- "name": "Faculty",
+ "name": "Student Project Mapping",
  "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [
@@ -45,14 +53,9 @@
    "write": 1
   }
  ],
- "route": "faculty-mentors",
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
- "show_preview_popup": 1,
- "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "title_field": "full_name",
- "translated_doctype": 1
+ "states": []
 }

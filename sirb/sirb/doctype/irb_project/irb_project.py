@@ -114,28 +114,28 @@ class IRBProject(Document):
 			order_by="creation"
 		)
 		#print("versions ", versions)
-		parent_fields = ["consent_form_attachment", "abstract"]
-		field_changes = False
-		for pf in parent_fields:
-			changes = ""
-			for v in versions:
-				diff = frappe.parse_json(v.data).get("changed", [])
-				# print(diff)
-				if diff:
-					for diff_instance in diff:
-						#print(diff_instance[0])
-						if diff_instance[0] == pf:
-							changes = f'"{diff_instance[1]}" changed to {diff_instance[2]}"'
-			if changes:
-				field_changes = True
-				#print("CHANGED!! ", changes)
-				frappe.db.set_value("IRB Project", self.name, f"{pf}_fc", changes)
-		if field_changes:
-			frappe.publish_realtime(
-				event="reload_form",
-				message={"doctype": "IRB Project", "docname": self.name},
-				after_commit=True
-			)
+		# parent_fields = ["consent_form_attachment", "abstract"]
+		# field_changes = False
+		# for pf in parent_fields:
+		# 	changes = ""
+		# 	for v in versions:
+		# 		diff = frappe.parse_json(v.data).get("changed", [])
+		# 		# print(diff)
+		# 		if diff:
+		# 			for diff_instance in diff:
+		# 				#print(diff_instance[0])
+		# 				if diff_instance[0] == pf:
+		# 					changes = f'"{diff_instance[1]}" changed to {diff_instance[2]}"'
+		# 	if changes:
+		# 		field_changes = True
+		# 		#print("CHANGED!! ", changes)
+		# 		frappe.db.set_value("IRB Project", self.name, f"{pf}_fc", changes)
+		# if field_changes:
+		# 	frappe.publish_realtime(
+		# 		event="reload_form",
+		# 		message={"doctype": "IRB Project", "docname": self.name},
+		# 		after_commit=True
+		# 	)
 
 
 

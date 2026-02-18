@@ -25,6 +25,7 @@
   "primary_reviewer",
   "secondary_reviewer",
   "faculty_mentor",
+  "num_reviewers",
   "animal_ethics_questionnaire_tab",
   "section_break_lrlc",
   "research_type",
@@ -142,19 +143,19 @@
   "approaching_participants",
   "toggle_heq_s4",
   "heq_s4_addons",
-  "heq_4_sc",
-  "heq_4_mf",
-  "heq_4_rf",
-  "heq_4_prn",
-  "heq_4_srn",
-  "heq_4_fc",
+  "heq_s4_sc",
+  "heq_s4_mf",
+  "heq_s4_rf",
+  "heq_s4_prn",
+  "heq_s4_srn",
+  "heq_s4_fc",
   "heq_s5",
   "participant_age_range",
   "toggle_heq_s5",
   "heq_s5_addons",
   "heq_5_srn",
-  "heq_5_sc",
-  "heq_5_mf",
+  "heq_s5_sc",
+  "heq_s5_mf",
   "heq_s5_rf",
   "heq_s5_prn",
   "heq_s5_srn",
@@ -664,12 +665,14 @@
    "permlevel": 2
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s1_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s1_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -695,13 +698,14 @@
   {
    "fieldname": "heq_s2_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s2_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
@@ -711,6 +715,7 @@
    "permlevel": 2
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s2_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -742,16 +747,18 @@
   {
    "fieldname": "heq_s3_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s3_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s3_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -854,37 +861,39 @@
    "label": "Third party storage of such data"
   },
   {
-   "fieldname": "heq_4_sc",
+   "fieldname": "heq_s4_sc",
    "fieldtype": "Small Text",
    "label": "Talk to your reviewer",
    "permlevel": 1
   },
   {
-   "fieldname": "heq_4_mf",
+   "fieldname": "heq_s4_mf",
    "fieldtype": "Small Text",
    "label": "Mentor Feedback",
    "permlevel": 2
   },
   {
-   "fieldname": "heq_4_rf",
+   "fieldname": "heq_s4_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
-   "fieldname": "heq_4_prn",
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "heq_s4_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
-   "fieldname": "heq_4_srn",
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "heq_s4_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
    "permlevel": 5
   },
   {
-   "fieldname": "heq_4_fc",
+   "fieldname": "heq_s4_fc",
    "fieldtype": "Small Text",
    "label": "Field Changes",
    "permlevel": 6
@@ -894,13 +903,13 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "heq_5_sc",
+   "fieldname": "heq_s5_sc",
    "fieldtype": "Small Text",
    "label": "Talk to your reviewer",
    "permlevel": 1
   },
   {
-   "fieldname": "heq_5_mf",
+   "fieldname": "heq_s5_mf",
    "fieldtype": "Small Text",
    "label": "Mentor Feedback",
    "permlevel": 2
@@ -908,16 +917,18 @@
   {
    "fieldname": "heq_s5_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s5_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s5_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -944,16 +955,18 @@
   {
    "fieldname": "heq_s6_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s6_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s6_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -980,16 +993,18 @@
   {
    "fieldname": "heq_s7_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s7_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s7_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1016,16 +1031,18 @@
   {
    "fieldname": "heq_s8_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s8_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s8_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1052,16 +1069,18 @@
   {
    "fieldname": "heq_s9_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s9_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s9_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1088,16 +1107,18 @@
   {
    "fieldname": "heq_s10_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s10_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s10_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1124,16 +1145,18 @@
   {
    "fieldname": "heq_s11_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s11_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s11_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1160,16 +1183,18 @@
   {
    "fieldname": "heq_s12_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s12_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s12_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1196,16 +1221,18 @@
   {
    "fieldname": "heq_s13_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s13_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s13_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1232,16 +1259,18 @@
   {
    "fieldname": "heq_s14_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s14_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s14_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1268,16 +1297,18 @@
   {
    "fieldname": "heq_s15_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s15_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s15_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1304,16 +1335,18 @@
   {
    "fieldname": "heq_s16_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s16_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s16_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1340,16 +1373,18 @@
   {
    "fieldname": "heq_s17_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s17_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s17_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1376,16 +1411,18 @@
   {
    "fieldname": "heq_s18_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s18_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s18_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1412,16 +1449,18 @@
   {
    "fieldname": "heq_s19_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s19_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s19_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1448,16 +1487,18 @@
   {
    "fieldname": "heq_s20_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s20_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s20_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1484,16 +1525,18 @@
   {
    "fieldname": "heq_s21_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s21_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "heq_s21_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1508,7 +1551,7 @@
   {
    "fieldname": "heq_s1_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
@@ -1733,16 +1776,18 @@
   {
    "fieldname": "nheq_s1_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s1_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s1_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1867,16 +1912,18 @@
   {
    "fieldname": "nheq_s2_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s2_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s2_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1908,16 +1955,18 @@
   {
    "fieldname": "nheq_s3_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s3_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s3_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1949,16 +1998,18 @@
   {
    "fieldname": "nheq_s4_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s4_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s4_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -1990,16 +2041,18 @@
   {
    "fieldname": "nheq_s5_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s5_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s5_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -2031,16 +2084,18 @@
   {
    "fieldname": "nheq_s6_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer Feedback",
+   "label": "Reviewer feedback to student",
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s6_prn",
    "fieldtype": "Small Text",
-   "label": "Primary Reviewer Notes",
+   "label": "Primary reviewer draft comments",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s6_srn",
    "fieldtype": "Small Text",
    "label": "Secondary Reviewer Notes",
@@ -2128,12 +2183,19 @@
    "fieldtype": "Select",
    "label": "Consent",
    "options": "Yes\nNo"
+  },
+  {
+   "fetch_from": "irb_unit.num_reviewers",
+   "fieldname": "num_reviewers",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Number of Reviewers"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-02-11 17:42:36.859762",
+ "modified": "2026-02-18 17:52:12.758202",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

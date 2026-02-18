@@ -195,6 +195,7 @@ frappe.ui.form.on("IRB Project", {
     async refresh(frm) {
 
         // 1. Initial Bulk Hide - Use a robust timeout
+        console.log(frm.doc.num_reviewers)
         setTimeout(() => {
             if (!frm.__addons_hidden_initially) {
                 Object.keys(frm.fields_dict).forEach(fieldname => {

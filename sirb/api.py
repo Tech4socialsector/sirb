@@ -15,7 +15,7 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit):
         # We read lines first to get the total count for the progress bar
         rows = list(csv.DictReader(f))
         total_rows = len(rows)
-        limit_student_count = 1
+        #limit_student_count = 1
         for i, row in enumerate(rows):
             keys = row.keys()
             student_emails = []
@@ -77,7 +77,7 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit):
                 pr_reviewer, sr_reviewer = get_reviewers(irb_unit, None)
                 if pr_reviewer is None:
                     raise Exception("Could not auto assign a primary reviewer - none available.")
-                num_reviewers = int(irb_unit_doc.number_of_irb_reviewers_for_a_project)
+                num_reviewers = int(irb_unit_doc.num_reviewers)
                 project.primary_reviewer = pr_reviewer
                 if num_reviewers == 2:
                     if sr_reviewer is None:
@@ -188,8 +188,8 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit):
                 )
                 print("Sent realtime")
                 print(message)
-                if i+1 == limit_student_count:
-                    return            
+                # if i+1 == limit_student_count:
+                #     return            
 
 @frappe.whitelist()
 def enque_student_upload(file_url, irb_unit):
@@ -207,7 +207,7 @@ def import_faculty_list(logged_in_user, file_url, ao_unit):
     faculty_name_field = "Faculty name"
     faculty_email_field = "Faculty's email ID"
     file_path = get_file_path(file_url.split('/')[-1])
-    limit_faculty_count = 5
+    #limit_faculty_count = 5
     with open(file_path, 'r') as f:
         rows = list(csv.DictReader(f))
         total_rows = len(rows)
@@ -296,8 +296,8 @@ def import_faculty_list(logged_in_user, file_url, ao_unit):
                     message = message
                 )
                 print("Sent realtime")                
-                if i+1 == limit_faculty_count:
-                    break
+                # if i+1 == limit_faculty_count:
+                #     break
 
 
 @frappe.whitelist()

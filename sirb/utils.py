@@ -25,7 +25,7 @@ def get_logged_in_doc(role_name):
 def get_reviewers(irb_unit, exclude_faculty_id = None):
 
     irb_unit_doc = frappe.get_doc("IRB Unit", irb_unit)
-    num_reviewers = int(irb_unit_doc.number_of_irb_reviewers_for_a_project)
+    num_reviewers = int(irb_unit_doc.num_reviewers)
     print("Num reviewers ", num_reviewers)
     
     all_reviewers = []

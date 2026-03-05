@@ -27,10 +27,19 @@
   "faculty_mentor",
   "num_reviewers",
   "animal_ethics_questionnaire_tab",
-  "section_break_lrlc",
+  "nheq_s0",
   "research_type",
   "replacement_reduction_and_refinement_pledge",
   "correctness_and_completeness_pledge",
+  "nheq_project_question",
+  "toggle_nheq_s0",
+  "nheq_s0_addons",
+  "nheq_s0_sc",
+  "nheq_s0_mf",
+  "nheq_s0_rf",
+  "nheq_s0_prn",
+  "nheq_s0_srn",
+  "nheq_s0_fc",
   "nheq_s1",
   "vertebrate",
   "invertebrate",
@@ -366,11 +375,6 @@
    "permlevel": 1
   },
   {
-   "fieldname": "section_break_lrlc",
-   "fieldtype": "Section Break",
-   "label": "Animal Ethics Questionnaire Section"
-  },
-  {
    "default": "Awaiting proposal completion by student",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -489,7 +493,8 @@
    "fieldname": "faculty_mentor",
    "fieldtype": "Link",
    "label": "Faculty Mentor",
-   "options": "Faculty"
+   "options": "Faculty",
+   "permlevel": 6
   },
   {
    "fieldname": "project_domain",
@@ -2238,12 +2243,62 @@
    "fieldtype": "Small Text",
    "hidden": 1,
    "label": "Number of Reviewers"
+  },
+  {
+   "fieldname": "nheq_s0",
+   "fieldtype": "Section Break",
+   "label": "Animal Ethics Questionnaire Section"
+  },
+  {
+   "fieldname": "nheq_project_question",
+   "fieldtype": "Small Text",
+   "label": "State your project question"
+  },
+  {
+   "fieldname": "nheq_s0_addons",
+   "fieldtype": "Section Break",
+   "label": "Review"
+  },
+  {
+   "fieldname": "nheq_s0_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer"
+  },
+  {
+   "fieldname": "nheq_s0_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor feedback"
+  },
+  {
+   "fieldname": "nheq_s0_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer feedback to students"
+  },
+  {
+   "fieldname": "nheq_s0_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary reviewer draft comments (to secondary reviewer)"
+  },
+  {
+   "fieldname": "nheq_s0_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes"
+  },
+  {
+   "fieldname": "nheq_s0_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes"
+  },
+  {
+   "fieldname": "toggle_nheq_s0",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-02-18 17:52:12.758202",
+ "modified": "2026-03-04 18:27:16.070059",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

@@ -4,9 +4,26 @@ var extns_with_fc = structuredClone(extns);
 extns_with_fc["_fc"] = "Field changed"
 
 var field_word_length_map = {
-    "abstract": 1
+    "abstract": 50,
+    "state_your_project_question": 200,
+    "project_context":20,
+    "project_subjects":200,
+    "approaching_participants":300,
+    "participant_age_range":50,
+    "sensitive_population_field":100,
+    "study_tools_field":300,
+    "sensitive_material_field": 300,
+    "subject_location": 200,
+    "foreseeable_risks":200,
+    "personal_risks": 150,
+    "participant_trust": 300,
+    "informed_consent_text_for_adults": 200,
+    "informed_consent_text_for_old_age_population": 200,
+    "need_for_such_data": 400,
+    "how_will_you_take_final_consent_for_this_data": 200,
+    "how_will_you_protect_the_confidentiality_of_such_data": 200,
+    "how_will_you_ensure_data_confidentiality_anonymity_and_security": 200
 }
-
 async function get_previous_login() {
     let res = await frappe.db.get_list("Activity Log",
         { fields: ["creation"], filters: { user: frappe.session.user, operation: "Login" }, order_by: "creation desc", limit: 2 });

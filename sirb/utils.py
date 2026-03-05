@@ -77,7 +77,7 @@ def get_reviewers(irb_unit, exclude_faculty_id = None):
         print(project_count_for_secondary_reviewers)
         for sr, src in project_count_for_secondary_reviewers.items():
             print(sr, src)
-            if sr == pr or pr == exclude_faculty_id:
+            if sr == min_pr or sr == exclude_faculty_id:
                 print("Continuing")
                 continue
             print("Finished ", src)

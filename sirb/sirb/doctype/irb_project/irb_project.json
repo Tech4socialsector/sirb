@@ -17,8 +17,6 @@
   "project_domain",
   "consent_required",
   "consent_form_attachment",
-  "section_break_keqe",
-  "mentor_comments_to_reviewers",
   "project_status_section",
   "status",
   "reviewers_section",
@@ -332,7 +330,11 @@
   "heq_s21_rf",
   "heq_s21_prn",
   "heq_s21_srn",
-  "heq_s21_fc"
+  "heq_s21_fc",
+  "general_comments_tab",
+  "section_break_keqe",
+  "mentor_comments_to_reviewers",
+  "mentor_comment_to_student"
  ],
  "fields": [
   {
@@ -343,18 +345,21 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Title",
-   "permlevel": 1
+   "permlevel": 1,
+   "reqd": 1
   },
   {
    "fieldname": "topic",
    "fieldtype": "Small Text",
    "label": "Topic",
-   "permlevel": 1
+   "permlevel": 1,
+   "reqd": 1
   },
   {
    "fieldname": "abstract",
    "fieldtype": "Small Text",
-   "label": "Abstract"
+   "label": "Abstract",
+   "reqd": 1
   },
   {
    "fieldname": "proposal",
@@ -428,7 +433,8 @@
    "fieldname": "irb_unit",
    "fieldtype": "Link",
    "label": "IRB Unit",
-   "options": "IRB Unit"
+   "options": "IRB Unit",
+   "reqd": 1
   },
   {
    "fieldname": "human_ethics_questionnaire_tab",
@@ -499,8 +505,8 @@
   {
    "fieldname": "project_domain",
    "fieldtype": "Select",
-   "label": "Project Domain",
-   "options": "Humans\nNon Human Species",
+   "label": "IRB Project Domain",
+   "options": "--Select--\nIRB Not Required\nHumans\nNon Human Species",
    "permlevel": 7
   },
   {
@@ -2252,7 +2258,8 @@
   {
    "fieldname": "nheq_project_question",
    "fieldtype": "Small Text",
-   "label": "State your project question"
+   "label": "State your project question",
+   "reqd": 1
   },
   {
    "fieldname": "nheq_s0_addons",
@@ -2293,12 +2300,23 @@
    "fieldname": "toggle_nheq_s0",
    "fieldtype": "Button",
    "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "general_comments_tab",
+   "fieldtype": "Tab Break",
+   "label": "General comments"
+  },
+  {
+   "fieldname": "mentor_comment_to_student",
+   "fieldtype": "Small Text",
+   "label": "Mentor's comments to student",
+   "permlevel": 2
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-03-04 18:27:16.070059",
+ "modified": "2026-03-31 12:15:21.902886",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

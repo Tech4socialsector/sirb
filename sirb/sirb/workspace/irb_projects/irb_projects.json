@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "IRB Projects",
  "links": [],
- "modified": "2025-12-31 17:47:18.663915",
+ "modified": "2026-03-31 09:30:41.667064",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Projects",
@@ -52,7 +52,7 @@
    "role": "IRB Reviewer"
   },
   {
-   "role": "Faculty Member"
+   "role": "Faculty Mentor"
   }
  ],
  "sequence_id": 24.2,

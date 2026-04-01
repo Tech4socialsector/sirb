@@ -13,7 +13,7 @@ class IRBProject(Document):
 				frappe.throw("Please select a valid IRB project domain.")
 		else:
 			# Ignore mandatory checks since it is created by a script.
-			self.ignore_mandatory = True
+			self.flags.ignore_mandatory = True
 
 	def before_save(self):
 		# print("Before save")

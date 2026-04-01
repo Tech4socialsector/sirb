@@ -226,6 +226,7 @@ def import_faculty_list(logged_in_user, file_url, ao_unit):
             )
             return
         for i, row in enumerate(rows):
+            status_msg = ""
             try:
                 print(row)
                 existing_faculty_users = frappe.get_all("User", filters = {

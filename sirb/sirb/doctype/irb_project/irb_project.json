@@ -2258,8 +2258,7 @@
   {
    "fieldname": "nheq_project_question",
    "fieldtype": "Small Text",
-   "label": "State your project question",
-   "reqd": 1
+   "label": "State your project question"
   },
   {
    "fieldname": "nheq_s0_addons",
@@ -2316,7 +2315,7 @@
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-03-31 12:15:21.902886",
+ "modified": "2026-04-01 12:49:35.926985",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

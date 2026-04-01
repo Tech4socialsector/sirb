@@ -7,9 +7,11 @@ from sirb.utils import set_reviewer_roles
 
 class IRBProject(Document):
 	def validate(self):
-		if self.project_domain not in ["IRB Not Required", "Humans", "Non Human Species"]:
-			frappe.throw("Please select a valid IRB project domain.")
-			
+        # Skip validation for new documents
+		if not self.is_new():
+			if self.project_domain not in ["IRB Not Required", "Humans", "Non Human Species"]:
+				frappe.throw("Please select a valid IRB project domain.")
+
 	def before_save(self):
 		# print("Before save")
 		user = frappe.session.user

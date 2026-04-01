@@ -362,6 +362,9 @@ def get_mentor_pending_project_count():
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
         return_dict["route"] = ["app", "query-report", "Mentor's pending worklist"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"        
     print(return_dict)
     return return_dict
 
@@ -373,6 +376,9 @@ def get_mentor_unapproved_project_count():
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
         return_dict["route"] = ["app", "query-report", "All Mentor Projects"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
     return return_dict
 
 def get_reviewer_project_count(type, role):
@@ -427,6 +433,9 @@ def get_primary_reviewer_unapproved_project_count():
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
         return_dict["route"] = ["app", "query-report", "All Primary Reviewer Projects"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
     return return_dict
 
 @frappe.whitelist()
@@ -437,6 +446,9 @@ def get_secondary_reviewer_unapproved_project_count():
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
         return_dict["route"] = ["app", "query-report", "All Secondary Reviewer Projects"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
     return return_dict
 
 @frappe.whitelist()
@@ -447,6 +459,9 @@ def get_primary_reviewer_pending_project_count():
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
         return_dict["route"] = ["app", "query-report", "Primary Reviewer's pending worklist"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
     return return_dict
 
 @frappe.whitelist()
@@ -457,6 +472,9 @@ def get_secondary_reviewer_pending_project_count():
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
         return_dict["route"] = ["app", "query-report", "Secondary Reviewer's pending worklist"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
     return return_dict
 
 @frappe.whitelist()

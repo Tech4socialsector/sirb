@@ -11,6 +11,9 @@ class IRBProject(Document):
 		if not self.is_new():
 			if self.project_domain not in ["IRB Not Required", "Humans", "Non Human Species"]:
 				frappe.throw("Please select a valid IRB project domain.")
+		else:
+			# Ignore mandatory checks since it is created by a script.
+			self.ignore_mandatory = True
 
 	def before_save(self):
 		# print("Before save")

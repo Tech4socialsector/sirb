@@ -329,11 +329,12 @@ frappe.ui.form.on("IRB Project", {
 
         //console.log(frm)
         //console.log(is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer)
-        //console.log("Secondary reviewer ", frm.doc.secondary_reviewer)
+        console.log("Secondary reviewer ", frm.doc.secondary_reviewer)
         if (frm.doc.secondary_reviewer != null)
             has_secondary_reviewer = true
         else
             has_secondary_reviewer = false
+        console.log("has_secondary_reviewer ", has_secondary_reviewer)
 
         // Display the role in the form intro..
         show_intro = false;
@@ -437,6 +438,7 @@ frappe.ui.form.on("IRB Project", {
         } else if (is_mentor) {
             if (frm.doc.status === "Awaiting Faculty mentor approval") {
                     frm.add_custom_button("Approve for review", () => {
+                        console.log("has_secondary_reviewer ", has_secondary_reviewer)
                         if (has_secondary_reviewer)
                             set_status = "Awaiting primary reviewer comments"
                         else

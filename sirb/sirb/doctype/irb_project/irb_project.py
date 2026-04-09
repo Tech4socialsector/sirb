@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from sirb.utils import set_reviewer_roles
+from sirb.utils import set_mentor_and_reviewer_roles
 
 class IRBProject(Document):
 	def validate(self):
@@ -50,7 +50,7 @@ class IRBProject(Document):
 		# print(frappe.session)
 		# print(frappe.session.last_update)
 		# print(self.name)
-		set_reviewer_roles()
+		set_mentor_and_reviewer_roles()
 		doc_before = self.get_doc_before_save()
 		if doc_before:
 			if doc_before.status != self.status:

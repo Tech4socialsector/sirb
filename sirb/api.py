@@ -52,6 +52,7 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit):
                         mentor_user = frappe.get_doc("User", existing_mentor_users[0]["name"])
                     print("Adding faculty role")
                     mentor_user.add_roles("Faculty Member")
+                    mentor_user.add_roles("Faculty Mentor")
                     mentor_user.save(ignore_permissions = True)
                     frappe.db.commit()                  
                     print("Added faculty role")

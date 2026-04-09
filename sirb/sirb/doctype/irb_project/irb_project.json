@@ -15,7 +15,6 @@
   "topic",
   "irb_unit",
   "project_domain",
-  "consent_required",
   "consent_form_attachment",
   "project_status_section",
   "status",
@@ -35,6 +34,7 @@
   "nheq_s0_sc",
   "nheq_s0_mf",
   "nheq_s0_rf",
+  "column_break_vyzu",
   "nheq_s0_prn",
   "nheq_s0_srn",
   "nheq_s0_fc",
@@ -48,6 +48,7 @@
   "nheq_s1_sc",
   "nheq_s1_mf",
   "nheq_s1_rf",
+  "column_break_qboa",
   "nheq_s1_prn",
   "nheq_s1_srn",
   "nheq_s1_fc",
@@ -60,6 +61,7 @@
   "nheq_s2_sc",
   "nheq_s2_mf",
   "nheq_s2_rf",
+  "column_break_yddv",
   "nheq_s2_prn",
   "nheq_s2_srn",
   "nheq_s2_fc",
@@ -75,6 +77,7 @@
   "nheq_s3_sc",
   "nheq_s3_mf",
   "nheq_s3_rf",
+  "column_break_gwio",
   "nheq_s3_prn",
   "nheq_s3_srn",
   "nheq_s3_fc",
@@ -88,6 +91,7 @@
   "nheq_s4_sc",
   "nheq_s4_mf",
   "nheq_s4_rf",
+  "column_break_ussy",
   "nheq_s4_prn",
   "nheq_s4_srn",
   "nheq_s4_fc",
@@ -101,6 +105,7 @@
   "nheq_s5_sc",
   "nheq_s5_mf",
   "nheq_s5_rf",
+  "column_break_srps",
   "nheq_s5_prn",
   "nheq_s5_srn",
   "nheq_s5_fc",
@@ -112,6 +117,7 @@
   "nheq_s6_sc",
   "nheq_s6_mf",
   "nheq_s6_rf",
+  "column_break_ubzx",
   "nheq_s6_prn",
   "nheq_s6_srn",
   "nheq_s6_fc",
@@ -123,6 +129,7 @@
   "heq_s1_sc",
   "heq_s1_mf",
   "heq_s1_rf",
+  "column_break_lscb",
   "heq_s1_prn",
   "heq_s1_srn",
   "heq_s1_fc",
@@ -133,6 +140,7 @@
   "heq_s2_sc",
   "heq_s2_mf",
   "heq_s2_rf",
+  "column_break_dyog",
   "heq_s2_prn",
   "heq_s2_srn",
   "heq_s2_fc",
@@ -143,6 +151,7 @@
   "heq_s3_sc",
   "heq_s3_mf",
   "heq_s3_rf",
+  "column_break_ulbq",
   "heq_s3_prn",
   "heq_s3_srn",
   "heq_s3_fc",
@@ -153,6 +162,7 @@
   "heq_s4_sc",
   "heq_s4_mf",
   "heq_s4_rf",
+  "column_break_tszs",
   "heq_s4_prn",
   "heq_s4_srn",
   "heq_s4_fc",
@@ -164,6 +174,7 @@
   "heq_s5_sc",
   "heq_s5_mf",
   "heq_s5_rf",
+  "column_break_ikdb",
   "heq_s5_prn",
   "heq_s5_srn",
   "heq_s5_fc",
@@ -174,6 +185,7 @@
   "heq_s6_sc",
   "heq_s6_mf",
   "heq_s6_rf",
+  "column_break_jezo",
   "heq_s6_prn",
   "heq_s6_srn",
   "heq_s6_fc",
@@ -185,6 +197,7 @@
   "heq_s7_sc",
   "heq_s7_mf",
   "heq_s7_rf",
+  "column_break_lvqg",
   "heq_s7_prn",
   "heq_s7_srn",
   "heq_s7_fc",
@@ -195,6 +208,7 @@
   "heq_s8_sc",
   "heq_s8_mf",
   "heq_s8_rf",
+  "column_break_rbwf",
   "heq_s8_prn",
   "heq_s8_srn",
   "heq_s8_fc",
@@ -205,6 +219,7 @@
   "heq_s9_sc",
   "heq_s9_mf",
   "heq_s9_rf",
+  "column_break_zejw",
   "heq_s9_prn",
   "heq_s9_srn",
   "heq_s9_fc",
@@ -215,6 +230,7 @@
   "heq_s10_sc",
   "heq_s10_mf",
   "heq_s10_rf",
+  "column_break_xwfh",
   "heq_s10_prn",
   "heq_s10_srn",
   "heq_s10_fc",
@@ -226,6 +242,7 @@
   "heq_s11_sc",
   "heq_s11_mf",
   "heq_s11_rf",
+  "column_break_bwqb",
   "heq_s11_prn",
   "heq_s11_srn",
   "heq_s11_fc",
@@ -236,6 +253,7 @@
   "heq_s12_sc",
   "heq_s12_mf",
   "heq_s12_rf",
+  "column_break_zjsq",
   "heq_s12_prn",
   "heq_s12_srn",
   "heq_s12_fc",
@@ -246,6 +264,7 @@
   "heq_s13_sc",
   "heq_s13_mf",
   "heq_s13_rf",
+  "column_break_giei",
   "heq_s13_prn",
   "heq_s13_srn",
   "heq_s13_fc",
@@ -256,6 +275,7 @@
   "heq_s14_sc",
   "heq_s14_mf",
   "heq_s14_rf",
+  "column_break_fxcm",
   "heq_s14_prn",
   "heq_s14_srn",
   "heq_s14_fc",
@@ -267,6 +287,7 @@
   "heq_s15_sc",
   "heq_s15_mf",
   "heq_s15_rf",
+  "column_break_tzbb",
   "heq_s15_prn",
   "heq_s15_srn",
   "heq_s15_fc",
@@ -277,6 +298,7 @@
   "heq_s16_sc",
   "heq_s16_mf",
   "heq_s16_rf",
+  "column_break_eswu",
   "heq_s16_prn",
   "heq_s16_srn",
   "heq_s16_fc",
@@ -287,6 +309,7 @@
   "heq_s17_sc",
   "heq_s17_mf",
   "heq_s17_rf",
+  "column_break_afdm",
   "heq_s17_prn",
   "heq_s17_srn",
   "heq_s17_fc",
@@ -297,6 +320,7 @@
   "heq_s18_sc",
   "heq_s18_",
   "heq_s18_rf",
+  "column_break_scof",
   "heq_s18_prn",
   "heq_s18_srn",
   "heq_s18_fc",
@@ -307,6 +331,7 @@
   "heq_s19_sc",
   "heq_s19_mf",
   "heq_s19_rf",
+  "column_break_yebz",
   "heq_s19_prn",
   "heq_s19_srn",
   "heq_s19_fc",
@@ -317,6 +342,7 @@
   "heq_s20_sc",
   "heq_s20_mf",
   "heq_s20_rf",
+  "column_break_qyip",
   "heq_s20_prn",
   "heq_s20_srn",
   "heq_s20_fc",
@@ -328,6 +354,7 @@
   "heq_s21_sc",
   "heq_s21_mf",
   "heq_s21_rf",
+  "column_break_xtxd",
   "heq_s21_prn",
   "heq_s21_srn",
   "heq_s21_fc",
@@ -373,13 +400,6 @@
    "label": "Basic Details"
   },
   {
-   "default": "0",
-   "fieldname": "consent_required",
-   "fieldtype": "Check",
-   "label": "Consent Form Required?",
-   "permlevel": 1
-  },
-  {
    "default": "Awaiting proposal completion by student",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -417,11 +437,9 @@
    "label": "Project Status"
   },
   {
-   "depends_on": "eval: doc.consent_required",
    "fieldname": "consent_form_attachment",
    "fieldtype": "Attach",
    "label": "Consent form attachment",
-   "mandatory_depends_on": "eval: doc.consent_required",
    "permlevel": 1
   },
   {
@@ -500,7 +518,7 @@
    "fieldtype": "Link",
    "label": "Faculty Mentor",
    "options": "Faculty",
-   "permlevel": 6
+   "permlevel": 5
   },
   {
    "fieldname": "project_domain",
@@ -2310,12 +2328,124 @@
    "fieldtype": "Small Text",
    "label": "Mentor's comments to student",
    "permlevel": 2
+  },
+  {
+   "fieldname": "column_break_vyzu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_qboa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_yddv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_gwio",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ussy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_srps",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ubzx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_lscb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_dyog",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ulbq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_tszs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ikdb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_jezo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_lvqg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_rbwf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_zejw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_xwfh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_bwqb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_zjsq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_giei",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_fxcm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_tzbb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_eswu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_afdm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_scof",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_yebz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_qyip",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_xtxd",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-04-01 12:49:35.926985",
+ "modified": "2026-04-09 17:01:06.818301",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

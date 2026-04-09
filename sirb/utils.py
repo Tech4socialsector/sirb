@@ -89,8 +89,8 @@ def get_reviewers(irb_unit, exclude_faculty_id = None):
     else:
         return min_pr, None
 
-def set_reviewer_roles():
-    # Make sure that all current reviewers have the right reviewer roles set and
+def set_mentor_and_reviewer_roles():
+    # Make sure that all current mentors and reviewers have the right roles set and
     # those that are not do not have this role.
 
     # Get all current primary reviewers
@@ -99,26 +99,30 @@ def set_reviewer_roles():
         where p.primary_reviewer is not null and p.status != "Approved" and 
         p.primary_reviewer=f.name and f.system_user=u.email'''
     result = frappe.db.sql(query, as_list=1)
-    prs = [pr[0] for pr in result]
-    print("Primary reviewers - ", prs)
-    pr_docs = {p: frappe.get_doc("User", p) for p in prs}
+    if result:
+        prs = [pr[0] for pr in result]
+        print("Primary reviewers - ", prs)
+        pr_docs = {p: frappe.get_doc("User", p) for p in prs}
 
-    print(pr_docs)
-    for _,p in pr_docs.items():
-        print("Adding for ", p)
-        p.add_roles("Primary IRB Reviewer")
+        print(pr_docs)
+        for _,p in pr_docs.items():
+            print("Adding for ", p)
+            p.add_roles("Primary IRB Reviewer")
 
-    all_prs = frappe.db.get_all(
-        "Has Role",
-        filters={"role": "Primary IRB Reviewer"},
-        pluck="parent"
-    )
-    all_prs_docs = {p: frappe.get_doc("User", p) for p in all_prs}
-    print(pr_docs, all_prs_docs)
-    for id, user in all_prs_docs.items():
-        if id not in pr_docs:
-            print("Removing for ", user)
-            user.remove_roles("Primary IRB Reviewer")
+        all_prs = frappe.get_all(
+            "User",
+            filters={
+                "enabled": 1,
+                "role_profile_name": ["in", ["Primary IRB Reviewer"]]
+            },
+            pluck="name"
+        )        
+        all_prs_docs = {p: frappe.get_doc("User", p) for p in all_prs}
+        print(pr_docs, all_prs_docs)
+        for id, user in all_prs_docs.items():
+            if id not in pr_docs:
+                print("Removing for ", user)
+                user.remove_roles("Primary IRB Reviewer")
 
     # Get all current secondary reviewers
     query = '''
@@ -126,18 +130,52 @@ def set_reviewer_roles():
         where p.secondary_reviewer is not null and p.status != "Approved" and 
         p.secondary_reviewer=f.name and f.system_user=u.email'''
     result = frappe.db.sql(query, as_list=1)
-    srs = [sr[0] for sr in result]
-    print("Secondary reviewers - ", srs)
-    secondary_reviewers = {s: frappe.get_doc("User", s) for s in srs}
-    for _, s in secondary_reviewers.items():
-        s.add_roles("Secondary IRB Reviewer")
-                             
-    all_srs = frappe.db.get_all(
-        "Has Role",
-        filters={"role": "Secondary IRB Reviewer"},
-        pluck="parent"  
-    )
-    all_srs_docs = {s: frappe.get_doc("User", s) for s in all_srs}
-    for _, user in all_srs_docs.items():
-        if user not in secondary_reviewers:
-            user.remove_roles("Secondry IRB Reviewer")
+    if result:
+        srs = [sr[0] for sr in result]
+        print("Secondary reviewers - ", srs)
+        secondary_reviewers = {s: frappe.get_doc("User", s) for s in srs}
+        for _, s in secondary_reviewers.items():
+            s.add_roles("Secondary IRB Reviewer")
+                                
+        all_srs = frappe.get_all(
+            "User",
+            filters={
+                "enabled": 1,
+                "role_profile_name": ["in", ["Secondary IRB Reviewer"]]
+            },
+            pluck="name"
+        )
+        all_srs_docs = {s: frappe.get_doc("User", s) for s in all_srs}
+        for _, user in all_srs_docs.items():
+            if user not in secondary_reviewers:
+                user.remove_roles("Secondry IRB Reviewer")
+
+    # Get all current mentors
+    query = '''
+        select u.email from tabUser as u join `tabIRB Project` as p join tabFaculty as f
+        where p.faculty_mentor is not null and p.status != "Approved" and 
+        p.faculty_mentor=f.name and f.system_user=u.email'''
+    #print(query)
+    result = frappe.db.sql(query, as_list=1)
+    if result:
+        current_mentor_ids = [m[0] for m in result]
+        #print("Faculty mentors - ", current_mentor_ids)
+        current_mentors = {cm: frappe.get_doc("User", cm) for cm in current_mentor_ids}
+        #print("Faculty mentors - ", current_mentors)
+        for _, m in current_mentors.items():
+            m.add_roles("Faculty Mentor")
+                               
+        all_mentors = frappe.get_all(
+            "User",
+            filters={
+                "enabled": 1,
+                "role_profile_name": ["in", ["Faculty Mentor"]]  # if using role profiles
+            },
+            pluck="name"
+        )        
+        #print(all_mentors)
+        all_mentor_docs = {m: frappe.get_doc("User", m) for m in all_mentors}
+        #print(all_mentor_docs)
+        for _, user in all_mentor_docs.items():
+            if user not in current_mentors:
+                user.remove_roles("Faculty Mentor")

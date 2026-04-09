@@ -179,6 +179,87 @@ function toggle_tabs(frm) {
     }
 }
 
+async function get_logged_in_role(frm) {
+    // Get the roles of the currently logged in user
+    const response = await frappe.call({
+        method: "sirb.api.get_irb_project_roles",
+        args: { project_name: frm.doc.name, user: frappe.session.user}
+    });
+    let is_student = false
+    let is_mentor = false
+    let is_primary_reviewer = false
+    let is_secondary_reviewer = false
+    if (response.message) {
+        //console.log("Data received:", response.message);
+        is_student = response.message.is_student;
+        is_mentor = response.message.is_mentor;
+        is_primary_reviewer = response.message.is_primary_reviewer;
+        is_secondary_reviewer = response.message.is_secondary_reviewer;
+    }
+    return [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer]   
+}
+
+async function toggle_save_button(frm) {
+    // Hide the save button based on state
+    // console.log(typeof get_logged_in_role);
+    // const result = await get_logged_in_role(frm);
+    // console.log(result); // Should be an array
+    // console.log(Array.isArray(result));
+    const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
+    let disable_button = false;
+    if (is_student && !["Awaiting proposal completion by student",
+        "Awaiting student correction for mentor feedback",
+        "Awaiting student correction for reviewer feedback",
+        "Provisionally approved", "Approved"].includes(frm.doc.status)) {
+        disable_button = true;
+    }
+    if (is_mentor && !["Awaiting Faculty mentor approval", "Approved"].includes(frm.doc.status)) {
+        disable_button = true;
+    }
+    if (is_primary_reviewer && !["Awaiting primary reviewer comments",
+        "Awaiting reviewer feedback to student",
+        "Awaiting final approval", "Approved"].includes(frm.doc.status)) {
+        disable_button = true;
+    }
+    if (is_secondary_reviewer && !["Awaiting secondary reviewer comments", "Approved"].includes(frm.doc.status)) {
+        disable_button = true;
+    }
+
+    if (disable_button) {
+        // Hide the primary save button
+        frm.page.set_primary_action(null);
+        frm.save_button.hide();
+        // Optionally disable keyboard save (Ctrl+S)
+        disable_keyboard_save(true);
+    }
+    else {
+        // Restore the default save button (if it was removed)
+        // Note: You might need to re-create it. Frappe's default action is 'Save'.
+        if (!frm.page.btn_primary || !frm.page.btn_primary.is(':visible')) {
+            frm.page.set_primary_action(__('Save'), () => frm.save(), null, 'btn-primary');
+        }
+        frm.save_button.show();
+        disable_keyboard_save(false);
+    }
+}
+
+let save_keyboard_disabled = false;
+
+function disable_keyboard_save(disable) {
+    if (disable === save_keyboard_disabled) return;
+    if (disable) {
+        $(window).on('keydown.saveblock', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.which === 83) {
+                frappe.msgprint(__('The current project status does not allow you to modify the form.'));
+                e.preventDefault();
+                return false;
+            }
+        });
+    } else {
+        $(window).off('keydown.saveblock');
+    }
+    save_keyboard_disabled = disable;
+}
 frappe.ui.form.on("IRB Project", {
 
     onload_post_render(frm) {
@@ -208,11 +289,24 @@ frappe.ui.form.on("IRB Project", {
         // Show/hide tabs based on the project domain field
         toggle_tabs(frm);
     },
-
+    status: function(frm) {
+        // Whenever the status field changes, re-evaluate
+        toggle_save_button(frm);
+    },
     async refresh(frm) {
 
         // 1. Initial Bulk Hide - Use a robust timeout
-        console.log(frm.doc.num_reviewers)
+        // console.log(frm.doc.num_reviewers)
+        // Store a reference to the save button for later use
+        if (!frm.save_button) {
+            frm.save_button = frm.page.btn_primary;
+        }
+        toggle_save_button(frm);
+
+        // Get the roles of the currently logged in user
+        const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
+        if (is_student && ["Humans","Non Human Species"].includes(frm.doc.project_domain))
+            frm.set_df_property('project_domain', 'read_only', 1);
         setTimeout(() => {
             if (!frm.__addons_hidden_initially) {
                 Object.keys(frm.fields_dict).forEach(fieldname => {
@@ -244,8 +338,22 @@ frappe.ui.form.on("IRB Project", {
                 } else {
                     wrapper.show();
                     frm.set_df_property(target_name, 'hidden', 0);
-                    
-                    // Optional: Smooth scroll to the revealed section
+                    if (is_student) {
+                        let show_talk_to_reviewer = false;
+                        if (["Awaiting student correction for reviewer feedback"].includes(frm.doc.status)) 
+                            show_talk_to_reviewer = true;
+                        else
+                            show_talk_to_reviewer = false;
+                        // console.log("talk ", show_talk_to_reviewer)
+                        for (let s of section_list) {
+                            fname = s+"_sc";
+                            // console.log(fname);
+                            if (!show_talk_to_reviewer)
+                                frm.set_df_property(fname, 'hidden', 1);
+                            else
+                                frm.set_df_property(fname, 'hidden', 0);
+                        }
+                    }
                     frappe.utils.scroll_to(target_field.wrapper, true, 30);
                 }
             }
@@ -267,23 +375,6 @@ frappe.ui.form.on("IRB Project", {
         // Show/hide tabs based on the project domain field
         toggle_tabs(frm);
         
-        // Get the roles of the currently logged in user
-        const response = await frappe.call({
-            method: "sirb.api.get_irb_project_roles",
-            args: { project_name: frm.doc.name, user: frappe.session.user}
-        });
-        let is_student = false
-        let is_mentor = false
-        let is_primary_reviewer = false
-        let is_secondary_reviewer = false
-        if (response.message) {
-            //console.log("Data received:", response.message);
-            is_student = response.message.is_student;
-            is_mentor = response.message.is_mentor;
-            is_primary_reviewer = response.message.is_primary_reviewer;
-            is_secondary_reviewer = response.message.is_secondary_reviewer;
-        }
-
         // Place a border around all data sections of the form
         for (let s of section_list) {
             section = frm.get_field(s)
@@ -330,7 +421,7 @@ frappe.ui.form.on("IRB Project", {
         //console.log(frm)
         //console.log(is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer)
         console.log("Secondary reviewer ", frm.doc.secondary_reviewer)
-        if (frm.doc.secondary_reviewer != null)
+        if (frm.doc.secondary_reviewer != null && frm.doc.secondary_reviewer != "")
             has_secondary_reviewer = true
         else
             has_secondary_reviewer = false
@@ -359,7 +450,7 @@ frappe.ui.form.on("IRB Project", {
         let roles = frappe.user_roles;
         let mentor_required = true;
 
-        //console.log("ROLES = ", is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer)
+        // console.log("ROLES = ", is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer)
         // console.log("HAS SECONDARY REVIEWER ", has_secondary_reviewer)
 
         // Now handle all the state changes and action buttons        
@@ -391,7 +482,7 @@ frappe.ui.form.on("IRB Project", {
                             callback: function(r) {
                                 if (!r.exc) {
                                     // frappe.msgprint("API executed successfully!");
-                                    //CHANGE ROUTE!!!
+                                    frm.reload_doc();
                                     frappe.set_route("app", "irb-project", frm.doc.name)
                                 }
                             }
@@ -411,8 +502,8 @@ frappe.ui.form.on("IRB Project", {
                         },
                         callback: function(r) {
                             if (!r.exc) {
-                                // CHANGE ROUTE!!!
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-project", frm.doc.name)
                             }
                         }
@@ -429,6 +520,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-project", frm.doc.name)
                             }
                         }
@@ -452,6 +544,7 @@ frappe.ui.form.on("IRB Project", {
                             callback: function(r) {
                                 if (!r.exc) {
                                     // frappe.msgprint("API executed successfully!");
+                                    frm.reload_doc();
                                     frappe.set_route("app", "irb-projects")
                                 }
                             }
@@ -467,6 +560,7 @@ frappe.ui.form.on("IRB Project", {
                             callback: function(r) {
                                 if (!r.exc) {
                                     // frappe.msgprint("API executed successfully!");
+                                    frm.reload_doc();
                                     frappe.set_route("app", "irb-projects")
                                 }
                             }
@@ -486,6 +580,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-projects")
                             }
                         }
@@ -501,6 +596,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-projects")
                             }
                         }
@@ -516,6 +612,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-projects")
                             }
                         }
@@ -532,6 +629,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-projects")
                             }
                         }
@@ -548,6 +646,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-projects")
                             }
                         }
@@ -564,6 +663,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-projects")
                             }
                         }
@@ -582,6 +682,7 @@ frappe.ui.form.on("IRB Project", {
                         callback: function(r) {
                             if (!r.exc) {
                                 // frappe.msgprint("API executed successfully!");
+                                frm.reload_doc();
                                 frappe.set_route("app", "irb-projects")
                             }
                         }
@@ -637,9 +738,10 @@ frappe.ui.form.on("IRB Project", {
                 for (let fieldname of field_list) {
                     if(field_changed_since_last_login(versions, fieldname)) {
                         // alert("field "+fieldname+" changed!!")
+                        if (fieldname.startsWith("toggle_"))
+                            continue
                         label = frm.get_field(fieldname).df.label;
                         // label = get_updated_label(frm, section);
-                        
                         if (!label.toLowerCase().includes("Changed".toLowerCase()))
                             // title_extns.push("Field changed")
                             //console.log("Label updated is ", label)
@@ -655,12 +757,13 @@ frappe.ui.form.on("IRB Project", {
                     //     frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>");
                     // }
                 }
-
+                let section_ext_changed = false
                 for (let ext in extns) {
                     section_with_ext = section + ext;
                     title_ext = []
                     // console.log(field_with_ext);
                     if(field_changed_since_last_login(versions, section_with_ext)) {
+                        section_ext_changed = true
                         // alert("field "+section_with_ext+" changed!!")
                         orig_label = frm.get_field(section_with_ext).df.label;
                         updated_label = get_updated_label(frm, section_with_ext);
@@ -668,13 +771,20 @@ frappe.ui.form.on("IRB Project", {
                         //console.log("Updated abel is ", updated_label)
                         //console.log(title_extns)
                         if (!(updated_label.toLowerCase().includes("changed"))) {
-                            console.log("XX")
+                            //console.log("XX")
                             frm.set_df_property(section_with_ext, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
                             frm.get_field(section_with_ext).refresh()
                         }
                             //title_extns.push(extns[ext]+" added")
                             //frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i>("+extns[ext]+" added) </i></span>");                                
                     }
+                if (section_ext_changed) {
+                    orig_label = frm.get_field("toggle_"+section).df.label;
+                    if (!orig_label.toLowerCase().includes("changed")) {
+                        frm.set_df_property("toggle_"+section, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Review Section Changed) </i></span>");
+                        frm.get_field(section_with_ext).refresh()
+                    }                
+                }
                     // if (title_extns.length > 0) {
                     //     var title_ext_str = "("+title_extns.join(', ')+")"
                     //     console.log(title_ext_str)

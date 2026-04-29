@@ -73,30 +73,42 @@ class IRBProject(Document):
 
 				if notification_info:
 					recipient_list = []
+					to_student = to_mentor = to_pr = to_sr = False
 					print("Statis is ", self.status)
 					if self.status == "Awaiting Faculty mentor approval":
 						print("!")
 						faculty_email = notification_info[0]["faculty_email"]
 						# recipient_list.append(frappe.get_doc("Faculty", notification_info[0]["mentor_id"]))
 						recipient_list.append(faculty_email)
+						to_mentor = True
 					elif self.status in ["Awaiting student correction for mentor feedback", "Awaiting student correction for reviewer feedback", "Provisionally approved", "Approved"]:
 						print("!!")
 						student_email = notification_info[0]["student_email"]
 						#recipient_list.append(frappe.get_doc("Student", notification_info[0]["student_id"]))
 						recipient_list.append(student_email)
+						to_student = True
 					elif self.status in ["Awaiting reviewer feedback to student", "Awaiting primary reviewer comments"]:
 						print("!!!")
 						if notification_info[0]["pr_id"]:
 							pr_email = frappe.get_value("Faculty", notification_info[0]["pr_id"], "system_user")
 							recipient_list.append(pr_email)
+							to_pr = True
 					elif self.status in ["Awaiting secondary reviewer comments"]:
 						print("!!!!")
 						if notification_info[0]["sr_id"]:
 							sr_email = frappe.get_value("Faculty", notification_info[0]["sr_id"], "system_user")
 							recipient_list.append(sr_email)
+							to_sr = True
+					
 
 					print("Recipient list ", recipient_list)
 					# Create a system notification
+					params = {
+						"project_status": self.status,
+						"project_name": self.title,
+						"student_name": notification_info[0]["student_name"]
+					}
+					send_email_if_configured("Status Change Email Template", params, recipient_list)
 					for u in recipient_list:
 						notification = frappe.new_doc("Notification Log")
 						notification.subject = f"IRBProject \"{self.title}\" status has changed to \"{self.status}\""
@@ -147,6 +159,26 @@ class IRBProject(Document):
 		# 	)
 
 
+def send_email_if_configured(email_template, params, recipient_list):
+	# Fetch the default outgoing email account
+	default_email_account = frappe.db.get_value("Email Account", {
+		"default_outgoing": 1,
+		"enable_outgoing": 1
+	}, "name")
+
+	# Check if an account exists
+	if default_email_account:
+		frappe.sendmail(
+			template = email_template,
+			recipients=recipient_list,
+			args = params,
+			delayed=False
+		)
+	else:
+		frappe.logger().info("Default email account not set")
+
+
+        
 
 				
 

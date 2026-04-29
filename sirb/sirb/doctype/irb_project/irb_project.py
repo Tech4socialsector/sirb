@@ -169,7 +169,7 @@ def send_email_if_configured(email_template, params, recipient_list):
 	# Check if an account exists
 	if default_email_account:
 		frappe.sendmail(
-			template = email_template,
+			email_template = email_template,
 			recipients=recipient_list,
 			args = params,
 			delayed=False

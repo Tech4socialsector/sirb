@@ -170,7 +170,7 @@ def send_email_if_configured(email_template, params, recipient_list):
 	if default_email_account:
 		email_template_doc = frappe.get_doc("Email Template", email_template)
 		rendered_content = frappe.render_template(email_template_doc.response_, params)
-		rendered_subject = frappe.render_template(email_template_doc.subject, params
+		rendered_subject = frappe.render_template(email_template_doc.subject, params)
 		frappe.sendmail(
 			subject = rendered_subject,
 			content = rendered_content,

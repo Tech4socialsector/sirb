@@ -1,28 +1,26 @@
-var section_list = ["heq_s1","heq_s2", "heq_s3", "heq_s4", "heq_s5", "heq_s6", "heq_s7", "heq_s8", "heq_s9", "heq_s10", "heq_s11", "heq_s12", "heq_s13", "heq_s14", "heq_s15", "heq_s16", "heq_s17", "heq_s18", "heq_s19", "heq_s20", "heq_s21", "nheq_s1", "nheq_s2", "nheq_s3", "nheq_s4", "nheq_s5", "nheq_s6"]
+var section_list = ["heq_s1","heq_s2", "heq_s3", "heq_s4", "heq_s5", "heq_s6", "heq_s7", "heq_s8", "heq_s9", "heq_s10", "heq_s11", "heq_s12", "heq_s13", "heq_s14", "heq_s15", "heq_s16", "heq_s17", "heq_s18", "heq_s19", "heq_s20", "nheq_s1", "nheq_s2", "nheq_s3", "nheq_s4", "nheq_s5", "nheq_s6", "uploads_s1"]
 var extns = {"_rf": "Reviewer feedback", "_prn": "Primary reviewer notes","_srn": "Secondary reviewer notes", "_sc": "Student comments", "_mf": "Mentor feedback"}
 var extns_with_fc = structuredClone(extns);
 extns_with_fc["_fc"] = "Field changed"
 
 var field_word_length_map = {
     "abstract": 50,
-    "state_your_project_question": 200,
-    "project_context":20,
-    "project_subjects":200,
-    "approaching_participants":300,
-    "participant_age_range":50,
-    "sensitive_population_field":100,
-    "study_tools_field":300,
-    "sensitive_material_field": 300,
-    "subject_location": 200,
-    "foreseeable_risks":200,
-    "personal_risks": 150,
-    "participant_trust": 300,
-    "informed_consent_text_for_adults": 200,
-    "informed_consent_text_for_old_age_population": 200,
+    "state_your_project_question":  200,
+    "project_context": 10,
+    "project_subjects": 200,
+    "minors_consent_text": 600,
+    "sensitive_population_field": 100,
+    "approaching_participants" : 300,
+    "data_collection_methods_and_locations" : 600,
+    "participant_risks_and_mitigation":  350,
+    "student_risks_and_mitigation": 350,
+    "trust_of_participants": 300,
+    "consent_text_for_participation": 600,
+    "interventions" : 300,
     "need_for_such_data": 400,
-    "how_will_you_take_final_consent_for_this_data": 200,
-    "how_will_you_protect_the_confidentiality_of_such_data": 200,
-    "how_will_you_ensure_data_confidentiality_anonymity_and_security": 200
+    "consent_for_photos": 400,
+    "photos_confidentiality":  200,
+    "other_data":  200
 }
 async function get_previous_login() {
     let res = await frappe.db.get_list("Activity Log",

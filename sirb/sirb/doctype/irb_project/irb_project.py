@@ -9,8 +9,13 @@ class IRBProject(Document):
 	def validate(self):
         # Skip validation for new documents
 		if not self.is_new():
-			if self.project_domain not in ["IRB Not Required", "Humans", "Non Human Species"]:
+			if self.project_domain == "-- Select --":
 				frappe.throw("Please select a valid IRB project domain.")
+			elif self.project_domain == "Humans":
+				if self.minor_participants == "-- Select --":
+					frappe.throw("Please select a valid answer for 4. Minors check")
+				if self.will_data_be_gathered_through_digital_means == "-- Select --":
+					frappe.throw("Please select a valid answer for 13.Gathering of Audio, Photographic and Video Data")
 		else:
 			# Ignore mandatory checks since it is created by a script.
 			self.flags.ignore_mandatory = True

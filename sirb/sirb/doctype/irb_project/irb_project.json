@@ -9,13 +9,11 @@
   "basic_details_tab",
   "introduction_section",
   "title",
-  "proposal",
   "abstract",
   "column_break_amrn",
   "topic",
   "irb_unit",
   "project_domain",
-  "consent_form_attachment",
   "project_status_section",
   "status",
   "reviewers_section",
@@ -155,30 +153,8 @@
   "heq_s3_prn",
   "heq_s3_srn",
   "heq_s3_fc",
-  "heq_s4",
-  "approaching_participants",
-  "toggle_heq_s4",
-  "heq_s4_addons",
-  "heq_s4_sc",
-  "heq_s4_mf",
-  "heq_s4_rf",
-  "column_break_tszs",
-  "heq_s4_prn",
-  "heq_s4_srn",
-  "heq_s4_fc",
-  "heq_s5",
-  "participant_age_range",
-  "toggle_heq_s5",
-  "heq_s5_addons",
-  "heq_5_srn",
-  "heq_s5_sc",
-  "heq_s5_mf",
-  "heq_s5_rf",
-  "column_break_ikdb",
-  "heq_s5_prn",
-  "heq_s5_srn",
-  "heq_s5_fc",
   "heq_s6",
+  "pocso",
   "minor_participants",
   "toggle_heq_s6",
   "heq_s6_addons",
@@ -189,9 +165,31 @@
   "heq_s6_prn",
   "heq_s6_srn",
   "heq_s6_fc",
+  "heq_s4",
+  "minors_consent_text",
+  "toggle_heq_s4",
+  "heq_s4_addons",
+  "heq_s4_sc",
+  "heq_s4_mf",
+  "heq_s4_rf",
+  "column_break_tszs",
+  "heq_s4_prn",
+  "heq_s4_srn",
+  "heq_s4_fc",
+  "heq_s5",
+  "consent_for_recording_of_minors",
+  "toggle_heq_s5",
+  "heq_s5_addons",
+  "heq_5_srn",
+  "heq_s5_sc",
+  "heq_s5_mf",
+  "heq_s5_rf",
+  "column_break_ikdb",
+  "heq_s5_prn",
+  "heq_s5_srn",
+  "heq_s5_fc",
   "heq_s7",
-  "html_jthe",
-  "posco_certification",
+  "oral_assessment_of_minors",
   "toggle_heq_s7",
   "heq_s7_addons",
   "heq_s7_sc",
@@ -213,7 +211,7 @@
   "heq_s8_srn",
   "heq_s8_fc",
   "heq_s9",
-  "study_tools_field",
+  "approaching_participants",
   "toggle_heq_s9",
   "heq_s9_addons",
   "heq_s9_sc",
@@ -224,7 +222,7 @@
   "heq_s9_srn",
   "heq_s9_fc",
   "heq_s10",
-  "sensitive_material_field",
+  "data_collection_methods_and_locations",
   "toggle_heq_s10",
   "heq_s10_addons",
   "heq_s10_sc",
@@ -235,8 +233,7 @@
   "heq_s10_srn",
   "heq_s10_fc",
   "heq_s11",
-  "html_dgjh",
-  "subject_location",
+  "participant_risks_and_mitigation",
   "toggle_heq_s11",
   "heq_s11_addons",
   "heq_s11_sc",
@@ -247,7 +244,7 @@
   "heq_s11_srn",
   "heq_s11_fc",
   "heq_s12",
-  "foreseeable_risks",
+  "student_risks_and_mitigation",
   "toggle_heq_s12",
   "heq_s12_addons",
   "heq_s12_sc",
@@ -258,7 +255,7 @@
   "heq_s12_srn",
   "heq_s12_fc",
   "heq_s13",
-  "personal_risks",
+  "trust_of_participants",
   "toggle_heq_s13",
   "heq_s13_addons",
   "heq_s13_sc",
@@ -269,7 +266,7 @@
   "heq_s13_srn",
   "heq_s13_fc",
   "heq_s14",
-  "participant_trust",
+  "consent_text_for_participation",
   "toggle_heq_s14",
   "heq_s14_addons",
   "heq_s14_sc",
@@ -280,8 +277,7 @@
   "heq_s14_srn",
   "heq_s14_fc",
   "heq_s15",
-  "informed_consent_text_for_adults",
-  "informed_consent_text_for_old_age_population",
+  "interventions",
   "toggle_heq_s15",
   "heq_s15_addons",
   "heq_s15_sc",
@@ -314,7 +310,7 @@
   "heq_s17_srn",
   "heq_s17_fc",
   "heq_s18",
-  "how_will_consent_be_obtained_for_this",
+  "consent_for_photos",
   "toggle_heq_s18",
   "heq_s18_addons",
   "heq_s18_sc",
@@ -325,7 +321,7 @@
   "heq_s18_srn",
   "heq_s18_fc",
   "heq_s19",
-  "how_will_you_take_final_consent_for_this_data",
+  "photos_confidentiality",
   "toggle_heq_s19",
   "heq_s19_addons",
   "heq_s19_sc",
@@ -336,7 +332,7 @@
   "heq_s19_srn",
   "heq_s19_fc",
   "heq_s20",
-  "how_will_you_protect_the_confidentiality_of_such_data",
+  "other_data",
   "toggle_heq_s20",
   "heq_s20_addons",
   "heq_s20_sc",
@@ -346,11 +342,15 @@
   "heq_s20_prn",
   "heq_s20_srn",
   "heq_s20_fc",
-  "heq_s21",
-  "third_party_storage",
-  "how_will_you_ensure_data_confidentiality_anonymity_and_security",
-  "toggle_heq_s21",
-  "heq_s21_addons",
+  "uploads_declarations_tab",
+  "declaration_section",
+  "irb_policy",
+  "student_declaration",
+  "i_hereby_confirm_the_above",
+  "uploads_s1",
+  "uploads",
+  "permission_letter_date",
+  "uploads_s1_addons",
   "heq_s21_sc",
   "heq_s21_mf",
   "heq_s21_rf",
@@ -372,27 +372,22 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Title",
-   "permlevel": 1,
+   "permlevel": 7,
    "reqd": 1
   },
   {
    "fieldname": "topic",
    "fieldtype": "Small Text",
    "label": "Topic",
-   "permlevel": 1,
+   "permlevel": 7,
    "reqd": 1
   },
   {
    "fieldname": "abstract",
    "fieldtype": "Small Text",
    "label": "Abstract",
+   "permlevel": 7,
    "reqd": 1
-  },
-  {
-   "fieldname": "proposal",
-   "fieldtype": "Attach",
-   "label": "Proposal",
-   "permlevel": 1
   },
   {
    "fieldname": "introduction_section",
@@ -435,12 +430,6 @@
    "fieldname": "project_status_section",
    "fieldtype": "Section Break",
    "label": "Project Status"
-  },
-  {
-   "fieldname": "consent_form_attachment",
-   "fieldtype": "Attach",
-   "label": "Consent form attachment",
-   "permlevel": 1
   },
   {
    "fieldname": "basic_details_tab",
@@ -524,7 +513,7 @@
    "fieldname": "project_domain",
    "fieldtype": "Select",
    "label": "IRB Project Domain",
-   "options": "--Select--\nIRB Not Required\nHumans\nNon Human Species",
+   "options": "-- Select --\nIRB Not Required\nHumans\nNon Human Species",
    "permlevel": 7
   },
   {
@@ -540,119 +529,32 @@
    "permlevel": 7
   },
   {
-   "description": "Explain the context of your study using 6 to 9 keywords. The keywords would include, State, district, defining characteristics of the respondents* (2 to 3 keywords), broad domain of your project** (2 to 3 keywords). Explain what their defining characteristics are with respect to their demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students etc.** Use appropriate keywords that explain the broad domain of the project. For example, informal labour, migration, mental health, sustainable agriculture, ecology, mining, farmers movement, groundwater, drinking water, urban ecology etc.",
+   "description": "[Note: *The keywords would include, State, district, defining characteristics of the respondents* (2 to 3 keywords), broad domain of your project** (2 to 3 keywords). Explain what their defining characteristics are with respect to their demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students etc.** Use appropriate keywords that explain the broad domain of the project. For example, teaching pedagogies, informal labour, migration, mental health, sustainable agriculture, ecology, mining, farmers movement, groundwater, drinking water, urban ecology etc.]\n",
    "fieldname": "project_context",
    "fieldtype": "Small Text",
-   "label": "Context of study",
+   "label": "Explain the context of your study using 6 to 9 keywords.",
    "permlevel": 7
   },
   {
-   "description": "[Note: Explain what their defining characteristics are with respect to their demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students etc.] [Word limit: 200 words]",
+   "description": "[Note: Explain their defining characteristics in terms of demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students, primary school teachers, anganwadi staff  etc.] [Word limit: 200 words]",
    "fieldname": "project_subjects",
    "fieldtype": "Small Text",
-   "label": "Who are your subjects/participants for this project?",
+   "label": "Who are your subjects for this project  and their expected age range? Will any of them be minors (below the age of 18 years)?",
    "permlevel": 7
   },
   {
-   "description": "[Note: E.g., in class, door to door solicitation, through email or social media platform, etc. Word limit: 300]",
-   "fieldname": "approaching_participants",
-   "fieldtype": "Small Text",
-   "label": "Describe how will you identify and approach your potential subjects/participants?",
-   "permlevel": 7
-  },
-  {
-   "description": "[Word limit: 50 words]",
-   "fieldname": "participant_age_range",
-   "fieldtype": "Small Text",
-   "label": "What is the expected age range of your research subjects/participants?",
-   "permlevel": 7
-  },
-  {
-   "default": "0",
+   "description": "[Note: Acknowledgment of Awareness of Legal Obligations (POCSO Act, 2012) confirms that you have understood your mandatory reporting obligations under the Act in the event that you become aware of any instance of child abuse or exploitation during the course of your research.]",
    "fieldname": "minor_participants",
-   "fieldtype": "Check",
+   "fieldtype": "Select",
    "label": "Will any of them be minors (i.e., below the age of 18 years",
-   "permlevel": 7
-  },
-  {
-   "fieldname": "html_jthe",
-   "fieldtype": "HTML",
-   "options": "<b>Certification of Awareness of Legal Obligations (POCSO Act, 2012):</b>\n<p>\nIf your research involves children (persons below 18 years of age), you are required to be aware of and comply with the provisions of the Protection of Children from Sexual Offences (POCSO) Act, 2012.</p>\n<p><b>Please confirm the following:</b></p>\n<ul>\n<li>I hereby certify that I have read, understood, and will comply with the provisions of the POCSO Act, 2012.\n</li><li>I understand my mandatory reporting obligations under the Act in the event that I become aware of any instance of child abuse or exploitation during the course of my research.</li></ul>",
-   "set_only_once": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "posco_certification",
-   "fieldtype": "Check",
-   "label": "<b>Yes, I certify that I have read and understood the POCSO Act, 2012.</b>",
+   "options": "-- Select --\nYes, I certify I have read and understood the POCSO Act, 2012.\nNo, my project does not involve minors",
    "permlevel": 7
   },
   {
    "description": "[Note: If yes, please explain what specific challenges and needs your participants may have. This does not include minors] [Word limit: 100 words]",
    "fieldname": "sensitive_population_field",
    "fieldtype": "Small Text",
-   "label": "Does your project involve any sensitive populations such as people with special needs, disabilities etc?",
-   "permlevel": 7
-  },
-  {
-   "description": "For the current study what tools will you be using to communicate/engage with your project participants/collect data/ pilot the intervention? (eg. Interviews, FGDs, observation, surveys, telephonic interviews, online tools such as google form, chat apps, video platforms, social media or other technology) [Word limit: 300]",
-   "fieldname": "study_tools_field",
-   "fieldtype": "Small Text",
-   "label": "What study tools will you use?",
-   "permlevel": 7
-  },
-  {
-   "description": "    10. In case of intervention projects, if you plan to develop and use any materials, tools, or modules as part of the intervention, do any of these contain content that could be considered sensitive, potentially distressing, or ethically/legally risky (e.g., topics related to violence, trauma, sexuality, mental health etc.)? Please elaborate a)how you will assess and review such materials for appropriateness before they are introduced to participants b) who will be responsible for vetting or approving the content (e.g., experts, ethics committees, institutional authorities), and what criteria will be used in this process?] \n[Note: Please mark N/A if not applicable to you] [Word limit: 300]",
-   "fieldname": "sensitive_material_field",
-   "fieldtype": "Small Text",
-   "label": "Do any of your material contain content that could be considered sensitive?",
-   "permlevel": 7
-  },
-  {
-   "fieldname": "html_dgjh",
-   "fieldtype": "HTML",
-   "options": "For each kind of subject/participant involved in your study, please reflect on the following questions"
-  },
-  {
-   "description": "[Note: a) In case of an intervention project, please mention where will you be piloting/implementing the intervention b) In case of a participatory action project, please mention where you will conduct the participatory activities with your participants c) Please mention whether the data will be collected within homes, outside their home, prison, Anganwadis, hospitals, old-age homes, schools, etc. d) If the exact location is not known, some rough idea about where the data collection would happen.]  [Word limit: 200]",
-   "fieldname": "subject_location",
-   "fieldtype": "Small Text",
-   "label": "What are the locations where you will collect data?",
-   "permlevel": 7
-  },
-  {
-   "description": "What are some of the foreseeable risks and discomforts related to your topic for each kind of subject/participant in your project? [Note: Kindly write if the topic itself is sensitive in nature. For example- topics on sexual reproductive health, mental health, discrimination etc. or the topic could be politically sensitive, conducted within conflict zones etc.] [Word limit: 200]",
-   "fieldname": "foreseeable_risks",
-   "fieldtype": "Small Text",
-   "label": "Foreseeable risks",
-   "permlevel": 7
-  },
-  {
-   "description": "What are the potential physical, emotional or any other kinds of risks to you in      your field project? How will you ensure you minimize those risks?  \n[Word limit: 150]",
-   "fieldname": "personal_risks",
-   "fieldtype": "Small Text",
-   "label": "What are the potential risks to you?",
-   "permlevel": 7
-  },
-  {
-   "description": "How will you gain trust and confidence of the subjects/participants and ensure that their participation is entirely voluntary? \n\n[Note: In case recruitment is conducted through or in collaboration with an organization please additionally describe how you will: clearly separate your role as a researcher from the organization's interests, and address potential pressures, perceived obligations, or conflicts of interest that could affect participants\u2019 freedom to decline or withdraw.] [Word limit: 300]",
-   "fieldname": "participant_trust",
-   "fieldtype": "Small Text",
-   "label": "How will you gain the trust and consent of participants?",
-   "permlevel": 7
-  },
-  {
-   "description": "Please write down below the verbatim/written text that you will use to seek the informed consent from youth/ adults involved in your study for their voluntary participation\n\n[Please write down separate consent, if needed, for different categories of participants with different levels of risk involved in your study. For eg. Sex- workers, prisoners, people in conflict zones] [Word limit: 200]",
-   "fieldname": "informed_consent_text_for_adults",
-   "fieldtype": "Small Text",
-   "label": "Informed consent text for adults",
-   "permlevel": 7
-  },
-  {
-   "description": "Please write down below the verbatim/written text that you will use to seek the informed consent from old-age population  involved in your study for their voluntary participation [Word limit: 200]",
-   "fieldname": "informed_consent_text_for_old_age_population",
-   "fieldtype": "Small Text",
-   "label": "Informed consent text for old age population",
+   "label": "Does your project/study involve any sensitive populations such as people with special needs, disabilities, trauma from extreme events etc.?",
    "permlevel": 7
   },
   {
@@ -660,56 +562,20 @@
    "fieldname": "will_data_be_gathered_through_digital_means",
    "fieldtype": "Select",
    "label": "Will data be gathered through digital means?",
-   "options": "Yes\nNo",
+   "options": "-- Select --\nYes\nNo",
    "permlevel": 7
   },
   {
-   "description": "As we respect confidentiality and anonymity of the participants, why are photographs/audio- video recordings or the use of online/app tools needed for your project? Kindly reflect on what burden these tools/recordings will put on the participants?\n\n[Note: If your project involves a technological intervention, please explain the kind of content that will be shared on these technological platforms. If it involves capturing audio, photographs or video recordings (including of people, spaces, or sites), please reflect on what will be recorded and photographed and why, and whether the visual material  (e.g., photos of buildings, landmarks, or interiors) could inadvertently reveal the identity or location of participants or communities you seek to protect)] [Word limit: 400]",
+   "description": "[Note: Since confidentiality and anonymity are important, explain why photos, audio/video, or online/app tools are needed. Reflect on any burden these tools or recordings may place on participants. If anonymity is not necessary please state the reason and explain whether participants may be identified.\n\n If your project involves a technological intervention, please explain the kind of content that will be shared on these technological platforms. If it involves capturing audio, photographs or video recordings (including of people, spaces, or sites), please reflect on what will be recorded/ photographed and why, and whether the visual material  (e.g., photos of buildings, landmarks, or interiors) could inadvertently reveal the identity or location of participants or communities you seek to protect)] [Word limit: 400]\t",
    "fieldname": "need_for_such_data",
    "fieldtype": "Small Text",
    "label": "Need for such data",
    "permlevel": 7
   },
   {
-   "description": "How will you obtain consent from  your subjects/participants to be recorded (audio, photo, or video or use of online/app tools)? Provide the   verbatim/text you will use to ask for consent (oral or written) for their interview/discussion to be recorded.\n\n[Note: Reflect on how you will handle situations where individuals who are not your primary research participants (e.g., passersby, family members, children) may be incidentally captured in recordings or photos. What steps will you take to obtain consent or ensure ethical representation in such cases? If you are capturing environmental or contextual footage (e.g., public spaces, homes, hospitals, disaster sites) where people in distress, poverty, or poor health may be visible, how will you ensure their dignity, privacy, and anonymity are respected in documentation, analysis, and dissemination?]",
-   "fieldname": "how_will_consent_be_obtained_for_this",
-   "fieldtype": "Small Text",
-   "label": "How will preliminary consent be obtained for this?",
-   "permlevel": 7
-  },
-  {
-   "description": "Even if you take prior consent from the subjects/participants, if and how will you go back to the participants  for their subsequent consent when you finalize on using some parts of the audio, photo, or video in any of your project dissemination [poster/report], outreach activities, or outputs?\n\n[Note: Please reflect beyond storing your data in a password protected computers] [Word limit: 200]",
-   "fieldname": "how_will_you_take_final_consent_for_this_data",
-   "fieldtype": "Small Text",
-   "label": "How will you take final consent for this data?",
-   "permlevel": 7
-  },
-  {
-   "description": "How will you protect the confidentiality of information collected through these devices? [Note: Please reflect beyond storing your data in a password protected computers] [Word limit: 200]",
-   "fieldname": "how_will_you_protect_the_confidentiality_of_such_data",
-   "fieldtype": "Small Text",
-   "label": "How will you protect the confidentiality of such data?",
-   "permlevel": 7
-  },
-  {
-   "default": "0",
-   "description": "Will the data or other information be shared/stored by any third party? (such as prior health records, electoral data etc.)",
-   "fieldname": "third_party_storage",
-   "fieldtype": "Check",
-   "label": "Will such data be stored/shared with a third party?",
-   "permlevel": 7
-  },
-  {
-   "description": "E.g., participants\u2019 mobile numbers stored by an online platform/app; identity information/data stored by the app; participants required to install Instagram with identity disclosed etc. [Note: If your organization will be providing the data as a file, student should fill a data sharing statement signed by the student and organization.  The document should be appended to the project report and submitted to the mentor on the completion of the project. It should contain the name of the provider and recipient, description of data, security and confidentiality measures, ownership, duration of access, terms of re-use and termination conditions.] [Word limit: 200].",
-   "fieldname": "how_will_you_ensure_data_confidentiality_anonymity_and_security",
-   "fieldtype": "Small Text",
-   "label": "How will you ensure data confidentiality, anonymity, and security?",
-   "permlevel": 7
-  },
-  {
    "fieldname": "heq_s1",
    "fieldtype": "Section Break",
-   "label": "Project Question"
+   "label": "1. Project Question"
   },
   {
    "fieldname": "heq_s1_sc",
@@ -746,7 +612,7 @@
   {
    "fieldname": "heq_s2",
    "fieldtype": "Section Break",
-   "label": "Project Context"
+   "label": "2. Project Context"
   },
   {
    "fieldname": "heq_s2_sc",
@@ -789,7 +655,7 @@
   {
    "fieldname": "heq_s3",
    "fieldtype": "Section Break",
-   "label": "Project participants"
+   "label": "3. Project participants"
   },
   {
    "fieldname": "heq_s3_sc",
@@ -830,94 +696,92 @@
    "permlevel": 6
   },
   {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s4",
    "fieldtype": "Section Break",
-   "label": "Approaching the participants"
+   "label": "4a. Consent text for working with minors"
   },
   {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s5",
    "fieldtype": "Section Break",
-   "label": "Participant Age Range"
+   "label": "4b. Consent for recording of minors"
   },
   {
    "fieldname": "heq_s6",
    "fieldtype": "Section Break",
-   "label": "Minors Check"
+   "label": "4. Minors Check"
   },
   {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s7",
    "fieldtype": "Section Break",
-   "label": "Minors Declaration"
+   "label": "4c. Oral assent from minor participants"
   },
   {
    "fieldname": "heq_s8",
    "fieldtype": "Section Break",
-   "label": "Sensitive Population"
+   "label": "5. Sensitive Population"
   },
   {
    "fieldname": "heq_s9",
    "fieldtype": "Section Break",
-   "label": "Study Tools"
+   "label": "6. Identifying and approaching participants"
   },
   {
    "fieldname": "heq_s10",
    "fieldtype": "Section Break",
-   "label": "Sensitive materials"
+   "label": "7. Data collection methods and locations"
   },
   {
    "fieldname": "heq_s11",
    "fieldtype": "Section Break",
-   "label": "Participants location"
+   "label": "8. Participant risks and mitigation"
   },
   {
    "fieldname": "heq_s12",
    "fieldtype": "Section Break",
-   "label": "Participant risks"
+   "label": "9. Student risks and mitigation"
   },
   {
    "fieldname": "heq_s13",
    "fieldtype": "Section Break",
-   "label": "Personal Risks"
+   "label": "10. Trust of participants"
   },
   {
    "fieldname": "heq_s14",
    "fieldtype": "Section Break",
-   "label": "Approach to participants"
+   "label": "11. Consent text for participation"
   },
   {
    "fieldname": "heq_s15",
    "fieldtype": "Section Break",
-   "label": "Informed Consent"
+   "label": "12. Interventions"
   },
   {
    "fieldname": "heq_s16",
    "fieldtype": "Section Break",
-   "label": "Audio, Photographic and Video Data"
+   "label": "13. Gathering of Audio, Photographic and Video Data"
   },
   {
    "fieldname": "heq_s17",
    "fieldtype": "Section Break",
-   "label": "Need for audio, photographic or video data"
+   "label": "14. Need for audio, photographic or video data"
   },
   {
    "fieldname": "heq_s18",
    "fieldtype": "Section Break",
-   "label": "Consent for audio, photographic or video data"
+   "label": "15. Consent for audio, photographic or video data"
   },
   {
    "fieldname": "heq_s19",
    "fieldtype": "Section Break",
-   "label": "Final Consent for audio, photographic or video data"
+   "label": "16. Confidentiality of audio, photographic or video data"
   },
   {
    "fieldname": "heq_s20",
    "fieldtype": "Section Break",
-   "label": "Confidentiality of audio, photographic or video data"
-  },
-  {
-   "fieldname": "heq_s21",
-   "fieldtype": "Section Break",
-   "label": "Third party storage of such data"
+   "label": "17. Confidentiality, anonymity, and security  of other data"
   },
   {
    "fieldname": "heq_s4_sc",
@@ -1616,88 +1480,104 @@
   {
    "fieldname": "heq_s1_addons",
    "fieldtype": "Section Break",
-   "label": "Project Question - Review"
+   "label": "1. Project Question - Review"
   },
   {
    "fieldname": "heq_s2_addons",
    "fieldtype": "Section Break",
-   "label": "Project Context - Review"
+   "label": "2. Project Context - Review"
   },
   {
    "fieldname": "heq_s3_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "3, Project participants - review"
   },
   {
    "fieldname": "heq_s4_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "4a. Approaching the participants - Review"
   },
   {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s5_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "4b. Consent for recording of minors - Review"
   },
   {
    "fieldname": "heq_s6_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "4. Minors check - review"
   },
   {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s7_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "4c. Oral assent from minor participants - Review"
   },
   {
    "fieldname": "heq_s8_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "5. Sensitive Population - Review"
   },
   {
    "fieldname": "heq_s9_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "6. Identifying and approaching participants - Review"
   },
   {
    "fieldname": "heq_s10_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "7. Data collection methods and locations - Review"
   },
   {
    "fieldname": "heq_s11_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "8. Participant risks and mitigation - Review"
   },
   {
    "fieldname": "heq_s12_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "9. Student risks and mitigation - Review"
   },
   {
    "fieldname": "heq_s13_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "10. Trust of participants - Review"
   },
   {
    "fieldname": "heq_s14_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "11. Consent text for participation - Review"
   },
   {
    "fieldname": "heq_s15_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "12. Interventions - Review"
   },
   {
    "fieldname": "heq_s16_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "13. Gathering of Audio, Photographic and Video Data - Review"
   },
   {
    "fieldname": "heq_s17_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "14. Need for audio, photographic or video data - Review"
   },
   {
    "fieldname": "heq_s18_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "15. Consent for audio, photographic or video data - Review"
   },
   {
    "fieldname": "heq_s19_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "16. Confidentiality of audio, photographic or video data - Review"
   },
   {
    "fieldname": "heq_s20_addons",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "heq_s21_addons",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "17. Confidentiality, anonymity, and security  of other data - Review"
   },
   {
    "fieldname": "toggle_heq_s1",
@@ -1800,11 +1680,6 @@
    "label": "Show/Hide Review Section"
   },
   {
-   "fieldname": "toggle_heq_s21",
-   "fieldtype": "Button",
-   "label": "Show/Hide Review Section"
-  },
-  {
    "fieldname": "section_break_keqe",
    "fieldtype": "Section Break"
   },
@@ -1812,7 +1687,7 @@
    "fieldname": "mentor_comments_to_reviewers",
    "fieldtype": "Small Text",
    "label": "Mentor comments to reviewers",
-   "permlevel": 2
+   "permlevel": 8
   },
   {
    "fieldname": "research_type",
@@ -2276,7 +2151,8 @@
   {
    "fieldname": "nheq_project_question",
    "fieldtype": "Small Text",
-   "label": "State your project question"
+   "label": "State your project question",
+   "permlevel": 7
   },
   {
    "fieldname": "nheq_s0_addons",
@@ -2286,32 +2162,40 @@
   {
    "fieldname": "nheq_s0_sc",
    "fieldtype": "Small Text",
-   "label": "Talk to your reviewer"
+   "label": "Talk to your reviewer",
+   "permlevel": 1
   },
   {
    "fieldname": "nheq_s0_mf",
    "fieldtype": "Small Text",
-   "label": "Mentor feedback"
+   "label": "Mentor feedback",
+   "permlevel": 2
   },
   {
    "fieldname": "nheq_s0_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer feedback to students"
+   "label": "Reviewer feedback to students",
+   "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s0_prn",
    "fieldtype": "Small Text",
-   "label": "Primary reviewer draft comments (to secondary reviewer)"
+   "label": "Primary reviewer draft comments (to secondary reviewer)",
+   "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s0_srn",
    "fieldtype": "Small Text",
-   "label": "Secondary Reviewer Notes"
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
   },
   {
    "fieldname": "nheq_s0_fc",
    "fieldtype": "Small Text",
-   "label": "Field Changes"
+   "label": "Field Changes",
+   "permlevel": 6
   },
   {
    "fieldname": "toggle_nheq_s0",
@@ -2327,7 +2211,7 @@
    "fieldname": "mentor_comment_to_student",
    "fieldtype": "Small Text",
    "label": "Mentor's comments to student",
-   "permlevel": 2
+   "permlevel": 9
   },
   {
    "fieldname": "column_break_vyzu",
@@ -2440,12 +2324,165 @@
   {
    "fieldname": "column_break_xtxd",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pocso",
+   "fieldtype": "Column Break",
+   "label": "If your research involves minors (under 18), you must know and follow the POCSO Act, 2012 "
+  },
+  {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "description": "[Note: Please read the FAQs on verbal/oral consent and assent. For research on minors you must take consent from a parent/guardian or the appropriate local authority (school head or a teacher, for e.g.). You can attach a separate sheet with the consent and assent forms, if necessary. If no legal guardian is present, a teacher or authority figure\u2019s consent is acceptable.][Word limit: 600]\n",
+   "fieldname": "minors_consent_text",
+   "fieldtype": "Small Text",
+   "label": "4a. Please provide the exact consent text you will use for guardians of minors  and assent text for minors.",
+   "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "permlevel": 7
+  },
+  {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "description": "If you plan to record (audio/photo/video) of minors, add the consent text details and explain if and how you will seek consent again before using material in reports or outreach. [Word limit: 50 words]",
+   "fieldname": "consent_for_recording_of_minors",
+   "fieldtype": "Small Text",
+   "label": "If you plan to record minors, add the consent text and explain if and how you will seek consent again before using material.",
+   "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "oral_assessment_of_minors",
+   "fieldtype": "Small Text",
+   "label": "If you plan on taking an oral assent from minor participants, please explain why this is appropriate. ",
+   "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: E.g., in class, door to door solicitation, through email or social media platform, etc. Word limit: 300]",
+   "fieldname": "approaching_participants",
+   "fieldtype": "Small Text",
+   "label": "Describe how you will identify and approach your potential subjects/participants?",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: For each participant type, explain: a) how you will engage or collect data (e.g., interviews, FGDs, online forms); b) sites or locations where you will gather data . Examples of tools for data collection/engagement/ intervention include interviews, FGDs, observation, surveys, telephonic interviews, online tools such as google form, chat apps, video platforms, social media or other technology) i) In case of an intervention project, please mention where will you be piloting/implementing the intervention ii) In case of a participatory action project, please mention where you will conduct the participatory activities with your participants iii) Please mention whether the data will be collected within homes, outside their home, prison, Anganwadis, hospitals, old-age homes, schools, etc. iv) If the exact location is not known, provide some rough idea about where the data collection would happen.]  [Word limit: 600]",
+   "fieldname": "data_collection_methods_and_locations",
+   "fieldtype": "Small Text",
+   "label": "For each participant type, explain how and where you will collect data",
+   "permlevel": 7
+  },
+  {
+   "description": "What are some of the foreseeable risks and discomforts related to your topic for each kind of subject/participant in your study/project? How will you ensure you minimize those risks? [Word limit: 350 words]",
+   "fieldname": "participant_risks_and_mitigation",
+   "fieldtype": "Small Text",
+   "label": "What are the risks and mitigation related to the participants for your topic.",
+   "permlevel": 7
+  },
+  {
+   "description": "What are the potential physical, emotional or any other kinds of risks to you in your field project? How will you ensure you minimize those risks?  [Word limit: 350 words]",
+   "fieldname": "student_risks_and_mitigation",
+   "fieldtype": "Small Text",
+   "label": "What are the potential risks to you in your field project? How will you ensure you minimize those risks?",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: The consent text needs to be provided for:  a) Adults/youth b) Guardians of people with special needs c) Elderly. Please refer to FAQs for verbal/oral consent. You can attach a separate sheet with the consent forms, if necessary. Please add separate consent, if needed, for different groups or levels of risk (e.g. prisoners, sex- workers, people in conflict areas).][Word limit: 600] \n",
+   "fieldname": "consent_text_for_participation",
+   "fieldtype": "Small Text",
+   "label": "Please provide the exact consent text you will use to ensure voluntary participation.",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: If you plan to create materials for an intervention, do they include sensitive topics? How will you review them for ethics, who will vet them, and what criteria will guide approval? Sensitive, potentially distressing, or ethically/legally risky topics include those related to violence, trauma, sexuality, mental health etc. Explain how you will assess and review such materials for appropriateness before they are introduced to participants and who will be responsible for vetting or approving the content, e.g., experts, ethics committees, institutional authorities. Please mark N/A if not applicable to you.] [Word limit: 300]",
+   "fieldname": "interventions",
+   "fieldtype": "Small Text",
+   "label": "Explain sensitive topics in materials for an intervention, vetting, ethics review and approval criteria process.",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: Please reflect beyond storing your data in a password protected computers] [Word limit: 200]",
+   "fieldname": "photos_confidentiality",
+   "fieldtype": "Small Text",
+   "label": "How will you protect the confidentiality of information collected through these devices?",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: If your organization is providing the data as a file, student should fill a data sharing statement signed by the student and organization. The document should be appended to the project report and submitted to the mentor on the completion of the project. It should contain the name of the provider and recipient, description of data, security and confidentiality measures, ownership, duration of access, terms of re-use and termination conditions. Data with third party includes participants\u2019 mobile numbers stored by an online platform/app; identity information/data stored by the app; participants required to install apps such as Instagram with identity disclosed etc.] [Word limit: 200]",
+   "fieldname": "other_data",
+   "fieldtype": "Small Text",
+   "label": "Will any data be stored/shared with a third party (e.g., health records, electoral data)? If yes, see note below.",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: In case of minors, explain how you will gain the confidence of both the parents/guardian and child.  If no legal guardian is present, a teacher or authority figure\u2019s consent is acceptable. In case recruitment is conducted through or in collaboration with an organization please additionally describe how you will: clearly separate your role as a researcher from the organization's interests, and address potential pressures, perceived obligations, or conflicts of interest that could affect participants\u2019 freedom to decline or withdraw.] [Word limit: 300]\n",
+   "fieldname": "trust_of_participants",
+   "fieldtype": "Small Text",
+   "label": "How will you gain trust and confidence of the subjects/participants and ensure that their participation is entirely voluntary?",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: How will you obtain consent to record (audio/photo/video) where anonymity is necessary? Provide consent text and explain if and how you will seek consent again before using material in reports or outreach. <br><br>\nReflect on how you will handle situations where individuals who are not your primary research participants (e.g., passersby, family members, children) may be incidentally captured in recordings or photos. What steps will you take to obtain consent or ensure ethical representation in such cases? If you are capturing environmental or contextual footage (e.g., public spaces, homes, hospitals, disaster sites) where people in distress, poverty, or poor health may be visible, how will you ensure their dignity, privacy, and anonymity are respected in documentation, analysis, and dissemination?] \n<br><br>[Word limit: 400]\n",
+   "fieldname": "consent_for_photos",
+   "fieldtype": "Small Text",
+   "label": "How will consent be obtained for this?",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "permission_letter_date",
+   "fieldtype": "Date",
+   "label": "If you have not procured relevant documents like permission letters yet, please specify the date by which you will submit them to IRB",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "uploads_declarations_tab",
+   "fieldtype": "Tab Break",
+   "label": "Uploads & Declaration"
+  },
+  {
+   "fieldname": "declaration_section",
+   "fieldtype": "Section Break",
+   "label": "IRB Policy & Declaration"
+  },
+  {
+   "fieldname": "irb_policy",
+   "fieldtype": "HTML",
+   "label": "IRB Policy",
+   "options": "<p><i>The University prioritizes integrity, responsibility and accountability in all research activities, from design to execution to dissemination. Researchers should follow ethical standards,\u00a0 obtain necessary permits, acquire informed consent from the participants, protect participant rights and ensure transparency. Violation of research ethics will terminate the project and the researcher can be liable for disciplinary action or any other appropriate measures. </i></p>",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "student_declaration",
+   "fieldtype": "HTML",
+   "label": "Student Declaration",
+   "options": "<p><b>I declare that the information that I have provided on the form is correct and complete. I also pledge that I will not change any of the forms, procedures and protocols used in this study without seeking approval from the IRB.</b></p>"
+  },
+  {
+   "default": "0",
+   "fieldname": "i_hereby_confirm_the_above",
+   "fieldtype": "Check",
+   "label": "I hereby confirm the above",
+   "permlevel": 7
+  },
+  {
+   "description": "Please upload a copy of all relevant documents (Project proposal, consent forms, survey tools, permission letters, etc) with  file name as \u2018document name_ student name\u2019 [for e.g., Proposal XYZ, Consent form XYZ, Survey tools XYZ etc.]",
+   "fieldname": "uploads",
+   "fieldtype": "Attach",
+   "label": "Please upload all relevant documents",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "uploads_s1",
+   "fieldtype": "Section Break",
+   "label": "Uploads"
+  },
+  {
+   "fieldname": "uploads_s1_addons",
+   "fieldtype": "Section Break",
+   "label": "Uploads - Review"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-04-09 17:01:06.818301",
+ "modified": "2026-05-04 14:44:33.186887",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

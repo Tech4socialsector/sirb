@@ -37,14 +37,14 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-01-05 17:24:43.098341",
+ "modified": "2026-05-07 14:42:41.014452",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Secondary Reviewer's pending worklist",
  "owner": "Administrator",
  "prepared_report": 0,
  "query": "select s.name as student_name, p.title as title, p.name as project_name, p.status as status from tabStudent as s join `tabStudent Project` as sp join\ntabProject as p on s.name = sp.parent and sp.project = p.name  where p.status=\"Awaiting Faculty mentor approval\"",
- "ref_doctype": "Student",
+ "ref_doctype": "IRB Project",
  "report_name": "Secondary Reviewer's pending worklist",
  "report_type": "Script Report",
  "roles": [
@@ -59,6 +59,9 @@
   },
   {
    "role": "Anchor"
+  },
+  {
+   "role": "Secondary IRB Reviewer"
   }
  ],
  "timeout": 0

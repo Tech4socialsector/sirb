@@ -844,7 +844,7 @@ frappe.ui.form.on("IRB Project", {
                     if (words.length > field_word_length_map[field_name]) {
                         frappe.msgprint(`Maximum ${field_word_length_map[field_name]} words allowed.`);
                         // Trim extra words
-                        $(this).val(words.slice(0, 1).join(" "));
+                        $(this).val(words.slice(0, field_word_length_map[field_name]).join(" "));
                     }
                 });            
             }

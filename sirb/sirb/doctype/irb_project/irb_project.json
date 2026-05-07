@@ -22,22 +22,13 @@
   "faculty_mentor",
   "num_reviewers",
   "animal_ethics_questionnaire_tab",
-  "nheq_s0",
+  "initial_pledge_section",
   "html_feit",
   "research_type",
   "replacement_reduction_and_refinement_pledge",
   "correctness_and_completeness_pledge",
-  "nheq_project_question",
-  "toggle_nheq_s0",
-  "nheq_s0_addons",
-  "nheq_s0_sc",
-  "nheq_s0_mf",
-  "nheq_s0_rf",
-  "column_break_vyzu",
-  "nheq_s0_prn",
-  "nheq_s0_srn",
-  "nheq_s0_fc",
   "nheq_s1",
+  "html_fucv",
   "vertebrate",
   "invertebrate",
   "speciescommon_name",
@@ -67,10 +58,6 @@
   "nheq_s3",
   "manipulative_experiments_select",
   "stree_reduction",
-  "stress_yes_no",
-  "precautions",
-  "what_will_be_done_with_the_live_animal_at_the_end_of_the_lab",
-  "disposal_method",
   "toggle_nheq_s3",
   "nheq_s3_addons",
   "nheq_s3_sc",
@@ -81,45 +68,77 @@
   "nheq_s3_srn",
   "nheq_s3_fc",
   "nheq_s4",
-  "study_site",
-  "taxa_name",
-  "native_select",
+  "stress_yes_no",
+  "precautions",
   "toggle_nheq_s4",
   "nheq_s4_addons",
   "nheq_s4_sc",
   "nheq_s4_mf",
   "nheq_s4_rf",
-  "column_break_ussy",
+  "column_break_bzor",
   "nheq_s4_prn",
   "nheq_s4_srn",
   "nheq_s4_fc",
   "nheq_s5",
-  "sensitive_areas",
-  "permission_to_work",
-  "ecological_data",
-  "potential_impacts",
-  "safe_and_ethical_collection",
+  "what_will_be_done_with_the_live_animal_at_the_end_of_the_lab",
+  "disposal_method",
   "toggle_nheq_s5",
   "nheq_s5_addons",
   "nheq_s5_sc",
   "nheq_s5_mf",
   "nheq_s5_rf",
-  "column_break_srps",
+  "column_break_vyzu",
   "nheq_s5_prn",
   "nheq_s5_srn",
   "nheq_s5_fc",
   "nheq_s6",
-  "professional_interaction_and_confidentiality",
-  "consent",
+  "study_site",
+  "taxa_name",
+  "native_select",
   "toggle_nheq_s6",
   "nheq_s6_addons",
   "nheq_s6_sc",
   "nheq_s6_mf",
   "nheq_s6_rf",
-  "column_break_ubzx",
+  "column_break_ussy",
   "nheq_s6_prn",
   "nheq_s6_srn",
   "nheq_s6_fc",
+  "nheq_s7",
+  "sensitive_areas",
+  "permission_to_work",
+  "toggle_nheq_s7",
+  "nheq_s7_addons",
+  "aa",
+  "nheq_s8",
+  "ecological_data",
+  "potential_impacts",
+  "safe_and_ethical_collection",
+  "toggle_nheq_s8",
+  "nheq_s8_addons",
+  "nheq_s8_sc",
+  "nheq_s8_mf",
+  "nheq_s8_rf",
+  "column_break_srps",
+  "nheq_s8_prn",
+  "nheq_s8_srn",
+  "nheq_s8_fc",
+  "nheq_s9",
+  "html_dumg",
+  "professional_interaction_and_confidentiality",
+  "consent",
+  "toggle_nheq_s9",
+  "nheq_s9_addons",
+  "nheq_s9_sc",
+  "nheq_s9_mf",
+  "nheq_s9_rf",
+  "column_break_ubzx",
+  "nheq_s9_prn",
+  "nheq_s9_srn",
+  "nheq_s9_fc",
+  "nheq_s10",
+  "replacement_declaration",
+  "information_correctness_declaration",
   "human_ethics_questionnaire_tab",
   "heq_s1",
   "state_your_project_question",
@@ -167,7 +186,7 @@
   "heq_s6_srn",
   "heq_s6_fc",
   "heq_s4",
-  "minors_consent_text",
+  "consent_type_and_explanation",
   "toggle_heq_s4",
   "heq_s4_addons",
   "heq_s4_sc",
@@ -178,7 +197,7 @@
   "heq_s4_srn",
   "heq_s4_fc",
   "heq_s5",
-  "consent_for_recording_of_minors",
+  "oral_assessment_of_minors",
   "toggle_heq_s5",
   "heq_s5_addons",
   "heq_5_srn",
@@ -190,7 +209,7 @@
   "heq_s5_srn",
   "heq_s5_fc",
   "heq_s7",
-  "oral_assessment_of_minors",
+  "field_4c",
   "toggle_heq_s7",
   "heq_s7_addons",
   "heq_s7_sc",
@@ -352,13 +371,13 @@
   "uploads",
   "permission_letter_date",
   "uploads_s1_addons",
-  "heq_s21_sc",
-  "heq_s21_mf",
-  "heq_s21_rf",
+  "uploads_s1_sc",
+  "uploads_s1_mf",
+  "uploads_s1_rf",
   "column_break_xtxd",
-  "heq_s21_prn",
-  "heq_s21_srn",
-  "heq_s21_fc",
+  "uploads_s1_prn",
+  "uploads_s1_srn",
+  "uploads_s1_fc",
   "general_comments_tab",
   "section_break_keqe",
   "mentor_comments_to_reviewers",
@@ -469,7 +488,7 @@
    "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "speciescommon_name",
    "fieldtype": "Small Text",
-   "label": "Name of the taxa",
+   "label": "2. Name of the taxa",
    "permlevel": 7
   },
   {
@@ -477,7 +496,7 @@
    "description": "(for vertebrates, please give exact number. For invertebrates, an approximate number is sufficient)",
    "fieldname": "number_of_animals_to_be_used",
    "fieldtype": "Int",
-   "label": "Number to be used",
+   "label": "3. Number to be used",
    "permlevel": 7
   },
   {
@@ -497,14 +516,14 @@
   {
    "fieldname": "proposed_source_of_animals",
    "fieldtype": "Small Text",
-   "label": "Proposed source of animals",
+   "label": "5. Proposed source of animals",
    "permlevel": 7
   },
   {
    "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "name_of_source",
    "fieldtype": "Small Text",
-   "label": "If animals are bought from outside, name of the source",
+   "label": "6. If animals are bought from outside, name of the source",
    "permlevel": 7
   },
   {
@@ -535,7 +554,7 @@
    "permlevel": 7
   },
   {
-   "description": "[Note: *The keywords would include, State, district, defining characteristics of the respondents* (2 to 3 keywords), broad domain of your project** (2 to 3 keywords). Explain what their defining characteristics are with respect to their demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students etc.** Use appropriate keywords that explain the broad domain of the project. For example, teaching pedagogies, informal labour, migration, mental health, sustainable agriculture, ecology, mining, farmers movement, groundwater, drinking water, urban ecology etc.]\n",
+   "description": "[Note: *Explain what their defining characteristics are with respect to their demography, socioeconomic status, occupation, gender etc. \u2013 e.g., marginal farmers/ASHA workers/vocational training institute students etc.** Use appropriate keywords that explain the broad domain of the project. For example, teaching pedagogies, informal labour, migration, mental health, sustainable agriculture, ecology, mining, farmers movement, groundwater, drinking water, urban ecology etc.]",
    "fieldname": "project_context",
    "fieldtype": "Small Text",
    "label": "Explain the context of your study using 6 to 9 keywords.",
@@ -553,12 +572,12 @@
    "description": "[Note: Acknowledgment of Awareness of Legal Obligations (POCSO Act, 2012) confirms that you have understood your mandatory reporting obligations under the Act in the event that you become aware of any instance of child abuse or exploitation during the course of your research.]",
    "fieldname": "minor_participants",
    "fieldtype": "Select",
-   "label": "Will any of them be minors (i.e., below the age of 18 years",
+   "label": "Please COMPULSORILY select one of the options below.",
    "options": "-- Select --\nYes, I certify I have read and understood the POCSO Act, 2012.\nNo, my project does not involve minors",
    "permlevel": 7
   },
   {
-   "description": "[Note: If yes, please explain what specific challenges and needs your participants may have. This does not include minors] [Word limit: 100 words]",
+   "description": "[Note: If yes, please explain what specific challenges and needs your participants may have. This does not include minors] [Word limit: 100 words]\n",
    "fieldname": "sensitive_population_field",
    "fieldtype": "Small Text",
    "label": "Does your project/study involve any sensitive populations such as people with special needs, disabilities, trauma from extreme events etc.?",
@@ -566,18 +585,18 @@
   },
   {
    "default": "-- Select --",
-   "description": "Will data be gathered through photographic, audio or video recording devices, including online platforms?\n\n[Note: that if you have promised confidentiality to your subjects, you cannot photograph or video or record them without taking steps to ensure that their confidentiality is maintained]",
+   "description": "[Note: If you have promised confidentiality to your subjects, you cannot photograph or video or record them without taking steps to ensure that their confidentiality is maintained]",
    "fieldname": "will_data_be_gathered_through_digital_means",
    "fieldtype": "Select",
-   "label": "Will data be gathered through digital means?",
+   "label": "Will data be gathered through photographic, audio or video recording devices, including online platforms?",
    "options": "-- Select --\nYes\nNo",
    "permlevel": 7
   },
   {
-   "description": "[Note: Since confidentiality and anonymity are important, explain why photos, audio/video, or online/app tools are needed. Reflect on any burden these tools or recordings may place on participants. If anonymity is not necessary please state the reason and explain whether participants may be identified.\n\n If your project involves a technological intervention, please explain the kind of content that will be shared on these technological platforms. If it involves capturing audio, photographs or video recordings (including of people, spaces, or sites), please reflect on what will be recorded/ photographed and why, and whether the visual material  (e.g., photos of buildings, landmarks, or interiors) could inadvertently reveal the identity or location of participants or communities you seek to protect)] [Word limit: 400]\t",
+   "description": "[Note: If your project involves a technological intervention, please explain the kind of content that will be shared on these technological platforms. If it involves capturing audio, photographs or video recordings (including of people, spaces, or sites), please reflect on what will be recorded/ photographed and why, and whether the visual material  (e.g., photos of buildings, landmarks, or interiors) could inadvertently reveal the identity or location of participants or communities you seek to protect. If identities must be disclosed,  explain why)] [Word limit: 400]\n",
    "fieldname": "need_for_such_data",
    "fieldtype": "Small Text",
-   "label": "Need for such data",
+   "label": "Explain why such tools are needed, any burden on participants, and whether anonymity is required or identification is acceptable.",
    "permlevel": 7
   },
   {
@@ -620,7 +639,7 @@
   {
    "fieldname": "heq_s2",
    "fieldtype": "Section Break",
-   "label": "2. Project Context"
+   "label": "2. Project Keywords"
   },
   {
    "fieldname": "heq_s2_sc",
@@ -707,13 +726,13 @@
    "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s4",
    "fieldtype": "Section Break",
-   "label": "4a. Consent text for working with minors"
+   "label": "4a. Consent type"
   },
   {
    "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s5",
    "fieldtype": "Section Break",
-   "label": "4b. Consent for recording of minors"
+   "label": "4b. Consent text"
   },
   {
    "fieldname": "heq_s6",
@@ -724,7 +743,7 @@
    "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s7",
    "fieldtype": "Section Break",
-   "label": "4c. Oral assent from minor participants"
+   "label": "4c. Recording consent & assent"
   },
   {
    "fieldname": "heq_s8",
@@ -754,7 +773,7 @@
   {
    "fieldname": "heq_s13",
    "fieldtype": "Section Break",
-   "label": "10. Trust of participants"
+   "label": "10. Voluntary participation"
   },
   {
    "fieldname": "heq_s14",
@@ -1442,44 +1461,6 @@
    "permlevel": 6
   },
   {
-   "fieldname": "heq_s21_sc",
-   "fieldtype": "Small Text",
-   "label": "Talk to your reviewer",
-   "permlevel": 1
-  },
-  {
-   "fieldname": "heq_s21_mf",
-   "fieldtype": "Small Text",
-   "label": "Mentor Feedback",
-   "permlevel": 2
-  },
-  {
-   "fieldname": "heq_s21_rf",
-   "fieldtype": "Small Text",
-   "label": "Reviewer feedback to student",
-   "permlevel": 3
-  },
-  {
-   "depends_on": "eval: doc.num_reviewers == 2",
-   "fieldname": "heq_s21_prn",
-   "fieldtype": "Small Text",
-   "label": "Primary reviewer draft comments (to secondary reviewer)",
-   "permlevel": 4
-  },
-  {
-   "depends_on": "eval: doc.num_reviewers == 2",
-   "fieldname": "heq_s21_srn",
-   "fieldtype": "Small Text",
-   "label": "Secondary Reviewer Notes",
-   "permlevel": 5
-  },
-  {
-   "fieldname": "heq_s21_fc",
-   "fieldtype": "Small Text",
-   "label": "Field Changes",
-   "permlevel": 6
-  },
-  {
    "fieldname": "heq_s1_rf",
    "fieldtype": "Small Text",
    "label": "Reviewer feedback to student",
@@ -1493,7 +1474,7 @@
   {
    "fieldname": "heq_s2_addons",
    "fieldtype": "Section Break",
-   "label": "2. Project Context - Review"
+   "label": "2. Project Keywords - Review"
   },
   {
    "fieldname": "heq_s3_addons",
@@ -1503,13 +1484,13 @@
   {
    "fieldname": "heq_s4_addons",
    "fieldtype": "Section Break",
-   "label": "4a. Approaching the participants - Review"
+   "label": "4a. Consent type - Review"
   },
   {
    "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s5_addons",
    "fieldtype": "Section Break",
-   "label": "4b. Consent for recording of minors - Review"
+   "label": "4b. Consent text - Review"
   },
   {
    "fieldname": "heq_s6_addons",
@@ -1520,7 +1501,7 @@
    "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "fieldname": "heq_s7_addons",
    "fieldtype": "Section Break",
-   "label": "4c. Oral assent from minor participants - Review"
+   "label": "4c. Recording consent & assent - Review"
   },
   {
    "fieldname": "heq_s8_addons",
@@ -1550,7 +1531,7 @@
   {
    "fieldname": "heq_s13_addons",
    "fieldtype": "Section Break",
-   "label": "10. Trust of participants - Review"
+   "label": "10. Voluntary participation - Review"
   },
   {
    "fieldname": "heq_s14_addons",
@@ -1746,62 +1727,60 @@
    "depends_on": "eval:doc.research_type == 'Lab based experiments'",
    "fieldname": "nheq_s2",
    "fieldtype": "Section Break",
-   "label": "Housing and source of Animals"
+   "label": "Housing and source of animals"
   },
   {
    "depends_on": "eval:doc.research_type == 'Lab based experiments'",
    "fieldname": "nheq_s3",
    "fieldtype": "Section Break",
-   "label": "Animal Stress"
+   "label": "Experimental protocols"
   },
   {
    "fieldname": "stress_yes_no",
    "fieldtype": "Select",
-   "label": "Will the vertebrate animals be subjected to stress (biotic or abiotic)",
+   "label": "9. Will the vertebrate animals be subjected to stress (biotic or abiotic)",
    "options": "Yes\nNo\nNot Applicable",
    "permlevel": 7
   },
   {
    "fieldname": "precautions",
    "fieldtype": "Small Text",
-   "label": "What will be the duration of stress (acute or chronic) and what will be done to ameliorate stress?",
+   "label": "10. What will be the duration of stress (acute or chronic) and what will be done to ameliorate stress?",
    "permlevel": 7
   },
   {
    "fieldname": "manipulative_experiments_select",
    "fieldtype": "Select",
-   "label": "Are you performing manipulative experiments with animals?",
+   "label": "7. Are you performing manipulative experiments with animals?",
    "options": "Yes\nNo\nNot Applicable",
    "permlevel": 7
   },
   {
    "fieldname": "stree_reduction",
    "fieldtype": "Small Text",
-   "label": "Please describe the experimental protocol",
+   "label": "8. Please describe the experimental protocol",
    "permlevel": 7
   },
   {
-   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
    "fieldname": "nheq_s4",
    "fieldtype": "Section Break",
-   "label": "Study location and organisms"
+   "label": "Animal welfare"
   },
   {
-   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
    "fieldname": "nheq_s5",
    "fieldtype": "Section Break",
-   "label": "Access and approvals"
+   "label": "Post-experimental handling"
   },
   {
    "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
    "fieldname": "nheq_s6",
    "fieldtype": "Section Break",
-   "label": "Interaction with people"
+   "label": "Study location and organisms"
   },
   {
    "fieldname": "nheq_s1_addons",
    "fieldtype": "Section Break",
-   "label": "Review"
+   "label": "Study animal details - Review"
   },
   {
    "fieldname": "toggle_nheq_s1",
@@ -1842,7 +1821,7 @@
   {
    "fieldname": "nheq_s2_addons",
    "fieldtype": "Section Break",
-   "label": "Review"
+   "label": "Housing and source of animals - Review"
   },
   {
    "fieldname": "nheq_s2_sc",
@@ -1885,7 +1864,7 @@
   {
    "fieldname": "nheq_s3_addons",
    "fieldtype": "Section Break",
-   "label": "Review"
+   "label": "Experimental protocols - Review"
   },
   {
    "fieldname": "nheq_s3_sc",
@@ -1926,52 +1905,39 @@
    "permlevel": 6
   },
   {
-   "fieldname": "nheq_s4_addons",
-   "fieldtype": "Section Break",
-   "label": "Review"
-  },
-  {
    "fieldname": "nheq_s4_sc",
    "fieldtype": "Small Text",
-   "label": "Talk to your reviewer",
-   "permlevel": 1
+   "label": "Talk to your reviewer"
   },
   {
    "fieldname": "nheq_s4_mf",
    "fieldtype": "Small Text",
-   "label": "Mentor Feedback",
-   "permlevel": 2
+   "label": "Mentor Feedback"
   },
   {
    "fieldname": "nheq_s4_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer feedback to student",
-   "permlevel": 3
+   "label": "Reviewer feedback to student"
   },
   {
-   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s4_prn",
    "fieldtype": "Small Text",
-   "label": "Primary reviewer draft comments (to secondary reviewer)",
-   "permlevel": 4
+   "label": "Primary reviewer draft comments (to secondary reviewer)"
   },
   {
-   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "nheq_s4_srn",
    "fieldtype": "Small Text",
-   "label": "Secondary Reviewer Notes",
-   "permlevel": 5
+   "label": "Secondary Reviewer Notes"
   },
   {
    "fieldname": "nheq_s4_fc",
    "fieldtype": "Small Text",
-   "label": "Field Changes",
-   "permlevel": 6
+   "label": "Field Changes"
   },
   {
    "fieldname": "nheq_s5_addons",
    "fieldtype": "Section Break",
-   "label": "Review"
+   "label": "Post-experimental handling - Review"
   },
   {
    "fieldname": "nheq_s5_sc",
@@ -1982,13 +1948,13 @@
   {
    "fieldname": "nheq_s5_mf",
    "fieldtype": "Small Text",
-   "label": "Mentor Feedback",
+   "label": "Mentor feedback",
    "permlevel": 2
   },
   {
    "fieldname": "nheq_s5_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer feedback to student",
+   "label": "Reviewer feedback to students",
    "permlevel": 3
   },
   {
@@ -2014,7 +1980,7 @@
   {
    "fieldname": "nheq_s6_addons",
    "fieldtype": "Section Break",
-   "label": "Review"
+   "label": "Study location and organisms - Review"
   },
   {
    "fieldname": "nheq_s6_sc",
@@ -2058,7 +2024,7 @@
    "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "animal_housing",
    "fieldtype": "Small Text",
-   "label": "How and where will the animals be housed ",
+   "label": "4. How and where will the animals be housed ",
    "permlevel": 7
   },
   {
@@ -2126,10 +2092,10 @@
    "permlevel": 7
   },
   {
+   "description": "If the project involves interactions with other people, such as interview surveys or stakeholder meetings, please provide information on the steps taken to ensure that these interactions are conducted in a professional and sensitive manner, and how you propose to protect the confidentiality of the responses provided by subjects",
    "fieldname": "professional_interaction_and_confidentiality",
    "fieldtype": "Small Text",
    "label": "Professional Interaction and confidentiality",
-   "options": "If the project involves interactions with other people, such as interview surveys or stakeholder meetings, please provide information on the steps taken to ensure that these interactions are conducted in a professional and sensitive manner, and how you propose to protect the confidentiality of the responses provided by subjects",
    "permlevel": 7
   },
   {
@@ -2146,65 +2112,6 @@
    "fieldtype": "Small Text",
    "hidden": 1,
    "label": "Number of Reviewers"
-  },
-  {
-   "fieldname": "nheq_s0",
-   "fieldtype": "Section Break",
-   "label": "Animal Ethics Questionnaire Section"
-  },
-  {
-   "fieldname": "nheq_project_question",
-   "fieldtype": "Small Text",
-   "label": "State your project question",
-   "permlevel": 7
-  },
-  {
-   "fieldname": "nheq_s0_addons",
-   "fieldtype": "Section Break",
-   "label": "Review"
-  },
-  {
-   "fieldname": "nheq_s0_sc",
-   "fieldtype": "Small Text",
-   "label": "Talk to your reviewer",
-   "permlevel": 1
-  },
-  {
-   "fieldname": "nheq_s0_mf",
-   "fieldtype": "Small Text",
-   "label": "Mentor feedback",
-   "permlevel": 2
-  },
-  {
-   "fieldname": "nheq_s0_rf",
-   "fieldtype": "Small Text",
-   "label": "Reviewer feedback to students",
-   "permlevel": 3
-  },
-  {
-   "depends_on": "eval: doc.num_reviewers == 2",
-   "fieldname": "nheq_s0_prn",
-   "fieldtype": "Small Text",
-   "label": "Primary reviewer draft comments (to secondary reviewer)",
-   "permlevel": 4
-  },
-  {
-   "depends_on": "eval: doc.num_reviewers == 2",
-   "fieldname": "nheq_s0_srn",
-   "fieldtype": "Small Text",
-   "label": "Secondary Reviewer Notes",
-   "permlevel": 5
-  },
-  {
-   "fieldname": "nheq_s0_fc",
-   "fieldtype": "Small Text",
-   "label": "Field Changes",
-   "permlevel": 6
-  },
-  {
-   "fieldname": "toggle_nheq_s0",
-   "fieldtype": "Button",
-   "label": "Show/Hide Review Section"
   },
   {
    "fieldname": "general_comments_tab",
@@ -2337,25 +2244,9 @@
   {
    "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "description": "[Note: Please read the FAQs on verbal/oral consent and assent. For research on minors you must take consent from a parent/guardian or the appropriate local authority (school head or a teacher, for e.g.). You can attach a separate sheet with the consent and assent forms, if necessary. If no legal guardian is present, a teacher or authority figure\u2019s consent is acceptable.][Word limit: 600]\n",
-   "fieldname": "minors_consent_text",
-   "fieldtype": "Small Text",
-   "label": "4a. Please provide the exact consent text you will use for guardians of minors  and assent text for minors.",
-   "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
-   "permlevel": 7
-  },
-  {
-   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
-   "description": "If you plan to record (audio/photo/video) of minors, add the consent text details and explain if and how you will seek consent again before using material in reports or outreach. [Word limit: 50 words]",
-   "fieldname": "consent_for_recording_of_minors",
-   "fieldtype": "Small Text",
-   "label": "If you plan to record minors, add the consent text and explain if and how you will seek consent again before using material.",
-   "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
-   "permlevel": 7
-  },
-  {
    "fieldname": "oral_assessment_of_minors",
    "fieldtype": "Small Text",
-   "label": "If you plan on taking an oral assent from minor participants, please explain why this is appropriate. ",
+   "label": "Please provide the exact consent text you will use for guardians of minors  and assent text for minors. ",
    "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
    "permlevel": 7
   },
@@ -2367,38 +2258,38 @@
    "permlevel": 7
   },
   {
-   "description": "[Note: For each participant type, explain: a) how you will engage or collect data (e.g., interviews, FGDs, online forms); b) sites or locations where you will gather data . Examples of tools for data collection/engagement/ intervention include interviews, FGDs, observation, surveys, telephonic interviews, online tools such as google form, chat apps, video platforms, social media or other technology) i) In case of an intervention project, please mention where will you be piloting/implementing the intervention ii) In case of a participatory action project, please mention where you will conduct the participatory activities with your participants iii) Please mention whether the data will be collected within homes, outside their home, prison, Anganwadis, hospitals, old-age homes, schools, etc. iv) If the exact location is not known, provide some rough idea about where the data collection would happen.]  [Word limit: 600]",
+   "description": "[Note: Examples of tools for data collection/engagement/ intervention include interviews, FGDs, observation, surveys, telephonic interviews, online tools such as google form, chat apps, video platforms, social media or other technology) i) In case of an intervention project, please mention where will you be piloting/implementing the intervention ii) In case of a participatory action project, please mention where you will conduct the participatory activities with your participants iii) Please mention whether the data will be collected within homes, outside their home, prison, Anganwadis, hospitals, old-age homes, schools, etc. iv) If the exact location is not known, provide some rough idea about where the data collection would happen.]  [Word limit: 600]",
    "fieldname": "data_collection_methods_and_locations",
    "fieldtype": "Small Text",
-   "label": "For each participant type, explain how and where you will collect data",
+   "label": "For each participant type, explain: a) how you will engage or collect data  b) sites or locations where you will gather data?",
    "permlevel": 7
   },
   {
-   "description": "What are some of the foreseeable risks and discomforts related to your topic for each kind of subject/participant in your study/project? How will you ensure you minimize those risks? [Word limit: 350 words]",
+   "description": "[Word limit: 350 words]\n",
    "fieldname": "participant_risks_and_mitigation",
    "fieldtype": "Small Text",
-   "label": "What are the risks and mitigation related to the participants for your topic.",
+   "label": "What are the foreseeable risks and discomforts related to your topic for each participant? How will you ensure you minimize those risks? ",
    "permlevel": 7
   },
   {
-   "description": "What are the potential physical, emotional or any other kinds of risks to you in your field project? How will you ensure you minimize those risks?  [Word limit: 350 words]",
+   "description": "[Word limit: 350 words]",
    "fieldname": "student_risks_and_mitigation",
    "fieldtype": "Small Text",
-   "label": "What are the potential risks to you in your field project? How will you ensure you minimize those risks?",
+   "label": "What are the potential physical, emotional or other risks to you? How will you ensure you minimize those risks?  ",
    "permlevel": 7
   },
   {
-   "description": "[Note: The consent text needs to be provided for:  a) Adults/youth b) Guardians of people with special needs c) Elderly. Please refer to FAQs for verbal/oral consent. You can attach a separate sheet with the consent forms, if necessary. Please add separate consent, if needed, for different groups or levels of risk (e.g. prisoners, sex- workers, people in conflict areas).][Word limit: 600] \n",
+   "description": "[Note: The consent text needs to be provided for: a)adults; b) guardians of people with special needs; c) elderly. Please refer to FAQs for verbal/oral consent. You can attach a separate sheet with the consent forms, if necessary. Please add separate consent, if needed, for different groups or levels of risk (e.g. prisoners, sex- workers, people in conflict areas).[Word limit: 600] ",
    "fieldname": "consent_text_for_participation",
    "fieldtype": "Small Text",
    "label": "Please provide the exact consent text you will use to ensure voluntary participation.",
    "permlevel": 7
   },
   {
-   "description": "[Note: If you plan to create materials for an intervention, do they include sensitive topics? How will you review them for ethics, who will vet them, and what criteria will guide approval? Sensitive, potentially distressing, or ethically/legally risky topics include those related to violence, trauma, sexuality, mental health etc. Explain how you will assess and review such materials for appropriateness before they are introduced to participants and who will be responsible for vetting or approving the content, e.g., experts, ethics committees, institutional authorities. Please mark N/A if not applicable to you.] [Word limit: 300]",
+   "description": "[Note: Sensitive, potentially distressing, or ethically/legally risky topics include those related to violence, trauma, sexuality, mental health etc. Explain how you will assess and review such materials for appropriateness before they are introduced to participants and who will be responsible for vetting or approving the content, e.g., experts, ethics committees, institutional authorities. Please mark N/A if not applicable to you.] [Word limit: 300]\n",
    "fieldname": "interventions",
    "fieldtype": "Small Text",
-   "label": "Explain sensitive topics in materials for an intervention, vetting, ethics review and approval criteria process.",
+   "label": "Does your intervention material include sensitive topics? How will it be ethically reviewed, by whom, and what criteria will guide approval?",
    "permlevel": 7
   },
   {
@@ -2409,24 +2300,24 @@
    "permlevel": 7
   },
   {
-   "description": "[Note: If your organization is providing the data as a file, student should fill a data sharing statement signed by the student and organization. The document should be appended to the project report and submitted to the mentor on the completion of the project. It should contain the name of the provider and recipient, description of data, security and confidentiality measures, ownership, duration of access, terms of re-use and termination conditions. Data with third party includes participants\u2019 mobile numbers stored by an online platform/app; identity information/data stored by the app; participants required to install apps such as Instagram with identity disclosed etc.] [Word limit: 200]",
+   "description": "[Note: Such as sharing data with an organization or taking data such as health records, electoral data etc, data from social media platforms, movement, tracking and any other electronic  data  If an organization  is providing the data as a file, the student should fill a data sharing statement signed by the student and organization. The document should be appended to the project report and submitted to the mentor on the completion of the project. It should contain the name of the provider and recipient, description of data, security and confidentiality measures, ownership, duration of access, terms of re-use and termination conditions. [Word limit: 200]",
    "fieldname": "other_data",
    "fieldtype": "Small Text",
-   "label": "Will any data be stored/shared with a third party (e.g., health records, electoral data)? If yes, see note below.",
+   "label": "Will data be shared/collected from third parties? If yes, how will you ensure confidentiality and anonymity of participants\u2019 data?",
    "permlevel": 7
   },
   {
-   "description": "[Note: In case of minors, explain how you will gain the confidence of both the parents/guardian and child.  If no legal guardian is present, a teacher or authority figure\u2019s consent is acceptable. In case recruitment is conducted through or in collaboration with an organization please additionally describe how you will: clearly separate your role as a researcher from the organization's interests, and address potential pressures, perceived obligations, or conflicts of interest that could affect participants\u2019 freedom to decline or withdraw.] [Word limit: 300]\n",
+   "description": "[Note: In case of minors, explain how you will gain the confidence of both the parents/guardian and child.  If no legal guardian is present, a teacher or authority figure\u2019s consent is acceptable. In case recruitment is conducted through or in collaboration with an organization please additionally describe how you will: clearly separate your role as a researcher from the organization's interests, and address potential pressures, perceived obligations, or conflicts of interest that could affect participants\u2019 freedom to decline or withdraw.] [Word limit: 300]",
    "fieldname": "trust_of_participants",
    "fieldtype": "Small Text",
    "label": "How will you gain trust and confidence of the subjects/participants and ensure that their participation is entirely voluntary?",
    "permlevel": 7
   },
   {
-   "description": "[Note: How will you obtain consent to record (audio/photo/video) where anonymity is necessary? Provide consent text and explain if and how you will seek consent again before using material in reports or outreach. <br><br>\nReflect on how you will handle situations where individuals who are not your primary research participants (e.g., passersby, family members, children) may be incidentally captured in recordings or photos. What steps will you take to obtain consent or ensure ethical representation in such cases? If you are capturing environmental or contextual footage (e.g., public spaces, homes, hospitals, disaster sites) where people in distress, poverty, or poor health may be visible, how will you ensure their dignity, privacy, and anonymity are respected in documentation, analysis, and dissemination?] \n<br><br>[Word limit: 400]\n",
+   "description": "[Note: Reflect on how you will handle situations where individuals who are not your primary research participants (e.g., passersby, family members, children) may be incidentally captured in recordings or photos. What steps will you take to obtain consent or ensure ethical representation in such cases? If you are capturing environmental or contextual footage (e.g., public spaces, homes, hospitals, disaster sites) where people in distress, poverty, or poor health may be visible, how will you ensure their dignity, privacy, and anonymity are respected in documentation, analysis, and dissemination?] [Word limit: 400]\n",
    "fieldname": "consent_for_photos",
    "fieldtype": "Small Text",
-   "label": "How will consent be obtained for this?",
+   "label": "How will you obtain consent for recording when anonymity is required? Include consent text and re-consent, if necessary, for use in reports.",
    "permlevel": 7
   },
   {
@@ -2492,12 +2383,238 @@
    "fieldname": "permission_to_work",
    "fieldtype": "Check",
    "label": "If yes, then has permission to work in such areas obtained? "
+  },
+  {
+   "fieldname": "initial_pledge_section",
+   "fieldtype": "Section Break",
+   "label": "Pledge"
+  },
+  {
+   "fieldname": "html_fucv",
+   "fieldtype": "HTML",
+   "options": "1. Types of animals in the lab"
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "fieldname": "nheq_s7",
+   "fieldtype": "Section Break",
+   "label": "Access and approvals"
+  },
+  {
+   "fieldname": "nheq_s8",
+   "fieldtype": "Section Break",
+   "label": "Data collection and environmental impact"
+  },
+  {
+   "fieldname": "nheq_s8_addons",
+   "fieldtype": "Section Break",
+   "label": "Data collection and environmental impact - Review"
+  },
+  {
+   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "fieldname": "nheq_s9",
+   "fieldtype": "Section Break",
+   "label": "Human participation and consent"
+  },
+  {
+   "fieldname": "html_dumg",
+   "fieldtype": "HTML",
+   "options": "This section is only relevant if people are involved"
+  },
+  {
+   "fieldname": "nheq_s9_addons",
+   "fieldtype": "Section Break",
+   "label": "Human participation and consent - Review"
+  },
+  {
+   "fieldname": "nheq_s10",
+   "fieldtype": "Section Break",
+   "label": "Student/Researcher declaration"
+  },
+  {
+   "default": "0",
+   "description": "I will follow replacement, reduction and refinement whenever using live organisms for my experiments.",
+   "fieldname": "replacement_declaration",
+   "fieldtype": "Check",
+   "label": "Reduction, replacement & refinedment pledge"
+  },
+  {
+   "default": "0",
+   "description": "I declare that the information that I have provided on the form is correct and complete. I also pledge that I will not change any of the forms, procedures and protocols used in this study without seeking approval from the IRB.",
+   "fieldname": "information_correctness_declaration",
+   "fieldtype": "Check",
+   "label": "Correctness & completeness pledge"
+  },
+  {
+   "fieldname": "nheq_s4_addons",
+   "fieldtype": "Section Break",
+   "label": "Animal welfare - review"
+  },
+  {
+   "fieldname": "toggle_nheq_s7",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_nheq_s8",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "toggle_nheq_s9",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "fieldname": "nheq_s7_addons",
+   "fieldtype": "Section Break",
+   "label": "Access and approvals - Review"
+  },
+  {
+   "fieldname": "aa",
+   "fieldtype": "Small Text",
+   "label": "aa"
+  },
+  {
+   "fieldname": "column_break_bzor",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nheq_s8_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s8_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s8_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer feedback to student",
+   "permlevel": 3
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "nheq_s8_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary reviewer draft comments (to secondary reviewer)",
+   "permlevel": 4
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "nheq_s8_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s8_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "nheq_s9_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s9_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s9_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer feedback to student",
+   "permlevel": 3
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "nheq_s9_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary reviewer draft comments (to secondary reviewer)",
+   "permlevel": 4
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "nheq_s9_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s9_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "uploads_s1_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "uploads_s1_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "uploads_s1_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer feedback to student",
+   "permlevel": 3
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "uploads_s1_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary reviewer draft comments (to secondary reviewer)",
+   "permlevel": 4
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "uploads_s1_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "uploads_s1_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "description": "[Note: You should clearly state if the consent is written or oral. And if the assent is written or oral, and explain why][Word Limit: 600 words]\n\n\n",
+   "fieldname": "consent_type_and_explanation",
+   "fieldtype": "Small Text",
+   "label": "4a.   Explain the type of consent you will obtain from minors and their guardians, and why is this appropriate?",
+   "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "permlevel": 7
+  },
+  {
+   "description": "[Note: Recording refers to audio/photo/video. Material use refers to reports and outreach. Add details for consent from guardians of minors and assent of minors. ] [Word limit: 600]\n",
+   "fieldname": "field_4c",
+   "fieldtype": "Small Text",
+   "label": "4c. If recording minors, include consent/assent details and explain if/how you will re-seek consent before using the material.",
+   "mandatory_depends_on": "eval:doc.minor_participants == 'Yes, I certify I have read and understood the POCSO Act, 2012.'",
+   "permlevel": 7
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-04 16:40:56.724234",
+ "modified": "2026-05-07 10:36:11.861489",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

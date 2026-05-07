@@ -4,11 +4,13 @@ var extns_with_fc = structuredClone(extns);
 extns_with_fc["_fc"] = "Field changed"
 
 var field_word_length_map = {
-    "abstract": 50,
+    "abstract": 500,
     "state_your_project_question":  200,
     "project_context": 10,
     "project_subjects": 200,
-    "minors_consent_text": 600,
+    "consent_type_and_explanation": 600,
+    "consent_text_for_minors": 600,
+    "recording_consent": 600,
     "sensitive_population_field": 100,
     "approaching_participants" : 300,
     "data_collection_methods_and_locations" : 600,
@@ -39,6 +41,7 @@ async function get_versions_after_login(doctype, docname, prev_login_time) {
                             String(prev_login_time.getHours()).padStart(2, '0') + ':' +
                             String(prev_login_time.getMinutes()).padStart(2, '0') + ':' +
                             String(prev_login_time.getSeconds()).padStart(2, '0');
+    console.log("Prev login str is ", prev_login_str)
     let versions = await frappe.db.get_list("Version",
         {
             fields: ["data", "modified"],
@@ -47,7 +50,8 @@ async function get_versions_after_login(doctype, docname, prev_login_time) {
                 ["ref_doctype", "=", doctype],
                 ["modified", ">", prev_login_str]
             ],
-            order_by: "modified asc"
+            order_by: "modified desc",
+            limit_page_length: 9999
         });
 
     return versions;
@@ -694,119 +698,142 @@ frappe.ui.form.on("IRB Project", {
         //console.log("LAST LOGIN ", last_login)
         if(last_login) {
             let versions = await get_versions_after_login("IRB Project", frm.doc.name, last_login);
-            // console.log("VERSIONS ", versions);
-            //console.log(change_list_str)
-            for (let section of section_list) {
-                field_list = get_fields_in_section(frm, section);
-                //console.log("Section ", section)
-                // console.log("Field List ", field_list)
-                change_list = []
-                for (let version of versions) {
-                    version_data = JSON.parse(version.data)
-                    // console.log("VERSION DATA ", version_data)
-                    for (let change of version_data["changed"]) {
-                        if (change) {
-                            fname = frappe.meta.get_label(frm.doctype, change[0])
-                            //console.log("CHANGE0 ", change)
-                            //console.log("FIELD LIST ", field_list)
-                            change_in_section = field_list.some(item => item.toLowerCase() === change[0].toLowerCase());
-                            //console.log("CHANGE IN SECTION ", change_in_section)
-                            if (change_in_section) {
-                                change_str = "'"+fname+"'  changed from '"+change[1]+"' to '"+change[2]+"'"
-                                //console.log("Adding to change list ", change_str)                                
-                                change_list.push(change_str)
+            if (versions && versions.length > 0) {
+                //console.log("versions ", versions)
+                //last_version = versions[versions.length - 1]
+                //console.log("Version 0 is ", versions[0].data)
+                //console.log("VERSIONS ", versions);
+                //console.log(change_list_str)
+                for (let section of section_list) {
+                    field_list = get_fields_in_section(frm, section);
+                    //console.log("Section ", section)
+                    // console.log("Field List ", field_list)
+                    fields_modifications_added = []
+                    change_list = []
+                    for (let version of versions) {
+                        //console.log("version is ", version)                        
+                        version_data = JSON.parse(version.data)
+                        //console.log("VERSION DATA ", version_data)
+                        for (let change of version_data["changed"]) {
+                            if (change) {
+                                fname = frappe.meta.get_label(frm.doctype, change[0])
+                                //console.log("CHANGED ", change)
+                                //console.log("FIELD LIST ", field_list)
+                                change_in_section = field_list.some(item => item.toLowerCase() === change[0].toLowerCase());
+                                //console.log("CHANGE IN SECTION ", change_in_section)
+                                if (change_in_section) {
+                                    //console.log(change)
+                                    //for (i=0;i<field_list.length;i++)
+                                    if (change[1] != "" && change[1] != null && !fields_modifications_added.includes(change[0])) {
+                                        fields_modifications_added.push(change[0])
+                                        fieldname = change[0]
+                                        //console.log(fieldname, " changed!")
+                                        label = frm.get_field(fieldname).df.label;
+                                        // label = get_updated_label(frm, section);
+                                        if (!label.toLowerCase().includes("Changed".toLowerCase()) && !(fieldname.startsWith("toggle_")))
+                                            // title_extns.push("Field changed")
+                                            //console.log("Label updated is ", label)
+                                            frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
+                                            frm.get_field(fieldname).refresh()
+                                        //console.log("ADDING!")
+                                        change_str = "'"+fname+"'  changed from '"+change[1]+"' to '<b>"+change[2]+"</b>'"
+                                        //console.log("Adding to change list ", change_str)                                
+                                        change_list.push(change_str)
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                //console.log("Change list ", change_list)
-                //console.log("Change list len ", change_list.length)
-                if (change_list.length !== 0 ) {
-                    var change_list_str = change_list.join('<br>')
-                    //console.log("Change str ", change_list_str)
-                    //console.log("Setting change in ", section+"_fc")
-                    //frm.set_value(section+"_fc", change_list_str, { no_dirty: true })
-                    frm.set_value(section+"_fc", change_list_str, null, false)
-                    //frm.get_field(section+"_fc").refresh()
-                }
-                var title_extns = []
-                orig_label = frm.get_field(section).df.label;
-                field_list = get_fields_in_section(frm, section);
-                //console.log("Field list is ", field_list)
-                for (let fieldname of field_list) {
-                    if(field_changed_since_last_login(versions, fieldname)) {
-                        // alert("field "+fieldname+" changed!!")
-                        if (fieldname.startsWith("toggle_"))
-                            continue
-                        label = frm.get_field(fieldname).df.label;
-                        // label = get_updated_label(frm, section);
-                        if (!label.toLowerCase().includes("Changed".toLowerCase()))
-                            // title_extns.push("Field changed")
-                            //console.log("Label updated is ", label)
-                            frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
-                            frm.get_field(fieldname).refresh()
-                            // Get the field object
-                            //let field = frm.get_field(fieldname);
-
-                            //field.label_area && $(field.label_area).html(__(label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>"))
-                    }
-                    // if (title_extns.length > 0) {
-                    //     var title_ext_str = "("+title_extns.join(', ')+")"
-                    //     frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>");
-                    // }
-                }
-                let section_ext_changed = false
-                for (let ext in extns) {
-                    section_with_ext = section + ext;
-                    title_ext = []
-                    // console.log(field_with_ext);
-                    if(field_changed_since_last_login(versions, section_with_ext)) {
-                        section_ext_changed = true
-                        // alert("field "+section_with_ext+" changed!!")
-                        orig_label = frm.get_field(section_with_ext).df.label;
-                        updated_label = get_updated_label(frm, section_with_ext);
-                        //console.log("Label is ", orig_label)
-                        //console.log("Updated abel is ", updated_label)
-                        //console.log(title_extns)
-                        if (!(updated_label.toLowerCase().includes("changed"))) {
-                            //console.log("XX")
-                            frm.set_df_property(section_with_ext, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
-                            frm.get_field(section_with_ext).refresh()
+                        //}
+                        //console.log("Change list ", change_list)
+                        //console.log("Change list len ", change_list.length)
+                        if (change_list.length !== 0 ) {
+                            var change_list_str = change_list.join('<br>')
+                            //console.log("Change str ", change_list_str)
+                            //console.log("Setting change in ", section+"_fc")
+                            //frm.set_value(section+"_fc", change_list_str, { no_dirty: true })
+                            frm.set_value(section+"_fc", change_list_str, null, false)
+                            //frm.get_field(section+"_fc").refresh()
                         }
-                            //title_extns.push(extns[ext]+" added")
-                            //frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i>("+extns[ext]+" added) </i></span>");                                
+                        var title_extns = []
+                        // orig_label = frm.get_field(section).df.label;
+                        // field_list = get_fields_in_section(frm, section);
+                        // //console.log("Field list is ", field_list)
+                        // for (let fieldname of field_list) {
+                        //     if(field_changed_since_last_login(versions, fieldname)) {
+                        //         // alert("field "+fieldname+" changed!!")
+                        //         if (fieldname.startsWith("toggle_"))
+                        //             continue
+                        //         label = frm.get_field(fieldname).df.label;
+                        //         // label = get_updated_label(frm, section);
+                        //         if (!label.toLowerCase().includes("Changed".toLowerCase()))
+                        //             // title_extns.push("Field changed")
+                        //             //console.log("Label updated is ", label)
+                        //             frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
+                        //             frm.get_field(fieldname).refresh()
+                        //             // Get the field object
+                        //             //let field = frm.get_field(fieldname);
+
+                        //             //field.label_area && $(field.label_area).html(__(label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>"))
+                        //     }
+                            // if (title_extns.length > 0) {
+                            //     var title_ext_str = "("+title_extns.join(', ')+")"
+                            //     frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>");
+                            // }
+                        //}
+                        let section_ext_changed = false
+                        for (let ext in extns) {
+                            section_with_ext = section + ext;
+                            title_ext = []
+                            // console.log(field_with_ext);
+                            if(field_changed_since_last_login(versions, section_with_ext)) {
+                                section_ext_changed = true
+                                // alert("field "+section_with_ext+" changed!!")
+                                orig_label = frm.get_field(section_with_ext).df.label;
+                                updated_label = get_updated_label(frm, section_with_ext);
+                                //console.log("Label is ", orig_label)
+                                //console.log("Updated abel is ", updated_label)
+                                //console.log(title_extns)
+                                if (!(updated_label.toLowerCase().includes("changed"))) {
+                                    //console.log("XX")
+                                    frm.set_df_property(section_with_ext, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
+                                    frm.get_field(section_with_ext).refresh()
+                                }
+                                    //title_extns.push(extns[ext]+" added")
+                                    //frm.set_df_property(fieldname, "label", label + " <span style=\"background-color: yellow;\"><i>("+extns[ext]+" added) </i></span>");                                
+                            }
+                        if (section_ext_changed) {
+                            orig_label = frm.get_field("toggle_"+section).df.label;
+                            if (!orig_label.toLowerCase().includes("changed")) {
+                                frm.set_df_property("toggle_"+section, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Review Section Changed) </i></span>");
+                                frm.get_field(section_with_ext).refresh()
+                            }                
+                        }
+                            // if (title_extns.length > 0) {
+                            //     var title_ext_str = "("+title_extns.join(', ')+")"
+                            //     console.log(title_ext_str)
+                            //     frm.set_df_property(section_with_ext, "label", label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>");                        
+                            // }
+                            
+                            // //console.log(title_extns)
+                            //     if (title_extns.length > 0) {
+                            //         var title_ext_str = "("+title_extns.join(', ')+")"
+                            //         console.log("Setting title to ", title_ext_str)
+                            //         //frm.set_df_property(section, "label", label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>");
+                            //         let head = $(frm.get_field(section).wrapper).find('.section-head');
+                            //         let head_contents = head.contents().filter(function() { return this.nodeType === 3; })
+                            //         console.log("Head contents ", head_contents)
+                            //         head_contents[0].nodeValue = orig_label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>";                        
+                            //         //frm.refresh_field(section);
+                            //     }
+                        }
                     }
-                if (section_ext_changed) {
-                    orig_label = frm.get_field("toggle_"+section).df.label;
-                    if (!orig_label.toLowerCase().includes("changed")) {
-                        frm.set_df_property("toggle_"+section, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Review Section Changed) </i></span>");
-                        frm.get_field(section_with_ext).refresh()
-                    }                
-                }
-                    // if (title_extns.length > 0) {
-                    //     var title_ext_str = "("+title_extns.join(', ')+")"
-                    //     console.log(title_ext_str)
-                    //     frm.set_df_property(section_with_ext, "label", label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>");                        
-                    // }
-                    
-                    // //console.log(title_extns)
-                    //     if (title_extns.length > 0) {
-                    //         var title_ext_str = "("+title_extns.join(', ')+")"
-                    //         console.log("Setting title to ", title_ext_str)
-                    //         //frm.set_df_property(section, "label", label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>");
-                    //         let head = $(frm.get_field(section).wrapper).find('.section-head');
-                    //         let head_contents = head.contents().filter(function() { return this.nodeType === 3; })
-                    //         console.log("Head contents ", head_contents)
-                    //         head_contents[0].nodeValue = orig_label + " <span style=\"background-color: yellow;\"><i>"+title_ext_str+"</i></span>";                        
-                    //         //frm.refresh_field(section);
-                    //     }
                 }
             }
         }
 
 
         // Set the word limits for each field
-        if (is_student) {
+        if (true) {
             for (const field_name in field_word_length_map) {
                 //console.log(field_name);
                 //console.log(frm.fields_dict[field_name]);
@@ -823,6 +850,13 @@ frappe.ui.form.on("IRB Project", {
             }
         }
 
+        // Loop through every field in the DocType and close all review sections
+        Object.keys(frm.fields_dict).forEach(fieldname => {
+            // If the fieldname ends with '_addons', hide it
+            if (fieldname.endsWith('_addons')) {
+                frm.set_df_property(fieldname, 'hidden', 1);
+            }
+        });
     }
 });
 

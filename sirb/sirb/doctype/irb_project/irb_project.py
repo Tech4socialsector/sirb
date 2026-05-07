@@ -16,6 +16,8 @@ class IRBProject(Document):
 					frappe.throw("Please select a valid answer for 4. Minors check")
 				if self.will_data_be_gathered_through_digital_means == "-- Select --":
 					frappe.throw("Please select a valid answer for 13.Gathering of Audio, Photographic and Video Data")
+				if not self.i_hereby_confirm_the_above:
+					frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
 		else:
 			# Ignore mandatory checks since it is created by a script.
 			self.flags.ignore_mandatory = True

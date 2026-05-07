@@ -833,7 +833,7 @@ frappe.ui.form.on("IRB Project", {
 
 
         // Set the word limits for each field
-        if (true) {
+        if (false) {
             for (const field_name in field_word_length_map) {
                 //console.log(field_name);
                 //console.log(frm.fields_dict[field_name]);

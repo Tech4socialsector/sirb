@@ -1,6 +1,6 @@
 {
  "aggregate_function_based_on": "",
- "background_color": "#F96167",
+ "background_color": "#F9E795",
  "color": "#000000",
  "creation": "2025-12-03 17:28:00.901752",
  "currency": "",
@@ -15,7 +15,7 @@
  "is_standard": 1,
  "label": "Secondary Reviewer's Action Pending",
  "method": "sirb.api.get_secondary_reviewer_pending_project_count",
- "modified": "2025-12-11 12:42:33.673277",
+ "modified": "2026-05-08 14:50:40.629474",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Pending Secondary Reviewer Projects",

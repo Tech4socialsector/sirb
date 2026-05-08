@@ -304,6 +304,44 @@ frappe.ui.form.on("IRB Project", {
             frm.save_button = frm.page.btn_primary;
         }
         toggle_save_button(frm);
+        if (frm.doc.__islocal) return; // Don't run on unsaved docs
+
+        frappe.call({
+            method: "sirb.api.get_project_students",
+            args: { project_name: frm.doc.name },
+            callback: function(r) {
+                if (r.message && r.message.length > 0) {
+                    // Create a simple, clean table
+                    let html = `
+                        <table class="table table-bordered table-condensed" style="background-color: #f8f9fa;">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Student Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    r.message.forEach(row => {
+                        html += `
+                            <tr>
+                                <td>${row.full_name}</td>
+                                <td>${row.user_email || ''}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `</tbody></table>`;
+                    
+                    // Set the HTML into the field
+                    frm.set_df_property('student_information', 'options', html);
+                } else {
+                    frm.set_df_property('student_information', 'options', '<p class="text-muted">No students assigned to this project.</p>');
+                }
+            }
+        });
+
 
         // Get the roles of the currently logged in user
         const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
@@ -833,20 +871,25 @@ frappe.ui.form.on("IRB Project", {
 
 
         // Set the word limits for each field
-        if (false) {
+        if (true) {
             for (const field_name in field_word_length_map) {
                 //console.log(field_name);
                 //console.log(frm.fields_dict[field_name]);
-                frm.fields_dict[field_name].$input.on("keyup", function () {
-                    let value = $(this).val() || "";
-                    let words = value.trim().split(/\s+/);
+                if (frm.fields_dict.hasOwnProperty(field_name) && frm.fields_dict[field_name].$input) {
+                    let field = frm.fields_dict[field_name];
+                    if (field && field.$input && field.df.fieldtype !== "Section Break") {                
+                        frm.fields_dict[field_name].$input.on("keyup", function () {
+                            let value = $(this).val() || "";
+                            let words = value.trim().split(/\s+/);
 
-                    if (words.length > field_word_length_map[field_name]) {
-                        frappe.msgprint(`Maximum ${field_word_length_map[field_name]} words allowed.`);
-                        // Trim extra words
-                        $(this).val(words.slice(0, field_word_length_map[field_name]).join(" "));
+                            if (words.length > field_word_length_map[field_name]) {
+                                frappe.msgprint(`Maximum ${field_word_length_map[field_name]} words allowed.`);
+                                // Trim extra words
+                                $(this).val(words.slice(0, field_word_length_map[field_name]).join(" "));
+                            }
+                        });
                     }
-                });            
+                }
             }
         }
 

@@ -314,6 +314,25 @@ def enque_faculty_upload(file_url, ao_unit):
     )
     return "Upload Started"
 
+# your_app/api.py
+import frappe
+
+@frappe.whitelist()
+def get_project_students(project_name):
+    return frappe.db.sql("""
+        SELECT
+            mapping.student as student_id,
+            student.full_name,
+            user.email as user_email
+        FROM
+            `tabStudent Project Mapping` mapping
+        INNER JOIN
+            `tabStudent` student ON mapping.student = student.name
+        INNER JOIN
+            `tabUser` user ON student.system_user = user.name
+        WHERE
+            mapping.irb_project = %s
+    """, (project_name), as_dict=1)
 
 @frappe.whitelist()
 def set_project_status(project_id, status):
@@ -337,7 +356,18 @@ def get_mentor_project_count(type):
             #print(query)
             data = frappe.db.sql(
                 query, as_dict=1
-            )        
+            )
+        if type == "approved":
+            query = f'''select count(*) as count from tabStudent as s 
+            join `tabStudent Project Mapping` as sp join `tabIRB Project` as p join 
+            tabFaculty as f on s.name = sp.student and sp.irb_project = p.name  
+            and p.faculty_mentor = f.name 
+            where p.status = "Approved" and sp.status="active"
+            and f.system_user = "{doc.system_user}"'''
+            #print(query)
+            data = frappe.db.sql(
+                query, as_dict=1
+            )                
         elif type == "pending":
             query = f'''select count(*) as count from tabStudent as s 
             join `tabStudent Project Mapping`
@@ -377,7 +407,20 @@ def get_mentor_unapproved_project_count():
     if data:
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Mentor Projects"]
+        return_dict["route"] = ["app", "query-report", "All Un-approved Mentor Projects"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
+    return return_dict
+
+@frappe.whitelist()
+def get_mentor_approved_project_count():
+    return_dict = {}
+    data = get_mentor_project_count("approved")
+    if data:
+        return_dict["value"] = data[0]["count"]
+        return_dict["fieldtype"] = "Int"
+        return_dict["route"] = ["app", "query-report", "All Approved Mentor Projects"]
     else:
         return_dict["value"] = 0
         return_dict["fieldtype"] = "Int"
@@ -400,7 +443,22 @@ def get_reviewer_project_count(type, role):
                 and sp.irb_project = p.name  
                 and f.name  = p.secondary_reviewer
                 where p.status !='Approved' and sp.status="active"
-                and f.system_user = "{doc.system_user}"'''                
+                and f.system_user = "{doc.system_user}"'''
+        elif type == "unapproved":
+            if role == "Primary Reviewer":
+                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
+                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
+                and sp.irb_project = p.name  
+                and f.name  = p.primary_reviewer
+                where p.status ='Approved' and sp.status="active"
+                and f.system_user = "{doc.system_user}"'''
+            elif role == "Secondary Reviewer":
+                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
+                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student
+                and sp.irb_project = p.name  
+                and f.name  = p.secondary_reviewer
+                where p.status ='Approved' and sp.status="active"
+                and f.system_user = "{doc.system_user}"'''                                
         elif type == "pending":
             if role == "Primary Reviewer":            
                 query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
@@ -441,13 +499,39 @@ def get_primary_reviewer_unapproved_project_count():
     return return_dict
 
 @frappe.whitelist()
+def get_primary_reviewer_approved_project_count():
+    return_dict = {}
+    data = get_reviewer_project_count("approved", "Primary Reviewer")
+    if data:
+        return_dict["value"] = data[0]["count"]
+        return_dict["fieldtype"] = "Int"
+        return_dict["route"] = ["app", "query-report", "All Approved Primary Reviewer Projects"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
+    return return_dict
+
+@frappe.whitelist()
 def get_secondary_reviewer_unapproved_project_count():
     return_dict = {}
     data = get_reviewer_project_count("unapproved", "Secondary Reviewer")
     if data:
         return_dict["value"] = data[0]["count"]
         return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Secondary Reviewer Projects"]
+        return_dict["route"] = ["app", "query-report", "All Un-approved Secondary Reviewer Projects"]
+    else:
+        return_dict["value"] = 0
+        return_dict["fieldtype"] = "Int"
+    return return_dict
+
+@frappe.whitelist()
+def get_secondary_reviewer_approved_project_count():
+    return_dict = {}
+    data = get_reviewer_project_count("approved", "Secondary Reviewer")
+    if data:
+        return_dict["value"] = data[0]["count"]
+        return_dict["fieldtype"] = "Int"
+        return_dict["route"] = ["app", "query-report", "All Approved Secondary Reviewer Projects"]
     else:
         return_dict["value"] = 0
         return_dict["fieldtype"] = "Int"

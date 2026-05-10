@@ -26,13 +26,13 @@
   "initial_pledge_section",
   "html_feit",
   "research_type",
-  "replacement_reduction_and_refinement_pledge",
-  "correctness_and_completeness_pledge",
+  "section_break_sfmt",
+  "html_wqye",
   "nheq_s1",
   "html_fucv",
-  "vertebrate",
-  "invertebrate",
-  "speciescommon_name",
+  "animal_type_vertebrate",
+  "animal_type_invertebrate",
+  "name_of_taxa",
   "number_of_animals_to_be_used",
   "toggle_nheq_s1",
   "nheq_s1_addons",
@@ -43,10 +43,11 @@
   "nheq_s1_prn",
   "nheq_s1_srn",
   "nheq_s1_fc",
+  "html_rnor",
   "nheq_s2",
   "animal_housing",
   "proposed_source_of_animals",
-  "name_of_source",
+  "name_of_animals_source",
   "toggle_nheq_s2",
   "nheq_s2_addons",
   "nheq_s2_sc",
@@ -56,9 +57,10 @@
   "nheq_s2_prn",
   "nheq_s2_srn",
   "nheq_s2_fc",
+  "html_ypvi",
   "nheq_s3",
   "manipulative_experiments_select",
-  "stree_reduction",
+  "experimental_protocol",
   "toggle_nheq_s3",
   "nheq_s3_addons",
   "nheq_s3_sc",
@@ -68,9 +70,10 @@
   "nheq_s3_prn",
   "nheq_s3_srn",
   "nheq_s3_fc",
+  "html_fyor",
   "nheq_s4",
   "stress_yes_no",
-  "precautions",
+  "duration_of_stress_and_amelioration",
   "toggle_nheq_s4",
   "nheq_s4_addons",
   "nheq_s4_sc",
@@ -80,9 +83,10 @@
   "nheq_s4_prn",
   "nheq_s4_srn",
   "nheq_s4_fc",
+  "html_ensg",
   "nheq_s5",
-  "what_will_be_done_with_the_live_animal_at_the_end_of_the_lab",
-  "disposal_method",
+  "animal_disposal_end_of_experiment",
+  "animal_disposal_method",
   "toggle_nheq_s5",
   "nheq_s5_addons",
   "nheq_s5_sc",
@@ -92,9 +96,12 @@
   "nheq_s5_prn",
   "nheq_s5_srn",
   "nheq_s5_fc",
+  "html_zdxr",
+  "section_break_ofql",
+  "html_queh",
   "nheq_s6",
   "study_site",
-  "taxa_name",
+  "taxa_name_field_based",
   "native_select",
   "toggle_nheq_s6",
   "nheq_s6_addons",
@@ -105,16 +112,25 @@
   "nheq_s6_prn",
   "nheq_s6_srn",
   "nheq_s6_fc",
+  "html_soou",
   "nheq_s7",
   "sensitive_areas",
-  "permission_to_work",
+  "sensitive_areas_permission_to_work",
   "toggle_nheq_s7",
   "nheq_s7_addons",
-  "aa",
+  "nheq_s7_sc",
+  "nheq_s7_mf",
+  "nheq_s7_rf",
+  "column_break_vhlr",
+  "nheq_s7_prn",
+  "nheq_s7_srn",
+  "nheq_s7_fc",
+  "html_mljz",
   "nheq_s8",
-  "ecological_data",
+  "ecological_data_types",
   "potential_impacts",
-  "safe_and_ethical_collection",
+  "measures_minimize_impact",
+  "safe_and_ethical_study_skills",
   "toggle_nheq_s8",
   "nheq_s8_addons",
   "nheq_s8_sc",
@@ -124,10 +140,11 @@
   "nheq_s8_prn",
   "nheq_s8_srn",
   "nheq_s8_fc",
+  "html_isuv",
   "nheq_s9",
   "html_dumg",
-  "professional_interaction_and_confidentiality",
-  "consent",
+  "confidentiality_of_responses",
+  "consent_for_people_interaction",
   "toggle_nheq_s9",
   "nheq_s9_addons",
   "nheq_s9_sc",
@@ -137,6 +154,9 @@
   "nheq_s9_prn",
   "nheq_s9_srn",
   "nheq_s9_fc",
+  "html_ijhm",
+  "section_break_npvv",
+  "html_hpan",
   "nheq_s10",
   "replacement_declaration",
   "information_correctness_declaration",
@@ -511,29 +531,6 @@
    "label": "Human Ethics Questionnaire"
   },
   {
-   "default": "0",
-   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
-   "fieldname": "vertebrate",
-   "fieldtype": "Check",
-   "label": "Animal Type - Vertebrate",
-   "permlevel": 7
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
-   "fieldname": "invertebrate",
-   "fieldtype": "Check",
-   "label": "Animal Type - Invertebrate",
-   "permlevel": 7
-  },
-  {
-   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
-   "fieldname": "speciescommon_name",
-   "fieldtype": "Small Text",
-   "label": "2. Name of the taxa",
-   "permlevel": 7
-  },
-  {
    "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "description": "(for vertebrates, please give exact number. For invertebrates, an approximate number is sufficient)",
    "fieldname": "number_of_animals_to_be_used",
@@ -542,30 +539,9 @@
    "permlevel": 7
   },
   {
-   "description": "Please mention where and how will they be released",
-   "fieldname": "what_will_be_done_with_the_live_animal_at_the_end_of_the_lab",
-   "fieldtype": "Small Text",
-   "label": "What will be done with the live animal at the end of the experiment? Please mention     where and how they will be released.",
-   "permlevel": 7
-  },
-  {
-   "description": "(Note: applicable to both vertebrates and invertebrates)",
-   "fieldname": "disposal_method",
-   "fieldtype": "Small Text",
-   "label": "If animals are sacrificed in the lab, how will they be disposed?",
-   "permlevel": 7
-  },
-  {
    "fieldname": "proposed_source_of_animals",
    "fieldtype": "Small Text",
    "label": "5. Proposed source of animals",
-   "permlevel": 7
-  },
-  {
-   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
-   "fieldname": "name_of_source",
-   "fieldtype": "Small Text",
-   "label": "6. If animals are bought from outside, name of the source",
    "permlevel": 7
   },
   {
@@ -581,7 +557,7 @@
    "fieldname": "project_domain",
    "fieldtype": "Select",
    "label": "IRB Project Domain",
-   "options": "-- Select --\nIRB Not Required\nHumans\nNon Human Species",
+   "options": "-- Select --\nIRB Not Required\nHumans\nNon Human Species\nBOTH Humans AND Non Humans",
    "permlevel": 7
   },
   {
@@ -594,6 +570,7 @@
    "fieldname": "state_your_project_question",
    "fieldtype": "Small Text",
    "label": "State your project question",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -601,6 +578,7 @@
    "fieldname": "project_context",
    "fieldtype": "Small Text",
    "label": "Explain the context of your study using 6 to 9 keywords.",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -624,6 +602,7 @@
    "fieldname": "sensitive_population_field",
    "fieldtype": "Small Text",
    "label": "Does your project/study involve any sensitive populations such as people with special needs, disabilities, trauma from extreme events etc.?",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -1729,10 +1708,11 @@
    "permlevel": 8
   },
   {
+   "default": "-- Select --",
    "fieldname": "research_type",
    "fieldtype": "Select",
    "label": "Research Type",
-   "options": "Lab based experiments\nField-based research (plants, animals included)\nBOTH Lab AND Field based",
+   "options": "-- Select --\nLab based experiments\nField-based research (plants, animals included)\nBOTH Lab AND Field based",
    "permlevel": 7
   },
   {
@@ -1788,41 +1768,34 @@
   {
    "fieldname": "stress_yes_no",
    "fieldtype": "Select",
-   "label": "9. Will the vertebrate animals be subjected to stress (biotic or abiotic)",
+   "label": "9. Will the vertebrate animals be subjected to stress (biotic or abiotic)?",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "options": "Yes\nNo\nNot Applicable",
    "permlevel": 7
   },
   {
-   "fieldname": "precautions",
-   "fieldtype": "Small Text",
-   "label": "10. What will be the duration of stress (acute or chronic) and what will be done to ameliorate stress?",
-   "permlevel": 7
-  },
-  {
+   "default": "-- Select --",
    "fieldname": "manipulative_experiments_select",
    "fieldtype": "Select",
    "label": "7. Are you performing manipulative experiments with animals?",
-   "options": "Yes\nNo\nNot Applicable",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "options": "-- Select --\nYes\nNo\nNot Applicable",
    "permlevel": 7
   },
   {
-   "fieldname": "stree_reduction",
-   "fieldtype": "Small Text",
-   "label": "8. Please describe the experimental protocol",
-   "permlevel": 7
-  },
-  {
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s4",
    "fieldtype": "Section Break",
    "label": "Animal welfare"
   },
   {
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s5",
    "fieldtype": "Section Break",
    "label": "Post-experimental handling"
   },
   {
-   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s6",
    "fieldtype": "Section Break",
    "label": "Study location and organisms"
@@ -1985,6 +1958,7 @@
    "label": "Field Changes"
   },
   {
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s5_addons",
    "fieldtype": "Section Break",
    "label": "Post-experimental handling - Review"
@@ -2028,6 +2002,7 @@
    "permlevel": 6
   },
   {
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s6_addons",
    "fieldtype": "Section Break",
    "label": "Study location and organisms - Review"
@@ -2075,85 +2050,36 @@
    "fieldname": "animal_housing",
    "fieldtype": "Small Text",
    "label": "4. How and where will the animals be housed ",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "permlevel": 7
   },
   {
    "fieldname": "study_site",
    "fieldtype": "Small Text",
-   "label": "Site(s) where the study will take place.",
-   "permlevel": 7
-  },
-  {
-   "fieldname": "taxa_name",
-   "fieldtype": "Small Text",
-   "label": "Name(s) of the taxa used in the study",
+   "label": "1. Site(s) where the study will take place.",
    "permlevel": 7
   },
   {
    "description": "Note: introduction of non-native species is not allowed)",
    "fieldname": "native_select",
    "fieldtype": "Select",
-   "label": "Is the animal/plant native to that ecosystem?",
+   "label": "3. Is the animal/plant native to that ecosystem?",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "options": "Yes\nNo",
-   "permlevel": 7
-  },
-  {
-   "default": "0",
-   "description": "I will follow replacement, reduction and refinement whenever using live organisms for my experiments.",
-   "fieldname": "replacement_reduction_and_refinement_pledge",
-   "fieldtype": "Check",
-   "label": "Replacement, reduction and refinement pledge",
-   "permlevel": 7
-  },
-  {
-   "default": "0",
-   "description": "I declare that the information that I have provided on the form is correct and complete. I also pledge that I will not change any of the forms, procedures and protocols used in this study without seeking approval from the IRB.",
-   "fieldname": "correctness_and_completeness_pledge",
-   "fieldtype": "Check",
-   "label": "Correctness and completeness pledge",
    "permlevel": 7
   },
   {
    "fieldname": "sensitive_areas",
    "fieldtype": "Small Text",
-   "label": "Indicate whether the project involves visiting any sensitive, restricted, or regulated areas.",
+   "label": "4. Indicate whether the project involves visiting any sensitive, restricted, or regulated areas.",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "permlevel": 7
   },
   {
-   "description": "(e.g., species observations, habitat measurements, water/soil samples)",
-   "fieldname": "ecological_data",
-   "fieldtype": "Small Text",
-   "label": "Describe the type of ecological data to be collected",
-   "options": "(e.g., species observations, habitat measurements, water/soil samples). ",
-   "permlevel": 7
-  },
-  {
-   "description": "Discuss potential impacts of data collection on the ecosystem as well as on other peoples\u2019 interactions with the ecosystem.",
    "fieldname": "potential_impacts",
    "fieldtype": "Small Text",
-   "label": "Potential impacts",
-   "permlevel": 7
-  },
-  {
-   "description": "If your research involves manipulating habitats, interaction with wildlife or collection of a biological specimen, describe your qualifications and skills for conducting these activities safely and ethically.",
-   "fieldname": "safe_and_ethical_collection",
-   "fieldtype": "Small Text",
-   "label": "Safe and ethical collection",
-   "permlevel": 7
-  },
-  {
-   "description": "If the project involves interactions with other people, such as interview surveys or stakeholder meetings, please provide information on the steps taken to ensure that these interactions are conducted in a professional and sensitive manner, and how you propose to protect the confidentiality of the responses provided by subjects",
-   "fieldname": "professional_interaction_and_confidentiality",
-   "fieldtype": "Small Text",
-   "label": "Professional Interaction and confidentiality",
-   "permlevel": 7
-  },
-  {
-   "description": "If data collection involves interaction with people, will consent be taken?  (you are required to fill consent form)",
-   "fieldname": "consent",
-   "fieldtype": "Select",
-   "label": "Consent",
-   "options": "Yes\nNo",
+   "label": "7. Discuss potential impacts of data collection on the ecosystem as well as on other peoples\u2019 interactions with the ecosystem. ",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "permlevel": 7
   },
   {
@@ -2296,6 +2222,7 @@
    "fieldname": "approaching_participants",
    "fieldtype": "Small Text",
    "label": "Describe how you will identify and approach your potential subjects/participants?",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2303,6 +2230,7 @@
    "fieldname": "data_collection_methods_and_locations",
    "fieldtype": "Small Text",
    "label": "For each participant type, explain: a) how you will engage or collect data  b) sites or locations where you will gather data?",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2310,6 +2238,7 @@
    "fieldname": "participant_risks_and_mitigation",
    "fieldtype": "Small Text",
    "label": "What are the foreseeable risks and discomforts related to your topic for each participant? How will you ensure you minimize those risks? ",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2317,6 +2246,7 @@
    "fieldname": "student_risks_and_mitigation",
    "fieldtype": "Small Text",
    "label": "What are the potential physical, emotional or other risks to you? How will you ensure you minimize those risks?  ",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2324,6 +2254,7 @@
    "fieldname": "consent_text_for_participation",
    "fieldtype": "Small Text",
    "label": "Please provide the exact consent text you will use to ensure voluntary participation.",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2331,6 +2262,7 @@
    "fieldname": "interventions",
    "fieldtype": "Small Text",
    "label": "Does your intervention material include sensitive topics? How will it be ethically reviewed, by whom, and what criteria will guide approval?",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2347,6 +2279,7 @@
    "fieldname": "other_data",
    "fieldtype": "Small Text",
    "label": "Will data be shared/collected from third parties? If yes, how will you ensure confidentiality and anonymity of participants\u2019 data?",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2354,6 +2287,7 @@
    "fieldname": "trust_of_participants",
    "fieldtype": "Small Text",
    "label": "How will you gain trust and confidence of the subjects/participants and ensure that their participation is entirely voluntary?",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "permlevel": 7
   },
   {
@@ -2415,39 +2349,35 @@
    "options": "<p><i>Animal Ethics Committee reviews applications for experiments conducted on animals as part of their research work. Any proposal that intends to use live animals in the lab or field as part of their work, should fill up this form. Work involving mammals (examples: rodents, primates etc.) in the lab is not permitted at Azim Premji University.</i></p>\n<p><i>Students/Researchers whose work involves transgenic cells and animals should apply separately to the Institutional Bio Safety Committee (IBSC). </i></p>"
   },
   {
-   "default": "0",
-   "fieldname": "permission_to_work",
-   "fieldtype": "Check",
-   "label": "If yes, then has permission to work in such areas obtained? "
-  },
-  {
    "fieldname": "initial_pledge_section",
    "fieldtype": "Section Break",
-   "label": "Pledge"
+   "label": "Policy & Research Type"
   },
   {
    "fieldname": "html_fucv",
    "fieldtype": "HTML",
-   "options": "1. Types of animals in the lab"
+   "options": "<p>1. Types of animals in the lab</p>"
   },
   {
-   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s7",
    "fieldtype": "Section Break",
    "label": "Access and approvals"
   },
   {
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s8",
    "fieldtype": "Section Break",
    "label": "Data collection and environmental impact"
   },
   {
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s8_addons",
    "fieldtype": "Section Break",
    "label": "Data collection and environmental impact - Review"
   },
   {
-   "depends_on": "eval:doc.research_type == 'Field-based research (plants, animals included)'",
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s9",
    "fieldtype": "Section Break",
    "label": "Human participation and consent"
@@ -2458,14 +2388,14 @@
    "options": "This section is only relevant if people are involved"
   },
   {
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s9_addons",
    "fieldtype": "Section Break",
    "label": "Human participation and consent - Review"
   },
   {
    "fieldname": "nheq_s10",
-   "fieldtype": "Section Break",
-   "label": "Student/Researcher declaration"
+   "fieldtype": "Section Break"
   },
   {
    "default": "0",
@@ -2482,6 +2412,7 @@
    "label": "Correctness & completeness pledge"
   },
   {
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s4_addons",
    "fieldtype": "Section Break",
    "label": "Animal welfare - review"
@@ -2502,14 +2433,10 @@
    "label": "Show/Hide Review Section"
   },
   {
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
    "fieldname": "nheq_s7_addons",
    "fieldtype": "Section Break",
    "label": "Access and approvals - Review"
-  },
-  {
-   "fieldname": "aa",
-   "fieldtype": "Small Text",
-   "label": "aa"
   },
   {
    "fieldname": "column_break_bzor",
@@ -2843,12 +2770,220 @@
   {
    "fieldname": "html_czgu",
    "fieldtype": "HTML"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "fieldname": "animal_type_vertebrate",
+   "fieldtype": "Check",
+   "label": "Animal Type - Vertebrate",
+   "permlevel": 7
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "fieldname": "animal_type_invertebrate",
+   "fieldtype": "Check",
+   "label": "Animal Type - Invertebrate",
+   "permlevel": 7
+  },
+  {
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "fieldname": "name_of_taxa",
+   "fieldtype": "Small Text",
+   "label": "2. Name of the taxa",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "fieldname": "name_of_animals_source",
+   "fieldtype": "Small Text",
+   "label": "6. If animals are bought from outside, name of the source",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "experimental_protocol",
+   "fieldtype": "Small Text",
+   "label": "8. Please describe the experimental protocol",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "duration_of_stress_and_amelioration",
+   "fieldtype": "Small Text",
+   "label": "10. What will be the duration of stress (acute or chronic) and what will be done to ameliorate stress?",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "animal_disposal_end_of_experiment",
+   "fieldtype": "Small Text",
+   "label": "11. What will be done with the live animals at the end of the experiment? Please mention     where and how they will be released.",
+   "permlevel": 7
+  },
+  {
+   "description": "(Note: applicable to both vertebrates and invertebrates)",
+   "fieldname": "animal_disposal_method",
+   "fieldtype": "Small Text",
+   "label": "12. If animals are sacrificed in the lab, how will they be disposed? (Note: applicable to both vertebrates and invertebrates)",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "depends_on": "eval:['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "fieldname": "section_break_ofql",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "html_queh",
+   "fieldtype": "HTML",
+   "options": "<h2>Ethics form for field-based research (plants, animals included)</h2>"
+  },
+  {
+   "fieldname": "taxa_name_field_based",
+   "fieldtype": "Small Text",
+   "label": "2. Name(s) of the taxa used in the study",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "default": "0",
+   "fieldname": "sensitive_areas_permission_to_work",
+   "fieldtype": "Check",
+   "label": "5. If yes, then has permission to work in such areas obtained? "
+  },
+  {
+   "fieldname": "ecological_data_types",
+   "fieldtype": "Small Text",
+   "label": "6. Describe the type of ecological data that will be collected (e.g., species observations, habitat measurements, water/soil samples). ",
+   "options": "(e.g., species observations, habitat measurements, water/soil samples). ",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "measures_minimize_impact",
+   "fieldtype": "Small Text",
+   "label": "8. Describe measures taken to minimize or mitigate ecological and social impacts."
+  },
+  {
+   "description": "Note: your research may involves manipulating habitats, interaction with wildlife or collection of a biological specimen. Describe your qualifications and skills for conducting these activities safely and ethically.",
+   "fieldname": "safe_and_ethical_study_skills",
+   "fieldtype": "Small Text",
+   "label": "9. Do you have the necessary skills to carry out this study ethically and safely?",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "description": "Note: Interactions with people may include interviews, surveys, focus group discussions, observations or stakeholder meetings. Please provide information on the steps taken to ensure that these interactions are conducted in a professional and sensitive manner.",
+   "fieldname": "confidentiality_of_responses",
+   "fieldtype": "Small Text",
+   "label": "10. If your project involves interactions with other people, how do you propose to protect the confidentiality of their responses? ",
+   "permlevel": 7
+  },
+  {
+   "default": "-- Select --",
+   "fieldname": "consent_for_people_interaction",
+   "fieldtype": "Select",
+   "label": "11. If data collection involves interaction with people, will consent be taken?  (you are required to fill the consent form)",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Field-based research (plants, animals included)', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "options": "-- Select --\nYes\nNo",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "section_break_npvv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "html_hpan",
+   "fieldtype": "HTML",
+   "options": "<h2>Student/Researcher declaration</h2>"
+  },
+  {
+   "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "fieldname": "section_break_sfmt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "html_wqye",
+   "fieldtype": "HTML",
+   "options": "<h2>Ethics form for lab-based research</h2>"
+  },
+  {
+   "fieldname": "nheq_s7_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer"
+  },
+  {
+   "fieldname": "nheq_s7_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback"
+  },
+  {
+   "fieldname": "nheq_s7_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer feedback to student"
+  },
+  {
+   "fieldname": "column_break_vhlr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nheq_s7_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary reviewer draft comments (to secondary reviewer)"
+  },
+  {
+   "fieldname": "nheq_s7_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes"
+  },
+  {
+   "fieldname": "nheq_s7_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes"
+  },
+  {
+   "fieldname": "html_rnor",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_ypvi",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_fyor",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_ensg",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_zdxr",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_soou",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_mljz",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_isuv",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "html_ijhm",
+   "fieldtype": "HTML"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-08 15:06:49.898168",
+ "modified": "2026-05-10 16:20:30.834808",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

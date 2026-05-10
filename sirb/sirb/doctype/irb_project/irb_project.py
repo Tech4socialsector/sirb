@@ -11,13 +11,21 @@ class IRBProject(Document):
 		if not self.is_new():
 			if self.project_domain == "-- Select --":
 				frappe.throw("Please select a valid IRB project domain.")
-			elif self.project_domain == "Humans":
+			elif self.project_domain in ["Humans", "BOTH Humans AND Non Humans"]:
 				if self.minor_participants == "-- Select --":
 					frappe.throw("Please select a valid answer for 4. Minors check")
 				if self.will_data_be_gathered_through_digital_means == "-- Select --":
 					frappe.throw("Please select a valid answer for 13.Gathering of Audio, Photographic and Video Data")
 				if not self.i_hereby_confirm_the_above:
 					frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
+			elif self.project_domain in ["Non Human Species", "BOTH Humans AND Non Humans"]:
+				if self.research_type ==  "-- Select --":
+					frappe.throw("Please select a valid answer for the Research Type in the Non-Human Questionnaire.")
+				if self.research_type in ["Lab based experiments", "BOTH Lab AND Field based"] and self.manipulative_experiments_select ==  "-- Select --":
+					frappe.throw("Please select a valid answer for \"7. Are you performing manipulative experiments with animals?\" in the Non-Human Questionnaire.")					
+					
+				if self.research_type in ["Field-based research (plants, animals included)", "BOTH Lab AND Field based"] and self.consent_for_people_interaction ==  "-- Select --":
+					frappe.throw("Please select a valid answer for \"If data collection involves interaction with people, will consent be taken?\" in the Non-Human Questionnaire.")
 		else:
 			# Ignore mandatory checks since it is created by a script.
 			self.flags.ignore_mandatory = True
@@ -132,6 +140,19 @@ class IRBProject(Document):
 							{"js": f"frappe.show_alert('Task {self.name} status changed to {self.status}');"},
 							user=u
 						)
+		if self.status == "Approved":
+			sp_mappings = frappe.get_all("Student Project Mapping", filters = {
+				"irb_project": self.name,
+				"status": "active"
+			})
+			# print("Mappings - ", sp_mappings)
+			for sp in sp_mappings:
+				# print("Mapping name ", sp["name"])
+				sp_doc = frappe.get_doc("Student Project Mapping", sp["name"])
+				sp_doc.status = "inactive"
+				sp_doc.save()
+				frappe.db.commit()
+						
 		versions = frappe.get_all(
 			"Version",
 			filters={

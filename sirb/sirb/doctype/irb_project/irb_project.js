@@ -162,7 +162,7 @@ function toggle_tabs(frm) {
         sections.forEach(s => frm.toggle_display(s, false));
     });
 
-    if (type === 'All') {
+    if (type === 'BOTH Humans AND Non Humans') {
         tabs.forEach(t => {
         //console.log(t)
         sections = get_sections_in_tab(frm, t);
@@ -261,6 +261,36 @@ function disable_keyboard_save(disable) {
         $(window).off('keydown.saveblock');
     }
     save_keyboard_disabled = disable;
+};
+async function update_status(frm, status) {
+    frappe.call({
+        method: "sirb.api.set_project_status",  // Python method
+        args: {
+            project_id: frm.doc.name,
+            status: status
+        },
+        callback: function(r) {
+            if (!r.exc) {
+                //frappe.msgprint("API executed successfully!");
+                frm.reload_doc();
+                //frappe.set_route("app", "irb-projects")
+            }
+        }
+    });    
+}
+async function process_status_change_button(frm, status) {
+    frappe.show_alert({ message: __('Saving changes...'), indicator: 'green' });
+    frm.save()
+        .then(() => {
+            // The 'then' block runs only if both client and server validations pass
+            console.log("UPDATING STATUS!")
+            update_status(frm, status);
+        })
+        .catch((err) => {
+            // If validation fails, the save is aborted and the error is shown automatically
+            console.error("Save failed:", err);
+            frappe.msgprint(__('Please correct the errors before proceeding.'));
+        });
 }
 frappe.ui.form.on("IRB Project", {
 
@@ -306,6 +336,20 @@ frappe.ui.form.on("IRB Project", {
         toggle_save_button(frm);
         if (frm.doc.__islocal) return; // Don't run on unsaved docs
 
+        if (!frm.doc.research_type)
+            frm.set_value('research_type', '-- Select --');
+        if (!frm.doc.project_domain)
+            frm.set_value('project_domain', '-- Select --');
+        if (!frm.doc.consent_for_people_interaction)
+            frm.set_value('consent_for_people_interaction', '-- Select --');
+        if (!frm.doc.minor_participants)
+            frm.set_value('minor_participants', '-- Select --'); 
+        if (!frm.doc.will_data_be_gathered_through_digital_means)
+            frm.set_value('will_data_be_gathered_through_digital_means', '-- Select --');
+        if (!frm.doc.manipulative_experiments_select)
+            frm.set_value('manipulative_experiments_select', '-- Select --');         
+                                            
+
         frappe.call({
             method: "sirb.api.get_project_students",
             args: { project_name: frm.doc.name },
@@ -345,7 +389,7 @@ frappe.ui.form.on("IRB Project", {
 
         // Get the roles of the currently logged in user
         const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
-        if (is_student && ["Humans","Non Human Species"].includes(frm.doc.project_domain))
+        if (is_student && ["Humans","Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain) && frm.doc.status !== "Awaiting proposal completion by student")
             frm.set_df_property('project_domain', 'read_only', 1);
         setTimeout(() => {
             if (!frm.__addons_hidden_initially) {
@@ -511,223 +555,257 @@ frappe.ui.form.on("IRB Project", {
                         btn_msg = "Request Reviewer Approval"
                         next_status = "Awaiting primary reviewer comments"
                     }
+                    
                     // console.log(btn_msg, next_status)
                     frm.add_custom_button(btn_msg, () => {
-                        frappe.call({
-                            method: "sirb.api.set_project_status",  // Python method
-                            args: {
-                                project_id: frm.doc.name,
-                                status: next_status
-                            },
-                            callback: function(r) {
-                                if (!r.exc) {
-                                    // frappe.msgprint("API executed successfully!");
-                                    frm.reload_doc();
-                                    frappe.set_route("app", "irb-project", frm.doc.name)
-                                }
-                            }
-                        });                    
+                        process_status_change_button(frm, next_status, true);
+                        // frappe.call({
+                        //     method: "sirb.api.set_project_status",  // Python method
+                        //     args: {
+                        //         project_id: frm.doc.name,
+                        //         status: next_status
+                        //     },
+                        //     callback: function(r) {
+                        //         if (!r.exc) {
+                        //             // frappe.msgprint("API executed successfully!");
+                        //             frm.reload_doc();
+                        //             frappe.set_route("app", "irb-project", frm.doc.name)
+                        //         }
+                        //     }
+                        // });                    
                     }, "Actions");
             } else if (["Awaiting student correction for mentor feedback", "Awaiting student correction for reviewer feedback"].includes(frm.doc.status)) {
+                if (frm.doc.status == "Awaiting student correction for mentor feedback")
+                    new_status = "Awaiting Faculty mentor approval";
+                else if (frm.doc.status == "Awaiting student correction for reviewer feedback")
+                    new_status = "Awaiting reviewer feedback to student";                
                 frm.add_custom_button("Submit corrections", () => {
-                    if (frm.doc.status == "Awaiting student correction for mentor feedback")
-                        new_status = "Awaiting Faculty mentor approval";
-                    else if (frm.doc.status == "Awaiting student correction for reviewer feedback")
-                        new_status = "Awaiting reviewer feedback to student";
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: new_status
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-project", frm.doc.name)
-                            }
-                        }
-                    });                    
+                    process_status_change_button(frm, new_status, true);
                 }, "Actions");
+                // frm.add_custom_button("Submit corrections", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: new_status
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-project", frm.doc.name)
+                //             }
+                //         }
+                //     });                    
+                // }, "Actions");
             } else if (frm.doc.status === "Provisionally approved") {
                 frm.add_custom_button("Submit for final approval", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Awaiting final approval"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-project", frm.doc.name)
-                            }
-                        }
-                    });                    
-                }, "Actions");                                
+                    process_status_change_button(frm, "Awaiting final approval", true);
+                }, "Actions");                
+                // frm.add_custom_button("Submit for final approval", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Awaiting final approval"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-project", frm.doc.name)
+                //             }
+                //         }
+                //     });                    
+                // }, "Actions");                                
             }
         } else if (is_mentor) {
             if (frm.doc.status === "Awaiting Faculty mentor approval") {
-                    frm.add_custom_button("Approve for review", () => {
-                        console.log("has_secondary_reviewer ", has_secondary_reviewer)
-                        if (has_secondary_reviewer)
-                            set_status = "Awaiting primary reviewer comments"
-                        else
-                            set_status = "Awaiting reviewer feedback to student"
-                        frappe.call({
-                            method: "sirb.api.set_project_status",  // Python method
-                            args: {
-                                project_id: frm.doc.name,
-                                status: set_status
-                            },
-                            callback: function(r) {
-                                if (!r.exc) {
-                                    // frappe.msgprint("API executed successfully!");
-                                    frm.reload_doc();
-                                    frappe.set_route("app", "irb-projects")
-                                }
-                            }
-                        });                    
-                    }, "Actions");
-                    frm.add_custom_button("Request corrections from student", () => {
-                        frappe.call({
-                            method: "sirb.api.set_project_status",  // Python method
-                            args: {
-                                project_id: frm.doc.name,
-                                status: "Awaiting student correction for mentor feedback"
-                            },
-                            callback: function(r) {
-                                if (!r.exc) {
-                                    // frappe.msgprint("API executed successfully!");
-                                    frm.reload_doc();
-                                    frappe.set_route("app", "irb-projects")
-                                }
-                            }
-                        });
-                    }, "Actions");
-    
+                console.log("has_secondary_reviewer ", has_secondary_reviewer)
+                if (has_secondary_reviewer)
+                    set_status = "Awaiting primary reviewer comments"
+                else
+                    set_status = "Awaiting reviewer feedback to student"                
+                frm.add_custom_button("Approve for review", () => {
+                    process_status_change_button(frm, set_status, false);
+                }, "Actions");
+                frm.add_custom_button("Request corrections from student", () => {
+                    process_status_change_button(frm, "Awaiting student correction for mentor feedback", false);
+                }, "Actions");                                 
+                // frm.add_custom_button("Approve for review", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: set_status
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });                    
+                // }, "Actions");
+                // frm.add_custom_button("Request corrections from student", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Awaiting student correction for mentor feedback"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });
+                // }, "Actions");
             }
         } else if (is_primary_reviewer) {
             if (frm.doc.status ==="Awaiting reviewer feedback to student") {
                 frm.add_custom_button("Request corrections from student", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Awaiting student correction for reviewer feedback"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-projects")
-                            }
-                        }
-                    });                    
+                    process_status_change_button(frm, "Awaiting student correction for reviewer feedback", false);
                 }, "Actions");
                 frm.add_custom_button("Grant FINAL approval", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Approved"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-projects")
-                            }
-                        }
-                    });
+                    process_status_change_button(frm, "Approved", false);
                 }, "Actions");
                 frm.add_custom_button("Grant PROVISIONAL approval", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Provisionally approved"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-projects")
-                            }
-                        }
-                    });
-                }, "Actions");
+                    process_status_change_button(frm, "Provisionally approved", false);
+                }, "Actions");                
+                // frm.add_custom_button("Request corrections from student", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Awaiting student correction for reviewer feedback"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });
+                // }, "Actions");
+                // frm.add_custom_button("Grant FINAL approval", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Approved"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });
+                // }, "Actions");
+                // frm.add_custom_button("Grant PROVISIONAL approval", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Provisionally approved"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });
+                // }, "Actions");
             } else if (frm.doc.status === "Awaiting final approval") {
                 frm.add_custom_button("Grant FINAL approval", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Approved"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-projects")
-                            }
-                        }
-                    });
+                    process_status_change_button(frm, "Approved", false);
                 }, "Actions");                
+                // frm.add_custom_button("Grant FINAL approval", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Approved"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });
+                // }, "Actions");                
             } else if (frm.doc.status === "Awaiting primary reviewer comments") {
                 frm.add_custom_button("Forward to secondary reviewer", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Awaiting secondary reviewer comments"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-projects")
-                            }
-                        }
-                    });
+                    process_status_change_button(frm, "Awaiting secondary reviewer comments", false);
                 }, "Actions");                
+                // frm.add_custom_button("Forward to secondary reviewer", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Awaiting secondary reviewer comments"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });
+                // }, "Actions");                
             } else if (frm.doc.status === "Provisionally approved") {
                 frm.add_custom_button("Grant FINAL approval", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Approved"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-projects")
-                            }
-                        }
-                    });
+                    process_status_change_button(frm, "Approved", false);
                 }, "Actions");                
+                // frm.add_custom_button("Grant FINAL approval", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Approved"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });
+                // }, "Actions");                
             }
         } else if (is_secondary_reviewer) {
             if (frm.doc.status ==="Awaiting secondary reviewer comments") {
                 frm.add_custom_button("Forward to primary reviewer", () => {
-                    frappe.call({
-                        method: "sirb.api.set_project_status",  // Python method
-                        args: {
-                            project_id: frm.doc.name,
-                            status: "Awaiting reviewer feedback to student"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                // frappe.msgprint("API executed successfully!");
-                                frm.reload_doc();
-                                frappe.set_route("app", "irb-projects")
-                            }
-                        }
-                    });                    
+                    process_status_change_button(frm, "Awaiting reviewer feedback to student", false);
                 }, "Actions");
+                // frm.add_custom_button("Forward to primary reviewer", () => {
+                //     frappe.call({
+                //         method: "sirb.api.set_project_status",  // Python method
+                //         args: {
+                //             project_id: frm.doc.name,
+                //             status: "Awaiting reviewer feedback to student"
+                //         },
+                //         callback: function(r) {
+                //             if (!r.exc) {
+                //                 // frappe.msgprint("API executed successfully!");
+                //                 frm.reload_doc();
+                //                 frappe.set_route("app", "irb-projects")
+                //             }
+                //         }
+                //     });                    
+                // }, "Actions");
             }
         }
 

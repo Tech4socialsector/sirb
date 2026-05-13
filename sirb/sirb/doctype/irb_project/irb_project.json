@@ -480,7 +480,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Awaiting proposal completion by student\nAwaiting Faculty mentor approval\nAwaiting student correction for mentor feedback\nAwaiting primary reviewer comments\nAwaiting secondary reviewer comments\nAwaiting reviewer feedback to student\nAwaiting student correction for reviewer feedback\nProvisionally approved\nAwaiting final approval\nApproved",
+   "options": "Awaiting proposal completion by student\nAwaiting Faculty mentor approval\nAwaiting student correction for mentor feedback\nAwaiting primary reviewer comments to secondary reviewer\nAwaiting secondary reviewer comments to primary reviewer\nAwaiting reviewer feedback to student\nAwaiting student correction for reviewer feedback\nProvisionally approved\nAwaiting final approval\nApproved",
    "read_only": 1,
    "read_only_depends_on": "eval:frappe.user != \"Administrator\""
   },
@@ -2983,7 +2983,7 @@
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-10 16:20:30.834808",
+ "modified": "2026-05-12 16:40:07.210058",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

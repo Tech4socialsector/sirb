@@ -534,7 +534,7 @@ def get_secondary_reviewer_approved_project_count():
     data = get_reviewer_project_count("approved", "Secondary Reviewer")
     if data:
         return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"r
+        return_dict["fieldtype"] = "Int"
         return_dict["route"] = ["app", "query-report", "All Approved Secondary Reviewer Pojects"]
     else:
         return_dict["value"] = 0

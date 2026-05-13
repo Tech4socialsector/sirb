@@ -1,0 +1,63 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Link",
+   "label": "Student Record",
+   "width": 0
+  },
+  {
+   "fieldname": "project_title",
+   "fieldtype": "Data",
+   "label": "Project Title",
+   "width": 0
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Link",
+   "label": "Project Record (click to open)",
+   "width": 0
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Project status",
+   "width": 0
+  }
+ ],
+ "creation": "2026-05-13 11:39:03.404152",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "letterhead": null,
+ "modified": "2026-05-13 11:54:49.346394",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "All Un-approved Mentor Projects",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "IRB Project",
+ "report_name": "All Un-approved Mentor Projects",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Anchor"
+  },
+  {
+   "role": "Faculty Mentor"
+  }
+ ],
+ "timeout": 0
+}

@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "IRB Projects",
  "links": [],
- "modified": "2026-05-08 13:03:32.768088",
+ "modified": "2026-05-13 11:31:37.328874",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Projects",
@@ -23,20 +23,20 @@
    "number_card_name": "Pending Mentor Projects"
   },
   {
-   "label": "Mentor - unapproved",
-   "number_card_name": "Unapproved Mentor Projects"
-  },
-  {
    "label": "Primary reviewer action pending",
    "number_card_name": "Pending Primary Reviewer Projects"
   },
   {
-   "label": "Primary reviewer - unapproved",
-   "number_card_name": "Primary Reviewer's Unapproved Projects"
-  },
-  {
    "label": "Secondary reviewer action pending",
    "number_card_name": "Pending Secondary Reviewer Projects"
+  },
+  {
+   "label": "Mentor - unapproved",
+   "number_card_name": "Unapproved Mentor Projects"
+  },
+  {
+   "label": "Primary reviewer - unapproved",
+   "number_card_name": "Primary Reviewer's Unapproved Projects"
   },
   {
    "label": "Secondary reviewer - unapproved",

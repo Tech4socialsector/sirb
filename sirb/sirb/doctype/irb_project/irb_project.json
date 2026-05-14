@@ -490,7 +490,7 @@
    "label": "Mentor and Reviewers"
   },
   {
-   "depends_on": "eval: frappe.user.has_role(\"Manager\") || frappe.user.has_role(\"Administrator\")",
+   "depends_on": "eval: frappe.user.has_role(\"System Manager\") || frappe.user.has_role(\"Administrator\")",
    "fieldname": "primary_reviewer",
    "fieldtype": "Link",
    "label": "Primary Reviewer",
@@ -545,7 +545,7 @@
    "permlevel": 7
   },
   {
-   "depends_on": "eval: frappe.user.has_role(\"Student\") || frappe.user.has_role(\"Administrator\")",
+   "depends_on": "eval: frappe.user.has_role(\"Student\") || frappe.user.has_role(\"System Manager\") || frappe.user.has_role(\"Administrator\")",
    "fieldname": "faculty_mentor",
    "fieldtype": "Link",
    "label": "Faculty Mentor",
@@ -2983,7 +2983,7 @@
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-12 16:40:07.210058",
+ "modified": "2026-05-14 10:42:36.566370",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

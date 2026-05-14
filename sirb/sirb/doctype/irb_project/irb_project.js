@@ -323,12 +323,12 @@ async function toggle_save_button(frm) {
     if (is_mentor && !["Awaiting Faculty mentor approval", "Approved"].includes(frm.doc.status)) {
         disable_button = true;
     }
-    if (is_primary_reviewer && !["Awaiting primary reviewer comments",
+    if (is_primary_reviewer && !["Awaiting primary reviewer comments to secondary reviewer",
         "Awaiting reviewer feedback to student",
         "Awaiting final approval", "Approved"].includes(frm.doc.status)) {
         disable_button = true;
     }
-    if (is_secondary_reviewer && !["Awaiting secondary reviewer comments", "Approved"].includes(frm.doc.status)) {
+    if (is_secondary_reviewer && !["Awaiting secondary reviewer comments to primary reviewer", "Approved"].includes(frm.doc.status)) {
         disable_button = true;
     }
 
@@ -384,18 +384,22 @@ async function update_status(frm, status) {
     });    
 }
 async function process_status_change_button(frm, status) {
-    frappe.show_alert({ message: __('Saving changes...'), indicator: 'green' });
-    frm.save()
-        .then(() => {
-            // The 'then' block runs only if both client and server validations pass
-            console.log("UPDATING STATUS!")
-            update_status(frm, status);
-        })
-        .catch((err) => {
-            // If validation fails, the save is aborted and the error is shown automatically
-            console.error("Save failed:", err);
-            frappe.msgprint(__('Please correct the errors before proceeding.'));
-        });
+    if (frm.is_dirty()) {    
+        frappe.show_alert({ message: __('Saving changes...'), indicator: 'green' });
+        frm.save()
+            .then(() => {
+                // The 'then' block runs only if both client and server validations pass
+                console.log("UPDATING STATUS!")
+                update_status(frm, status);
+            })
+            .catch((err) => {
+                // If validation fails, the save is aborted and the error is shown automatically
+                console.error("Save failed:", err);
+                frappe.msgprint(__('Please correct the errors before proceeding.'));
+            });
+    } else {
+        update_status(frm, status);
+    }
 }
 frappe.ui.form.on("IRB Project", {
 
@@ -673,7 +677,7 @@ frappe.ui.form.on("IRB Project", {
                         next_ststus = "Awaiting reviewer feedback to student"
                     } else { 
                         btn_msg = "Request Reviewer Approval"
-                        next_status = "Awaiting primary reviewer comments"
+                        next_status = "Awaiting primary reviewer comments to secondary reviewer"
                     }
                     
                     // console.log(btn_msg, next_status)
@@ -747,7 +751,7 @@ frappe.ui.form.on("IRB Project", {
             if (frm.doc.status === "Awaiting Faculty mentor approval") {
                 console.log("has_secondary_reviewer ", has_secondary_reviewer)
                 if (has_secondary_reviewer)
-                    set_status = "Awaiting primary reviewer comments"
+                    set_status = "Awaiting primary reviewer comments to secondary reviewer"
                 else
                     set_status = "Awaiting reviewer feedback to student"             
                 frm.add_custom_button("Approve for review", () => {
@@ -870,9 +874,9 @@ frappe.ui.form.on("IRB Project", {
                 //         }
                 //     });
                 // }, "Actions");                
-            } else if (frm.doc.status === "Awaiting primary reviewer comments") {
+            } else if (frm.doc.status === "Awaiting primary reviewer comments to secondary reviewer") {
                 frm.add_custom_button("Forward to secondary reviewer", () => {
-                    process_status_change_button(frm, "Awaiting secondary reviewer comments", false);
+                    process_status_change_button(frm, "Awaiting secondary reviewer comments to primary reviewer", false);
                 }, "Actions");                
                 // frm.add_custom_button("Forward to secondary reviewer", () => {
                 //     frappe.call({
@@ -912,7 +916,7 @@ frappe.ui.form.on("IRB Project", {
                 // }, "Actions");                
             }
         } else if (is_secondary_reviewer) {
-            if (frm.doc.status ==="Awaiting secondary reviewer comments") {
+            if (frm.doc.status ==="Awaiting secondary reviewer comments to primary reviewer") {
                 frm.add_custom_button("Forward to primary reviewer", () => {
                     process_status_change_button(frm, "Awaiting reviewer feedback to student", false);
                 }, "Actions");

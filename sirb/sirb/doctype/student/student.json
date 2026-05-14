@@ -8,7 +8,8 @@
   "user_information_section",
   "system_user",
   "full_name",
-  "student_id"
+  "student_id",
+  "academic_year"
  ],
  "fields": [
   {
@@ -33,13 +34,18 @@
    "fieldtype": "Link",
    "label": "System User",
    "options": "User"
+  },
+  {
+   "fieldname": "academic_year",
+   "fieldtype": "Data",
+   "label": "Academic Year"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-27 09:50:39.258103",
+ "modified": "2026-05-14 15:45:40.720642",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Student",

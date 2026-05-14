@@ -1,4 +1,4 @@
-var section_list = ["heq_s1","heq_s2", "heq_s3", "heq_s4", "heq_s5", "heq_s6", "heq_s7", "heq_s8", "heq_s9", "heq_s10", "heq_s11", "heq_s12", "heq_s13", "heq_s14", "heq_s15", "heq_s16", "heq_s17", "heq_s18", "heq_s19", "heq_s20", "nheq_s1", "nheq_s2", "nheq_s3", "nheq_s4", "nheq_s5", "nheq_s6", "uploads_s1"]
+var section_list = ["heq_s1","heq_s2", "heq_s3", "heq_s4", "heq_s5", "heq_s6", "heq_s7", "heq_s8", "heq_s9", "heq_s10", "heq_s11", "heq_s12", "heq_s13", "heq_s14", "heq_s15", "heq_s16", "heq_s17", "heq_s18", "heq_s19", "heq_s20", "nheq_s0","nheq_s1", "nheq_s2", "nheq_s3", "nheq_s4", "nheq_s5", "nheq_s6", "nheq_s7", "nheq_s8", "nheq_s9","uploads_s1"]
 var extns = {"_rf": "Reviewer feedback", "_prn": "Primary reviewer notes","_srn": "Secondary reviewer notes", "_sc": "Student comments", "_mf": "Mentor feedback"}
 var extns_with_fc = structuredClone(extns);
 extns_with_fc["_fc"] = "Field changed"
@@ -6,7 +6,9 @@ extns_with_fc["_fc"] = "Field changed"
 var field_word_length_map = {
     "abstract": 500,
     "state_your_project_question":  200,
+    "nheq_project_question": 200,
     "project_context": 10,
+    "nheq_project_context": 10,
     "project_subjects": 200,
     "consent_type_and_explanation": 600,
     "consent_text_for_minors": 600,
@@ -64,8 +66,13 @@ async function get_versions_after_status_change(doctype, docname, status) {
                 break;
         }
     }
-    console.log("CHANGES ", changed_versions);
-    return changed_versions;
+    if (found_needed_status_change) {
+        console.log("CHANGES ", changed_versions);
+        return changed_versions;
+    } else
+        console.log("NO CHANGES FOUND!")
+        return []
+
 }
 function get_field_changes_from_version_list(versions, fieldname) {
     let changes = []
@@ -84,9 +91,25 @@ function get_field_changes_from_version_list(versions, fieldname) {
     // console.log("FOUND NEEDED FIELD CHANGE! ", changes)
     return changes
 }
+function clear_all_field_changes(frm) {
+    console.log("TRYING TO CLEAR!")
+    Object.keys(frm.fields_dict).forEach(fieldname => {
+        let field = frm.get_field(fieldname);
+        if (!field || !field.$wrapper) return;
+        let $label = field.$wrapper.find('.control-label');
+        // Remove any span whose text contains "(Field Changed)"
+        $label.find('span').each(function() {
+            if ($(this).text().includes('(Field Changed)')) {
+                console.log("REMOVING!")
+                $(this).remove();
+            }
+        });
+    });
+}
+
 async function update_field_changes(frm, doctype, docname, status) {
     console.log("CHECKING FIELD UPDATES AFTER ", status, " !!")
-    changed_versions = await get_versions_after_status_change(doctype, docname, status)
+    let changed_versions = await get_versions_after_status_change(doctype, docname, status)
     if (changed_versions.length > 0) {
         console.log("FOUND CHANGED VERSIONS!")
         for (let section of section_list) {
@@ -103,7 +126,14 @@ async function update_field_changes(frm, doctype, docname, status) {
                     updated_label = get_updated_label(frm, field);
                     if (!(updated_label.toLowerCase().includes("changed"))) {
                         let orig_label = frm.get_field(field).df.label;
-                        frm.set_df_property(field, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
+                        if (field && field.$wrapper) {
+                            let $label = field.$wrapper.find('.control-label');
+                            if ($label.length) {
+                                // Keep the original text inside the label, append the marker as HTML
+                                $label.html(orig_label + ' <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>');
+                            }
+                        }                        
+                        // frm.set_df_property(field, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
                     }                    
                 }
             }
@@ -124,7 +154,14 @@ async function update_field_changes(frm, doctype, docname, status) {
                     updated_label = get_updated_label(frm, section_with_ext);
                     if (!(updated_label.toLowerCase().includes("changed"))) {
                         let orig_label = frm.get_field(section_with_ext).df.label;
-                        frm.set_df_property(section_with_ext, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
+                        //frm.set_df_property(section_with_ext, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
+                        if (section_with_ext && section_with_ext.$wrapper) {
+                            let $label = section_with_ext.$wrapper.find('.control-label');
+                            if ($label.length) {
+                                // Keep the original text inside the label, append the marker as HTML
+                                $label.html(orig_label + ' <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>');
+                            }
+                        }                        
                     }
                 }
             }
@@ -458,6 +495,7 @@ frappe.ui.form.on("IRB Project", {
             frm.set_value('manipulative_experiments_select', '-- Select --');         
 
         // SHOW FIELD UPDATES
+        clear_all_field_changes(frm);
         if (frm.doc.status == "Awaiting student correction for mentor feedback") {
             // SHOW STUDENT THE UPDATES FROM MENTOR
             await update_field_changes(frm, "IRB Project", frm.doc.name, "Awaiting Faculty mentor approval");
@@ -486,6 +524,8 @@ frappe.ui.form.on("IRB Project", {
                                 <tr>
                                     <th>Student Name</th>
                                     <th>Student Email</th>
+                                    <th>Student ID</th>
+                                    <th>Academic Year</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -496,6 +536,8 @@ frappe.ui.form.on("IRB Project", {
                             <tr>
                                 <td>${row.full_name}</td>
                                 <td>${row.user_email || ''}</td>
+                                <td>${row.student_id || ''}</td>
+                                <td>${row.academic_year || ''}</td>
                             </tr>
                         `;
                     });

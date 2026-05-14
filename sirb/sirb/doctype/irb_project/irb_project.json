@@ -7,14 +7,15 @@
  "engine": "InnoDB",
  "field_order": [
   "basic_details_tab",
-  "introduction_section",
+  "student_details_section",
   "student_information",
-  "title",
-  "abstract",
-  "column_break_amrn",
-  "topic",
   "irb_unit",
+  "introduction_section",
   "project_domain",
+  "title",
+  "column_break_amrn",
+  "abstract",
+  "topic",
   "project_status_section",
   "status",
   "reviewers_section",
@@ -25,7 +26,20 @@
   "animal_ethics_questionnaire_tab",
   "initial_pledge_section",
   "html_feit",
+  "nheq_s0",
+  "nheq_project_question",
+  "nheq_project_context",
   "research_type",
+  "toggle_nheq_s0",
+  "nheq_s0_addons",
+  "nheq_s0_sc",
+  "nheq_s0_mf",
+  "nheq_s0_rf",
+  "column_break_irjc",
+  "nheq_s0_prn",
+  "nheq_s0_srn",
+  "nheq_s0_fc",
+  "html_okgn",
   "section_break_sfmt",
   "html_wqye",
   "nheq_s1",
@@ -159,7 +173,6 @@
   "html_hpan",
   "nheq_s10",
   "replacement_declaration",
-  "information_correctness_declaration",
   "human_ethics_questionnaire_tab",
   "heq_s1",
   "state_your_project_question",
@@ -473,7 +486,7 @@
   {
    "fieldname": "introduction_section",
    "fieldtype": "Section Break",
-   "label": "Basic Details"
+   "label": "Basic Project Details"
   },
   {
    "default": "Awaiting proposal completion by student",
@@ -521,7 +534,7 @@
   {
    "fieldname": "irb_unit",
    "fieldtype": "Link",
-   "label": "IRB Unit",
+   "label": "School/Programme",
    "options": "IRB Unit",
    "reqd": 1
   },
@@ -2351,7 +2364,7 @@
   {
    "fieldname": "initial_pledge_section",
    "fieldtype": "Section Break",
-   "label": "Policy & Research Type"
+   "label": "Policy"
   },
   {
    "fieldname": "html_fucv",
@@ -2402,14 +2415,7 @@
    "description": "I will follow replacement, reduction and refinement whenever using live organisms for my experiments.",
    "fieldname": "replacement_declaration",
    "fieldtype": "Check",
-   "label": "Reduction, replacement & refinedment pledge"
-  },
-  {
-   "default": "0",
-   "description": "I declare that the information that I have provided on the form is correct and complete. I also pledge that I will not change any of the forms, procedures and protocols used in this study without seeking approval from the IRB.",
-   "fieldname": "information_correctness_declaration",
-   "fieldtype": "Check",
-   "label": "Correctness & completeness pledge"
+   "label": "Reduction, replacement & refinement pledge"
   },
   {
    "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
@@ -2978,12 +2984,97 @@
   {
    "fieldname": "html_ijhm",
    "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "student_details_section",
+   "fieldtype": "Section Break",
+   "label": "Student details"
+  },
+  {
+   "depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
+   "fieldname": "nheq_s0",
+   "fieldtype": "Section Break",
+   "label": "Research type, project question and context"
+  },
+  {
+   "depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
+   "description": "[Word limit: 200]",
+   "fieldname": "nheq_project_question",
+   "fieldtype": "Small Text",
+   "label": "State your project question",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
+   "fieldname": "nheq_project_context",
+   "fieldtype": "Small Text",
+   "label": "Explain the context of your study using 6 to 9 keywords.",
+   "mandatory_depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "toggle_nheq_s0",
+   "fieldtype": "Button",
+   "label": "Show/Hide Review Section"
+  },
+  {
+   "depends_on": "eval:['Non Human Species', 'BOTH Humans AND Non Humans'].includes(doc.project_domain) && ['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
+   "fieldname": "nheq_s0_addons",
+   "fieldtype": "Section Break",
+   "label": "Research type, project question and context - Review"
+  },
+  {
+   "fieldname": "nheq_s0_sc",
+   "fieldtype": "Small Text",
+   "label": "Talk to your reviewer",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "nheq_s0_mf",
+   "fieldtype": "Small Text",
+   "label": "Mentor Feedback",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "nheq_s0_rf",
+   "fieldtype": "Small Text",
+   "label": "Reviewer feedback to student",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "column_break_irjc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "nheq_s0_prn",
+   "fieldtype": "Small Text",
+   "label": "Primary reviewer draft comments (to secondary reviewer)",
+   "permlevel": 4
+  },
+  {
+   "depends_on": "eval: doc.num_reviewers == 2",
+   "fieldname": "nheq_s0_srn",
+   "fieldtype": "Small Text",
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "nheq_s0_fc",
+   "fieldtype": "Small Text",
+   "label": "Field Changes",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "html_okgn",
+   "fieldtype": "HTML"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-14 10:42:36.566370",
+ "modified": "2026-05-14 17:29:26.265463",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

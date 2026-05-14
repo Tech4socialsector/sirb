@@ -5,6 +5,7 @@ def get_logged_in_doc(role_name):
     user = frappe.session.user
     role_doc_mapping = {
         "Faculty Mentor" : "Faculty",
+        "Faculty Member" : "Faculty",
         "Primary Reviewer" : "Faculty",
         "Secondary Reviewer" : "Faculty",
         "Faculty": "Faculty",

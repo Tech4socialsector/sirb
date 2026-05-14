@@ -343,7 +343,7 @@ def set_project_status(project_id, status):
     return {'message': "Success"}
 
 def get_mentor_project_count(type):
-    doc = get_logged_in_doc("Faculty")
+    doc = get_logged_in_doc("Faculty Member")
     #print("doc is ", doc)  
     # print(type) 
     if doc:
@@ -352,7 +352,7 @@ def get_mentor_project_count(type):
             join `tabStudent Project Mapping` as sp join `tabIRB Project` as p join 
             tabFaculty as f on s.name = sp.student and sp.irb_project = p.name  
             and p.faculty_mentor = f.name 
-            where p.status not in ("Approved") and sp.status="active"
+            where p.status not in ("Approved", "Awaiting Faculty mentor approval") and sp.status="active"
             and f.system_user = "{doc.system_user}"'''
             # print(query)
             data = frappe.db.sql(
@@ -364,7 +364,7 @@ def get_mentor_project_count(type):
             join `tabStudent Project Mapping` as sp join `tabIRB Project` as p join 
             tabFaculty as f on s.name = sp.student and sp.irb_project = p.name  
             and p.faculty_mentor = f.name 
-            where p.status = "Approved" and sp.status="active"
+            where p.status = "Approved"
             and f.system_user = "{doc.system_user}"'''
             #print(query)
             data = frappe.db.sql(
@@ -377,7 +377,7 @@ def get_mentor_project_count(type):
             and sp.irb_project = p.name  
             and p.faculty_mentor = f.name
             where p.status='Awaiting Faculty mentor approval'
-            and f.system_user = "{doc.full_name}"  and sp.status="active"'''
+            and f.system_user = "{doc.system_user}"  and sp.status="active"'''
         else:
             return None
     else:
@@ -387,7 +387,7 @@ def get_mentor_project_count(type):
     data = frappe.db.sql(
         query, as_dict=1
     )
-    print(data)
+    #print(data)
     return data
 
 @frappe.whitelist()
@@ -439,29 +439,29 @@ def get_reviewer_project_count(type, role):
                 as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
                 and sp.irb_project = p.name  
                 and f.name  = p.primary_reviewer
-                where p.status !='Approved' and sp.status="active"
+                where p.status not in ("Approved", "Awaiting primary reviewer comments to secondary reviewer", "Awaiting reviewer feedback to student", "Awaiting final approval") and sp.status="active"
                 and f.system_user = "{doc.system_user}"'''
             elif role == "Secondary Reviewer":
                 query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
                 as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student
                 and sp.irb_project = p.name  
                 and f.name  = p.secondary_reviewer
-                where p.status !='Approved' and sp.status="active"
+                where p.status not in ("Approved", "Awaiting secondary reviewer comments to primary reviewer") and sp.status="active"
                 and f.system_user = "{doc.system_user}"'''
-        elif type == "unapproved":
+        elif type == "approved":
             if role == "Primary Reviewer":
                 query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
                 as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
                 and sp.irb_project = p.name  
                 and f.name  = p.primary_reviewer
-                where p.status ='Approved' and sp.status="active"
+                where p.status ='Approved'
                 and f.system_user = "{doc.system_user}"'''
             elif role == "Secondary Reviewer":
                 query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
                 as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student
                 and sp.irb_project = p.name  
                 and f.name  = p.secondary_reviewer
-                where p.status ='Approved' and sp.status="active"
+                where p.status ='Approved'
                 and f.system_user = "{doc.system_user}"'''                                
         elif type == "pending":
             if role == "Primary Reviewer":            
@@ -469,14 +469,14 @@ def get_reviewer_project_count(type, role):
                 as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
                 and sp.irb_project = p.name  
                 and f.name  = p.primary_reviewer
-                where p.status in ('Awaiting primary reviewer comments', 'Awaiting final approval', 'Awaiting reviewer feedback to student')
+                where p.status in ("Awaiting primary reviewer comments to secondary reviewer", "Awaiting reviewer feedback to student", "Awaiting final approval")
                 and f.system_user = "{doc.system_user}" and sp.status="active"'''
             elif role == "Secondary Reviewer":
                 query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
                 as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
                 and sp.irb_project = p.name  
                 and f.name  = p.secondary_reviewer
-                where p.status='Awaiting secondary reviewer comments' and sp.status="active"
+                where p.status='Awaiting secondary reviewer comments to primary reviewer' and sp.status="active"
                 and f.system_user = "{doc.system_user}"'''                
         else:
             return None

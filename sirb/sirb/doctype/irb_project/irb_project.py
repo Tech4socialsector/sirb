@@ -102,13 +102,13 @@ class IRBProject(Document):
 						#recipient_list.append(frappe.get_doc("Student", notification_info[0]["student_id"]))
 						recipient_list.append(student_email)
 						to_student = True
-					elif self.status in ["Awaiting reviewer feedback to student", "Awaiting primary reviewer comments"]:
+					elif self.status in ["Awaiting reviewer feedback to student", "Awaiting primary reviewer comments to secondary reviewer"]:
 						print("!!!")
 						if notification_info[0]["pr_id"]:
 							pr_email = frappe.get_value("Faculty", notification_info[0]["pr_id"], "system_user")
 							recipient_list.append(pr_email)
 							to_pr = True
-					elif self.status in ["Awaiting secondary reviewer comments"]:
+					elif self.status in ["Awaiting secondary reviewer comments to primary reviewer"]:
 						print("!!!!")
 						if notification_info[0]["sr_id"]:
 							sr_email = frappe.get_value("Faculty", notification_info[0]["sr_id"], "system_user")

@@ -47,7 +47,7 @@ def execute(filters=None):
 			as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student and 
 			sp.irb_project = p.name  and p.secondary_reviewer=f.name where f.system_user="{doc.system_user}" 
 			and sp.status="active" and
-			p.status = "Awaiting secondary reviewer comments"''', as_dict=1
+			p.status = "Awaiting secondary reviewer comments to primary reviewer"''', as_dict=1
 		)
 		print("DATA!!! ", data)
 	else:

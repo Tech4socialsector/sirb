@@ -828,6 +828,7 @@
    "label": "13. Gathering of Audio, Photographic and Video Data"
   },
   {
+   "depends_on": "eval:doc.will_data_be_gathered_through_digital_means == 'Yes'",
    "fieldname": "heq_s17",
    "fieldtype": "Section Break",
    "label": "14. Need for audio, photographic or video data"
@@ -1518,7 +1519,7 @@
   {
    "fieldname": "heq_s3_addons",
    "fieldtype": "Section Break",
-   "label": "3, Project participants - review"
+   "label": "3. Project participants - review"
   },
   {
    "fieldname": "heq_s4_addons",
@@ -1943,32 +1944,38 @@
   {
    "fieldname": "nheq_s4_sc",
    "fieldtype": "Small Text",
-   "label": "Talk to your reviewer"
+   "label": "Talk to your reviewer",
+   "permlevel": 1
   },
   {
    "fieldname": "nheq_s4_mf",
    "fieldtype": "Small Text",
-   "label": "Mentor Feedback"
+   "label": "Mentor Feedback",
+   "permlevel": 2
   },
   {
    "fieldname": "nheq_s4_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer feedback to student"
+   "label": "Reviewer feedback to student",
+   "permlevel": 3
   },
   {
    "fieldname": "nheq_s4_prn",
    "fieldtype": "Small Text",
-   "label": "Primary reviewer draft comments (to secondary reviewer)"
+   "label": "Primary reviewer draft comments (to secondary reviewer)",
+   "permlevel": 4
   },
   {
    "fieldname": "nheq_s4_srn",
    "fieldtype": "Small Text",
-   "label": "Secondary Reviewer Notes"
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
   },
   {
    "fieldname": "nheq_s4_fc",
    "fieldtype": "Small Text",
-   "label": "Field Changes"
+   "label": "Field Changes",
+   "permlevel": 6
   },
   {
    "depends_on": "eval:['Lab based experiments', 'BOTH Lab AND Field based'].includes(doc.research_type)",
@@ -2918,17 +2925,20 @@
   {
    "fieldname": "nheq_s7_sc",
    "fieldtype": "Small Text",
-   "label": "Talk to your reviewer"
+   "label": "Talk to your reviewer",
+   "permlevel": 1
   },
   {
    "fieldname": "nheq_s7_mf",
    "fieldtype": "Small Text",
-   "label": "Mentor Feedback"
+   "label": "Mentor Feedback",
+   "permlevel": 2
   },
   {
    "fieldname": "nheq_s7_rf",
    "fieldtype": "Small Text",
-   "label": "Reviewer feedback to student"
+   "label": "Reviewer feedback to student",
+   "permlevel": 3
   },
   {
    "fieldname": "column_break_vhlr",
@@ -2937,17 +2947,20 @@
   {
    "fieldname": "nheq_s7_prn",
    "fieldtype": "Small Text",
-   "label": "Primary reviewer draft comments (to secondary reviewer)"
+   "label": "Primary reviewer draft comments (to secondary reviewer)",
+   "permlevel": 4
   },
   {
    "fieldname": "nheq_s7_srn",
    "fieldtype": "Small Text",
-   "label": "Secondary Reviewer Notes"
+   "label": "Secondary Reviewer Notes",
+   "permlevel": 5
   },
   {
    "fieldname": "nheq_s7_fc",
    "fieldtype": "Small Text",
-   "label": "Field Changes"
+   "label": "Field Changes",
+   "permlevel": 6
   },
   {
    "fieldname": "html_rnor",
@@ -3068,13 +3081,14 @@
   },
   {
    "fieldname": "html_okgn",
-   "fieldtype": "HTML"
+   "fieldtype": "HTML",
+   "options": "<&nbsp;>"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-14 17:29:26.265463",
+ "modified": "2026-05-15 17:37:24.829212",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

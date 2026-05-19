@@ -44,7 +44,7 @@ def execute(filters=None):
 			p.status as project_status from tabStudent as s join `tabStudent Project Mapping` 
 			as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student and 
 			sp.irb_project = p.name  and p.primary_reviewer=f.name where  f.system_user="{doc.system_user}" 
-			and p.status == "Approved"''', as_dict=1
+			and p.status = "Approved"''', as_dict=1
 		)
 	else:
 		data = []

@@ -607,6 +607,7 @@
    "fieldname": "minor_participants",
    "fieldtype": "Select",
    "label": "Please COMPULSORILY select one of the options below.",
+   "mandatory_depends_on": "eval:['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)",
    "options": "-- Select --\nYes, I certify I have read and understood the POCSO Act, 2012.\nNo, my project does not involve minors",
    "permlevel": 7
   },
@@ -633,7 +634,7 @@
    "fieldname": "need_for_such_data",
    "fieldtype": "Small Text",
    "label": "Explain why such tools are needed, any burden on participants, and whether anonymity is required or identification is acceptable.",
-   "mandatory_depends_on": "eval:doc.will_data_be_gathered_through_digital_means == 'Yes'",
+   "mandatory_depends_on": "eval:(['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)) && (doc.will_data_be_gathered_through_digital_means == 'Yes')",
    "permlevel": 7
   },
   {
@@ -2291,7 +2292,7 @@
    "fieldname": "photos_confidentiality",
    "fieldtype": "Small Text",
    "label": "How will you protect the confidentiality of information collected through these devices?",
-   "mandatory_depends_on": "eval:doc.will_data_be_gathered_through_digital_means == 'Yes'",
+   "mandatory_depends_on": "eval:(['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)) && (doc.will_data_be_gathered_through_digital_means == 'Yes')",
    "permlevel": 7
   },
   {
@@ -2316,7 +2317,7 @@
    "fieldname": "consent_for_photos",
    "fieldtype": "Small Text",
    "label": "How will you obtain consent for recording when anonymity is required? Include consent text and re-consent, if necessary, for use in reports.",
-   "mandatory_depends_on": "eval:doc.will_data_be_gathered_through_digital_means == 'Yes'",
+   "mandatory_depends_on": "eval:(['Humans', 'BOTH Humans AND Non Humans'].includes(doc.project_domain)) && (doc.will_data_be_gathered_through_digital_means == 'Yes')",
    "permlevel": 7
   },
   {
@@ -3088,7 +3089,7 @@
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-15 17:37:24.829212",
+ "modified": "2026-05-22 18:10:51.894062",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

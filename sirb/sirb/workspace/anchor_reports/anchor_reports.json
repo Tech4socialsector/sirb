@@ -1,0 +1,42 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"5EUfkv82hE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Anchor reports</span>\",\"col\":12}},{\"id\":\"CiG1PECD1j\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Project Status Tracker\",\"col\":3}}]",
+ "creation": "2026-05-21 12:43:41.624503",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "folder-normal-large",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Anchor reports",
+ "links": [],
+ "modified": "2026-05-22 18:14:06.854806",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "Anchor reports",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Anchor"
+  }
+ ],
+ "sequence_id": 27.2,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Project Status Tracker",
+   "link_to": "Projects by IRB Unit",
+   "report_ref_doctype": "IRB Project",
+   "type": "Report"
+  }
+ ],
+ "title": "Anchor reports"
+}

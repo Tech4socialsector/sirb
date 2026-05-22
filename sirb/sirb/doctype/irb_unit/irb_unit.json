@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "ao_unit",
+  "ao_name",
   "num_reviewers",
   "mentor_required",
   "irb_committee_faculty_members"
@@ -36,12 +37,18 @@
    "fieldtype": "Select",
    "label": "Number of IRB Reviewers for a project",
    "options": "1\n2"
+  },
+  {
+   "fetch_from": "ao_unit.ao_name",
+   "fieldname": "ao_name",
+   "fieldtype": "Read Only",
+   "label": "School/Programme"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-29 09:48:39.234146",
+ "modified": "2026-05-22 13:10:26.196893",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Unit",
@@ -66,5 +73,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "ao_unit"
+ "title_field": "ao_name"
 }

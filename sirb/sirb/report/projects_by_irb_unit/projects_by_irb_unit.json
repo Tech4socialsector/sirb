@@ -1,0 +1,91 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [
+  {
+   "fieldname": "project_status",
+   "fieldtype": "Data",
+   "label": "Project Status",
+   "width": 2
+  },
+  {
+   "fieldname": "days_in_state",
+   "fieldtype": "Int",
+   "label": "Days in current status",
+   "width": 1
+  },
+  {
+   "fieldname": "student_info",
+   "fieldtype": "Data",
+   "label": "Student Name & Email",
+   "width": 0
+  },
+  {
+   "fieldname": "mentor",
+   "fieldtype": "Data",
+   "label": "Mentor information",
+   "width": 0
+  },
+  {
+   "fieldname": "pr",
+   "fieldtype": "Data",
+   "label": "Primary Reviewer Information",
+   "width": 0
+  },
+  {
+   "fieldname": "sr",
+   "fieldtype": "Data",
+   "label": "Secondary Reviewer Information",
+   "width": 0
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Link",
+   "label": "Project details (click to view)",
+   "width": 0
+  },
+  {
+   "fieldname": "irb_unit",
+   "fieldtype": "Data",
+   "label": "School/Programme",
+   "width": 0
+  }
+ ],
+ "creation": "2026-05-21 18:22:42.210735",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "irb_unit",
+   "fieldtype": "Data",
+   "label": "School/Programme",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  }
+ ],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letterhead": null,
+ "modified": "2026-05-22 12:57:52.315975",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "Projects by IRB Unit",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "IRB Project",
+ "report_name": "Projects by IRB Unit",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Anchor"
+  }
+ ],
+ "timeout": 0
+}

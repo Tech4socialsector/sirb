@@ -2,198 +2,331 @@ import frappe
 from frappe.model.document import Document
 from sirb.utils import get_logged_in_doc
 import frappe
-import csv
+import csv, re
 from frappe.utils.file_manager import get_file_path
 
+def analyze_student_headers(csv_path):
+    """
+    Parse CSV headers to determine:
+    - Which student numbers have all the student fields and the missing entries if any.
 
-def import_student_irb_information(logged_in_user, file_url, irb_unit):
-    file_path = get_file_path(file_url.split('/')[-1])
+    Returns:
+        Tuple: (Error string or None, Number of students in the CSV)
+    """
+    with open(csv_path, 'r', newline='', encoding='utf-8') as f:
+        headers = next(csv.reader(f))
 
-    from sirb.utils import get_reviewers
-    # print(logged_in_user)
-    with open(file_path, 'r') as f:
-        # We read lines first to get the total count for the progress bar
-        rows = list(csv.DictReader(f))
-        total_rows = len(rows)
-        #limit_student_count = 1
-        for i, row in enumerate(rows):
-            keys = row.keys()
-            student_emails = []
-            mentor_email = None
-            mentor_name = None
-            print(row)
-            for key in keys:
-                if key.lower().startswith("student-email-"):
-                    student_emails.append(row[key])
-                if key.lower().startswith("mentor-email"):
-                    mentor_email = row[key]
-                if key.lower().startswith("mentor-name"):
-                    mentor_name = row[key]
-            error = False
-            try:
-                project = None
-                irb_unit_doc = frappe.get_doc("IRB Unit", irb_unit)
-                mentor_required = irb_unit_doc.mentor_required
-                if mentor_required:
-                    if (not mentor_name) or (not mentor_email):
-                        raise Exception("Mentor email and name are required for this IRB Unit")
-                    existing_mentor_users = frappe.get_all("User", filters = {
-                        "email": mentor_email
-                    }, fields = ["name"])
-                    print("Existing mentor users ", existing_mentor_users)
-                    if not existing_mentor_users:
-                        mentor_user = frappe.get_doc({
-                            "doctype": "User",
-                            "email": mentor_email,
-                            "first_name": mentor_name,
-                            "send_welcome_email" : 0
-                        })
-                    else:
-                        mentor_user = frappe.get_doc("User", existing_mentor_users[0]["name"])
-                    print("Adding faculty role")
-                    mentor_user.add_roles("Faculty Member")
-                    mentor_user.add_roles("Faculty Mentor")
-                    mentor_user.save(ignore_permissions = True)
-                    frappe.db.commit()                  
-                    print("Added faculty role")
-                    existing_faculty = frappe.get_all("Faculty", filters = {
-                        'system_user': mentor_user.name
-                    }, fields = ["name"])
-                    print("Existing faculty ", existing_faculty)
-                    if not existing_faculty:
-                        faculty_mentor = frappe.get_doc({
-                            "doctype": "Faculty",
-                            "system_user": mentor_user.name,
-                            "full_name": mentor_name
-                        })
-                        faculty_mentor.save()
-                    else:
-                        faculty_mentor = frappe.get_doc("Faculty", existing_faculty[0]["name"])
+    # Case‑insensitive patterns
+    email_pat = re.compile(r'^student-email-(\d+)$', re.IGNORECASE)
+    name_pat  = re.compile(r'^student-name-(\d+)$', re.IGNORECASE)
+    id_pat  = re.compile(r'^student-id-(\d+)$', re.IGNORECASE)
+    mentor_email_pat  = re.compile(r'^mentor-email', re.IGNORECASE)
+    mentor_name_pat  = re.compile(r'^mentor-name', re.IGNORECASE)
 
-                project = frappe.get_doc({
-                    "doctype": "IRB Project",
-                    "irb_unit": irb_unit,
-                    "owner": logged_in_user
-                })
-                pr_reviewer, sr_reviewer = get_reviewers(irb_unit, None)
-                if pr_reviewer is None:
-                    raise Exception("Could not auto assign a primary reviewer - none available.")
-                num_reviewers = int(irb_unit_doc.num_reviewers)
-                project.primary_reviewer = pr_reviewer
-                if num_reviewers == 2:
-                    if sr_reviewer is None:
-                        raise Exception("Could not auto assign a secondary reviewer - none available.")                    
-                    project.secondary_reviewer = sr_reviewer
-                if mentor_required:
-                    project.faculty_mentor = faculty_mentor.name
-                print("Reviewers ", pr_reviewer, sr_reviewer)
-                project.save()
-                frappe.db.commit()
-                print("Created project")
-            except Exception as e:
-                frappe.log_error(frappe.get_traceback(), "Hard failure")
-                if project:
-                    frappe.delete_doc("IRB Project", project.name)
-                status_msg = f"Failed to upload student information: {str(e)}"
-                print(e)
-                progress = 100
-                message = {"progress": progress,
-                        "status" : status_msg}
-                if error:
-                    message["error"] =  1
-                print("Sending realtime to ", logged_in_user)
-                frappe.publish_realtime(
-                    event = "sirb_student_import_progress",
-                    user = logged_in_user,
-                    message = message
-                )
-                print("Sent realtime")                
-                return
-            try:
-                for student_email in student_emails:
-                    print("Processing ", student_email)
-                    existing_users = frappe.get_all("User", filters = {
-                        "email": student_email
-                    }, fields = ["name"])
-                    print("Existing users ", existing_users)
-                    if not existing_users:
-                        user = frappe.get_doc({
-                            "doctype": "User",
-                            "email": student_email,
-                            "first_name": student_email,
-                            "send_welcome_email" : 0,
-                        })
-                        print("Adding role")
-                        user.add_roles("Student")          
-                        user.save(ignore_permissions = True)
-                        frappe.db.commit()
-                    else:
-                        user = frappe.get_doc("User", existing_users[0]["name"])
-                                
-                    existing_students = frappe.get_all("Student", filters = {
-                        'system_user': user.name
-                    }, fields = ["name"])
-                    print("Existing students ", existing_students)
-                    print(user, user.name)
-                    if not existing_students:
-                        print("Creating student")
-                        student = frappe.get_doc({
-                            "doctype": "Student",
-                            "system_user": user.name,
-                        })
-                        student.save()
-                    else:
-                        student = frappe.get_doc("Student", existing_students[0]["name"])
-                    print("Created Student")
+    email_numbers = set()
+    name_numbers = set()
+    id_numbers = set()
+    mentor_email_found = False
+    mentor_name_found = False
+    error_list = []
+    for col in headers:
+        col = col.strip()
+        if not col:
+            continue
+        if not mentor_email_found and mentor_email_pat.match(col):
+            mentor_email_found = True
+            continue
+        if not mentor_name_found and mentor_name_pat.match(col):
+            mentor_name_found = True
+            continue
+        # print("COL ", col)
+        m = email_pat.match(col)
+        if m:
+            print("Matched email")
+            email_numbers.add(int(m.group(1)))
+            continue
+        m = name_pat.match(col)
+        if m:
+            #print("Matched name")
+            name_numbers.add(int(m.group(1)))
+        m = id_pat.match(col)
+        if m:
+            #print("Matched ID")
+            id_numbers.add(int(m.group(1)))            
+    if not mentor_email_found:
+        error_list.append("mentor-email")
+    if not mentor_name_found:
+        error_list.append("mentor-name")
+    # Determine the maximum student number that appears in either set
+    all_present_numbers = email_numbers.union(name_numbers).union(id_numbers)
+    #print("all_present_numbers ", all_present_numbers)
+    if not all_present_numbers:
+        return "No student information found!", 0
 
-                    existing_student_projects = frappe.get_all("Student Project Mapping", filters = {
-                        "student": student.name,
-                        "status": "active"
+    max_num = max(all_present_numbers)
+
+    #print("numbers ", email_numbers, name_numbers, id_numbers, max_num)
+    for n in range(1, max_num + 1):
+        has_email = n in email_numbers
+        has_name  = n in name_numbers
+        has_id  = n in id_numbers
+        if not(has_email and has_name and has_id):
+            if not has_name:
+                error_list.append(f"student-name-{n}")
+            if not has_email:
+                error_list.append(f"student-email-{n}")
+            if not has_id:
+                error_list.append(f"student-id-{n}")
+    if error_list:
+        return f"The following fields are missing in the uploaded file: {', '.join(error_list)}", 0
+    else:
+        return None, max_num
+
+
+def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle):
+    try:
+        file_path = get_file_path(file_url.split('/')[-1])
+        from sirb.utils import get_reviewers
+        # print(logged_in_user)
+        err, num_students = analyze_student_headers(file_path)
+        if err:
+            frappe.log_error(frappe.get_traceback(), title="Student upload failure", message = err)
+            frappe.publish_realtime(
+                event = "sirb_student_import_progress",
+                user = logged_in_user,
+                message = {"progress": 100, "status": err}
+            )
+            print("Sent realtime")                
+            return        
+        with open(file_path, 'r') as f:
+            # We read lines first to get the total count for the progress bar
+            rows = list(csv.DictReader(f))
+            total_rows = len(rows)
+            #limit_student_count = 1
+            for i, row in enumerate(rows):
+                # frappe.publish_realtime(
+                #     event = "sirb_student_import_progress",
+                #     user = logged_in_user,
+                #     message = {"progress": 10, "status": f"Getting student info for project {i+1}"}
+                # )                                    
+                student_info = []
+                mentor_email = None
+                mentor_name = None
+                print(row)
+                keys = row.keys()
+                for key in keys:
+                    if key.strip().lower() == "mentor-email":
+                        mentor_email = row[key]
+                    if key.strip().lower() == "mentor-name":                        
+                        mentor_name = row[key]
+                for n in range(1, num_students + 1):
+                    email = None
+                    name = None
+                    id = None
+                    for key in keys:
+                        if key.strip().lower() == f"student-email-{n}":
+                            email = row[key]
+                        if key.strip().lower() == f"student-name-{n}":
+                            name = row[key]
+                        if key.strip().lower() == f"student-id-{n}":
+                            id = row[key]
+                    student_info.append({
+                        f"student_email": email,
+                        f"student_name": name,
+                        f"student_id": id
                     })
-                    if existing_student_projects:
-                        raise Exception(f"{user.name} has an existing active project.")
-                    else:
-                        print("Creating student project with ", student.name, project.name)                        
-                        sp = frappe.get_doc({
-                            "doctype": "Student Project Mapping",
-                            "status": "active",
-                            "student": student.name,
-                            "irb_project": project.name
-                        })
-                        sp.save()
-                        print("Created student project")
-                    frappe.db.commit()
-            except Exception as e:
-                if project:
-                    frappe.delete_doc("IRB Project", project.name)                
-                frappe.log_error(frappe.get_traceback(), "Hard failure")
-                status_msg = f"Failed to upload {student_email}: {str(e)}"
-                print("Status message is ", status_msg)
-                error = True
-            else:
-                print("NO ERROR")
-                status_msg = f"Successfully uploaded {student_email}"
-                print("Status message is ", status_msg)
                 error = False
-            finally:
-                progress = int(((i+1)/total_rows)*100)
-                message = {"progress": progress,
-                        "status" : status_msg}
-                if error:
-                    message["error"] =  1
-                print("Sending realtime to ", logged_in_user)
-                frappe.publish_realtime(
-                    event = "sirb_student_import_progress",
-                    user = logged_in_user,
-                    message = message
-                )
-                print("Sent realtime")
-                print(message)
-                # if i+1 == limit_student_count:
-                #     return            
+                # frappe.publish_realtime(
+                #     event = "sirb_student_import_progress",
+                #     user = logged_in_user,
+                #     message = {"progress": 10, "status": "Got student info"}
+                # )
+                try:
+                    project = None
+                    irb_unit_doc = frappe.get_doc("IRB Unit", irb_unit)
+                    mentor_required = irb_unit_doc.mentor_required
+                    if mentor_required:
+                        if (not mentor_name) or (not mentor_email):
+                            raise Exception("Mentor email and name are required for this IRB Unit")
+                        existing_mentor_users = frappe.get_all("User", filters = {
+                            "email": mentor_email
+                        }, fields = ["name"])
+                        print("Existing mentor users ", existing_mentor_users)
+                        if not existing_mentor_users:
+                            mentor_user = frappe.get_doc({
+                                "doctype": "User",
+                                "email": mentor_email,
+                                "first_name": mentor_name,
+                                "send_welcome_email" : 0
+                            })
+                        else:
+                            mentor_user = frappe.get_doc("User", existing_mentor_users[0]["name"])
+                        print("Adding faculty role")
+                        mentor_user.add_roles("Faculty Member")
+                        mentor_user.add_roles("Faculty Mentor")
+                        mentor_user.save(ignore_permissions = True)
+                        frappe.db.commit()                  
+                        print("Added faculty role")
+                        existing_faculty = frappe.get_all("Faculty", filters = {
+                            'system_user': mentor_user.name
+                        }, fields = ["name"])
+                        print("Existing faculty ", existing_faculty)
+                        if not existing_faculty:
+                            faculty_mentor = frappe.get_doc({
+                                "doctype": "Faculty",
+                                "system_user": mentor_user.name,
+                                "full_name": mentor_name
+                            })
+                            faculty_mentor.save()
+                        else:
+                            faculty_mentor = frappe.get_doc("Faculty", existing_faculty[0]["name"])
+
+                    project = frappe.get_doc({
+                        "doctype": "IRB Project",
+                        "irb_unit": irb_unit,
+                        "irb_cycle": irb_cycle,
+                        "owner": logged_in_user
+                    })
+                    if mentor_required:
+                        pr_reviewer, sr_reviewer = get_reviewers(irb_unit, faculty_mentor.name)
+                        #frappe.log_error(title="Debug", message=f"{faculty_mentor.name} {pr_reviewer} {sr_reviewer}")
+                    else:
+                        pr_reviewer, sr_reviewer = get_reviewers(irb_unit, None)
+                    if pr_reviewer is None:
+                        raise Exception("Could not auto assign a primary reviewer - none available.")
+                    num_reviewers = int(irb_unit_doc.num_reviewers)
+                    project.primary_reviewer = pr_reviewer
+                    if num_reviewers == 2:
+                        if sr_reviewer is None:
+                            raise Exception("Could not auto assign a secondary reviewer - none available.")                    
+                        project.secondary_reviewer = sr_reviewer
+                    if mentor_required:
+                        project.faculty_mentor = faculty_mentor.name
+                    print("Reviewers ", pr_reviewer, sr_reviewer)
+                    project.save()
+                    frappe.db.commit()
+                    print("Created project")
+                except Exception as e:
+                    frappe.log_error(frappe.get_traceback(), "Student upload failure")
+                    if project:
+                        frappe.delete_doc("IRB Project", project.name)
+                    status_msg = f"Failed to upload student information: {str(e)}"
+                    print(e)
+                    progress = 100
+                    message = {"progress": progress,
+                            "status" : status_msg}
+                    if error:
+                        message["error"] =  1
+                    print("Sending realtime to ", logged_in_user)
+                    frappe.publish_realtime(
+                        event = "sirb_student_import_progress",
+                        user = logged_in_user,
+                        message = message
+                    )
+                    print("Sent realtime")                
+                    return
+                # frappe.publish_realtime(
+                #     event = "sirb_student_import_progress",
+                #     user = logged_in_user,
+                #     message = {"progress": 10, "status": "Created project, etc"}
+                # )            
+                for s_info in student_info:
+                    try:                
+                        print("Processing ", s_info)
+                        existing_users = frappe.get_all("User", filters = {
+                            "email": s_info["student_email"]
+                        }, fields = ["name"])
+                        print("Existing users ", existing_users)
+                        if not existing_users:
+                            user = frappe.get_doc({
+                                "doctype": "User",
+                                "email": s_info["student_email"],
+                                "first_name": s_info["student_name"],
+                                "send_welcome_email" : 0,
+                            })
+                            print("Adding role")
+                            user.add_roles("Student")          
+                            user.save(ignore_permissions = True)
+                            frappe.db.commit()
+                        else:
+                            user = frappe.get_doc("User", existing_users[0]["name"])
+                                    
+                        existing_students = frappe.get_all("Student", filters = {
+                            'system_user': user.name
+                        }, fields = ["name"])
+                        print("Existing students ", existing_students)
+                        print(user, user.name)
+                        if not existing_students:
+                            print("Creating student")
+                            student = frappe.get_doc({
+                                "doctype": "Student",
+                                "system_user": user.name,
+                                "full_name": s_info["student_name"],
+                                "student_id": s_info["student_id"]
+                            })
+                            student.save()
+                        else:
+                            student = frappe.get_doc("Student", existing_students[0]["name"])
+                        print("Created Student")
+
+                        existing_student_projects = frappe.get_all("Student Project Mapping", filters = {
+                            "student": student.name,
+                            "status": "active"
+                        })
+                        if existing_student_projects:
+                            raise Exception(f"{user.name} has an existing active project.")
+                        else:
+                            print("Creating student project with ", student.name, project.name)                        
+                            sp = frappe.get_doc({
+                                "doctype": "Student Project Mapping",
+                                "status": "active",
+                                "student": student.name,
+                                "irb_project": project.name
+                            })
+                            sp.save()
+                            print("Created student project")
+                        frappe.db.commit()
+                    except Exception as e:
+                        if project:
+                            frappe.delete_doc("IRB Project", project.name)
+                        frappe.log_error(frappe.get_traceback(), "Student upload failure")
+                        status_msg = f"Failed to upload {s_info["student_email"]}: {str(e)}"
+                        print("Status message is ", status_msg)
+                        error = True
+                    else:
+                        print("NO ERROR")
+                        status_msg = f"Successfully uploaded {s_info["student_email"]}"
+                        print("Status message is ", status_msg)
+                        error = False
+                    finally:
+                        progress = int(((i+1)/total_rows)*100)
+                        message = {"progress": progress,
+                                "status" : status_msg}
+                        if error:
+                            message["error"] =  1
+                        print("Sending realtime to ", logged_in_user)
+                        frappe.publish_realtime(
+                            event = "sirb_student_import_progress",
+                            user = logged_in_user,
+                            message = message
+                        )
+                        print("Sent realtime")
+                        print(message)
+                        # if i+1 == limit_student_count:
+                        #     return 
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Student upload failure")
+        frappe.publish_realtime(
+            event = "sirb_student_import_progress",
+            user = logged_in_user,
+            message = {"progress": 100,
+                    "status" : "Student upload failed: " + str(e)}
+
+        )        
+        return
 
 @frappe.whitelist()
-def enque_student_upload(file_url, irb_unit):
+def enque_student_upload(file_url, irb_unit, irb_cycle):
     # 1. Enqueue the job to the background worker
     frappe.enqueue(
         import_student_irb_information,
@@ -201,6 +334,7 @@ def enque_student_upload(file_url, irb_unit):
         logged_in_user = frappe.session.user,
         file_url=file_url,
         irb_unit = irb_unit,
+        irb_cycle = irb_cycle
     )
     return "Upload Started"
 
@@ -321,7 +455,7 @@ import frappe
 def get_project_students(project_name):
     return frappe.db.sql("""
         SELECT
-            mapping.student as student_id,
+            student.student_id as student_id,
             student.full_name,
             user.email as user_email
         FROM

@@ -95,6 +95,7 @@ function open_upload_dialog(progress_container, task_log, button) {
         title: 'Upload IRB Students File',
         fields: [
             { fieldtype: 'Link', label: 'Select IRB Unit', fieldname: 'irb_unit', options: 'IRB Unit', reqd: 1 },
+            { fieldtype: 'Data', label: 'IRB Cycle/year name', fieldname: 'irb_cycle', reqd: 1},
             { fieldtype: 'Attach', label: 'Upload File', fieldname: 'file', reqd: 1 }
         ],
         primary_action_label: 'Submit',
@@ -110,6 +111,7 @@ function open_upload_dialog(progress_container, task_log, button) {
                 method: 'sirb.api.enque_student_upload',
                 args: {
                     irb_unit: values.irb_unit,
+                    irb_cycle: values.irb_cycle,
                     file_url: values.file
                 },
                 callback: function(r) {

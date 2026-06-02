@@ -525,7 +525,6 @@ frappe.ui.form.on("IRB Project", {
                                     <th>Student Name</th>
                                     <th>Student Email</th>
                                     <th>Student ID</th>
-                                    <th>Academic Year</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -537,7 +536,6 @@ frappe.ui.form.on("IRB Project", {
                                 <td>${row.full_name}</td>
                                 <td>${row.user_email || ''}</td>
                                 <td>${row.student_id || ''}</td>
-                                <td>${row.academic_year || ''}</td>
                             </tr>
                         `;
                     });

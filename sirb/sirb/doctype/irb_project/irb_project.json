@@ -9,6 +9,7 @@
   "basic_details_tab",
   "student_details_section",
   "student_information",
+  "irb_cycle",
   "irb_unit",
   "introduction_section",
   "project_domain",
@@ -536,6 +537,7 @@
    "fieldtype": "Link",
    "label": "School/Programme",
    "options": "IRB Unit",
+   "read_only_depends_on": "eval: !(frappe.user.has_role(\"System Manager\") || frappe.user.has_role(\"Administrator\"))",
    "reqd": 1
   },
   {
@@ -3084,12 +3086,18 @@
    "fieldname": "html_okgn",
    "fieldtype": "HTML",
    "options": "<&nbsp;>"
+  },
+  {
+   "fieldname": "irb_cycle",
+   "fieldtype": "Data",
+   "label": "IRB Cycle",
+   "read_only_depends_on": "eval: !(frappe.user.has_role(\"System Manager\") || frappe.user.has_role(\"Administrator\"))"
   }
  ],
  "grid_page_length": 50,
  "hide_toolbar": 1,
  "links": [],
- "modified": "2026-05-22 18:10:51.894062",
+ "modified": "2026-05-29 16:28:44.481018",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "IRB Project",

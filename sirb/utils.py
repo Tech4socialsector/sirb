@@ -49,40 +49,53 @@ def get_reviewers(irb_unit, exclude_faculty_id = None):
     print(primary_reviewer_data)
     for d in primary_reviewer_data:
         # primary_reviewers_with_projects.add(d["primary_reviewer"])
-        project_count_for_primary_reviewers[d["primary_reviewer"]] += d["count"]
+        if d["primary_reviewer"] in project_count_for_primary_reviewers:
+            project_count_for_primary_reviewers[d["primary_reviewer"]] += d["count"]
 
     min_count = 0
     min_pr = None
     print("Project count for primary reviewers - ", project_count_for_primary_reviewers)
-    
+
+    # frappe.log_error(
+    #     title=f"project_count_for_primary_reviewers",
+    #     message=str(project_count_for_primary_reviewers)
+    # )
     for pr, prc in project_count_for_primary_reviewers.items():
-        if pr == exclude_faculty_id:
+        #frappe.log_error(title="Debug", message=f"{pr}, {exclude_faculty_id}")
+        if exclude_faculty_id is not None and str(pr) == str(exclude_faculty_id) or pr == exclude_faculty_id:
+            #frappe.log_error(title="Debug", message=f"Skipping {pr}")
             continue
-        if prc <= min_count:
+        if min_pr is None or prc <= min_count:
             min_count = prc
             min_pr = pr
     print("Current primary mins are ", min_count, min_pr)
 
     if num_reviewers == 2:
         print("Checking secondary")
-        secondary_reviewer_data = frappe.db.sql(
-            f'''select p.secondary_reviewer, count(*) as count from `tabIRB Project` as p where 
+        query = f'''select p.secondary_reviewer, count(*) as count from `tabIRB Project` as p where 
             p.secondary_reviewer is not null and p.irb_unit = "{irb_unit}" and p.status != "Approved" 
-            group by p.secondary_reviewer;''', as_dict=1
+            group by p.secondary_reviewer;'''
+        secondary_reviewer_data = frappe.db.sql(
+            query, as_dict=1
         )
         for d in secondary_reviewer_data:
+            # frappe.log_error(
+            #     title=f"d",
+            #     message=str(d)
+            # )
             # secondary_reviewers_with_projects.add(d["secondary_reviewer"])
-            project_count_for_secondary_reviewers[d["secondary_reviewer"]] += d["count"]
+            if d["secondary_reviewer"] in project_count_for_secondary_reviewers:
+                project_count_for_secondary_reviewers[d["secondary_reviewer"]] += d["count"]
         min_count = 0
         min_sr = None
-        print(project_count_for_secondary_reviewers)
         for sr, src in project_count_for_secondary_reviewers.items():
             print(sr, src)
-            if sr == min_pr or sr == exclude_faculty_id:
+            if sr == min_pr or (exclude_faculty_id is not None and str(sr) == str(exclude_faculty_id)):
+                #frappe.log_error(title="Debug", message=f"Skipping {sr}")
                 print("Continuing")
                 continue
             print("Finished ", src)
-            if src <= min_count:
+            if min_sr is None or src <= min_count:
                 min_count = src
                 min_sr = sr
         print("Current secondary mins are ", min_count, min_sr)
@@ -180,3 +193,5 @@ def set_mentor_and_reviewer_roles():
         for _, user in all_mentor_docs.items():
             if user not in current_mentors:
                 user.remove_roles("Faculty Mentor")
+
+

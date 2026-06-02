@@ -290,12 +290,12 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
                         if project:
                             frappe.delete_doc("IRB Project", project.name)
                         frappe.log_error(frappe.get_traceback(), "Student upload failure")
-                        status_msg = f"Failed to upload {s_info["student_email"]}: {str(e)}"
+                        status_msg = f"Failed to upload {s_info['student_email']}: {str(e)}"
                         print("Status message is ", status_msg)
                         error = True
                     else:
                         print("NO ERROR")
-                        status_msg = f"Successfully uploaded {s_info["student_email"]}"
+                        status_msg = f"Successfully uploaded {s_info['student_email']}"
                         print("Status message is ", status_msg)
                         error = False
                     finally:

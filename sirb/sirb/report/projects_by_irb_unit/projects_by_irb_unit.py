@@ -131,7 +131,7 @@ def execute(filters=None):
 			if project_data:
 				data_item["project_status"] = project_data[0]["status"]
 				if project_data[0]['mentor_email']:
-					data_item["mentor"] = f"{project_data[0]["mentor_name"]} ({project_data[0]['mentor_email']})"
+					data_item["mentor"] = f"{project_data[0]['mentor_name']} ({project_data[0]['mentor_email']})"
 				else:
 					data_item["mentor"] = 'None'
 				data_item["pr"] = f"{project_data[0]['pr_name']} ({project_data[0]['pr_email']})"

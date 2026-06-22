@@ -59,6 +59,37 @@ class IRBProject(Document):
 		# 		#print("In!")
 		# 		self.status = "Awaiting student correction for reviewer feedback"
 
+	def after_insert(self):
+
+		notification_info = frappe.db.sql(
+			f'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
+			f.name as mentor_id, 
+			f.system_user as mentor_email, p.primary_reviewer as pr_id, 
+			p.secondary_reviewer as sr_id 
+			from tabStudent as s join `tabStudent Project Mapping` as sp join 
+			`tabIRB Project` as p 
+			join tabFaculty as f on s.name = sp.student and 
+			sp.irb_project = p.name  and p.faculty_mentor=f.name where 
+			p.name="{self.name}"''', as_dict=1
+		)
+		print("NOTIFICATION INFO ", notification_info)
+		if notification_info:
+			params = {
+				"project_status": self.status,
+				"project_name": self.title,
+				"student_names": student_names
+			}			
+			student_name_list = []
+			student_email_list = []
+			for n in notification_info:
+				student_name_list.append(n["student_name"])
+				student_email_list.append(n["student_email"])
+			student_names = ",".join(student_name_list)
+			if student_names[-1] == ',':
+				student_names = student_names[:-1]
+
+			send_email_if_configured("New IRB Project Template", params, student_email_list)
+
 	def on_change(self):
 		# print("!!!!!")
 		# print("On save")
@@ -74,72 +105,91 @@ class IRBProject(Document):
 				notification_info = frappe.db.sql(
 					f'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
 					f.name as mentor_id, 
-					f.system_user as faculty_email, p.primary_reviewer as pr_id, 
+					f.system_user as mentor_email, p.primary_reviewer as pr_id, 
 					p.secondary_reviewer as sr_id 
 					from tabStudent as s join `tabStudent Project Mapping` as sp join 
 					`tabIRB Project` as p 
 					join tabFaculty as f on s.name = sp.student and 
 					sp.irb_project = p.name  and p.faculty_mentor=f.name where 
-					sp.status="active" and p.name="{self.name}"''', as_dict=1
+					p.name="{self.name}"''', as_dict=1
 				)
 				print("NOTIFICATION INFO ", notification_info)
 				#[{'student_email': 'student1@apu.in', 'student_id': 17, 'mentor_id': 4, 'faculty_email': 'f1@apu.in', 'pr_id': '4', 'sr_id': None}]
 
 
 				if notification_info:
-					recipient_list = []
-					to_student = to_mentor = to_pr = to_sr = False
+					student_name_list = []
+					student_email_list = []
+					for n in notification_info:
+						student_name_list.append(n["student_name"])
+						student_email_list.append(n["student_email"])
+					student_names = ",".join(student_name_list)
+					if student_names[-1] == ',':
+						student_names = student_names[:-1]
+					mentor_email = notification_info[0]["mentor_email"]
+					faculty_recipient_list = []
+					to_students = to_faculty = False
 					print("Statis is ", self.status)
 					if self.status == "Awaiting Faculty mentor approval":
-						print("!")
-						faculty_email = notification_info[0]["faculty_email"]
 						# recipient_list.append(frappe.get_doc("Faculty", notification_info[0]["mentor_id"]))
-						recipient_list.append(faculty_email)
-						to_mentor = True
-					elif self.status in ["Awaiting student correction for mentor feedback", "Awaiting student correction for reviewer feedback", "Provisionally approved", "Approved"]:
-						print("!!")
-						student_email = notification_info[0]["student_email"]
-						#recipient_list.append(frappe.get_doc("Student", notification_info[0]["student_id"]))
-						recipient_list.append(student_email)
-						to_student = True
+						faculty_recipient_list.append(mentor_email)
+						template = "Awaiting Mentor Approval Template"
+						to_faculty = True
+						to_students = True
 					elif self.status in ["Awaiting reviewer feedback to student", "Awaiting primary reviewer comments to secondary reviewer"]:
-						print("!!!")
 						if notification_info[0]["pr_id"]:
 							pr_email = frappe.get_value("Faculty", notification_info[0]["pr_id"], "system_user")
-							recipient_list.append(pr_email)
-							to_pr = True
+							faculty_recipient_list.append(pr_email)
+							to_faculty = True
 					elif self.status in ["Awaiting secondary reviewer comments to primary reviewer"]:
 						print("!!!!")
 						if notification_info[0]["sr_id"]:
 							sr_email = frappe.get_value("Faculty", notification_info[0]["sr_id"], "system_user")
-							recipient_list.append(sr_email)
-							to_sr = True
-					
-
-					print("Recipient list ", recipient_list)
+							faculty_recipient_list.append(sr_email)
+							to_faculty = True
+					elif self.status == "Provisionally approved":
+						template = "Project Provisionally Approved Template"
+						faculty_recipient_list.append(mentor_email)
+						to_students = True
+						to_faculty = True
+					elif self.status == "Approved":
+						template = "Project Approved Template"
+						faculty_recipient_list.append(mentor_email)
+						to_students = True
+						to_faculty = True
+					elif self.status == "Awaiting student correction for reviewer feedback":
+						template = "Student Correction For Reviewer Feedback Template"
+						to_students = True
+					elif self.status in ["Awaiting student correction for mentor feedback"]:
+						template = "Student Correction For Mentor Feedback Template"
+						to_students = True
+					# print("Recipient list ", recipient_list)
 					# Create a system notification
 					params = {
 						"project_status": self.status,
 						"project_name": self.title,
-						"student_name": notification_info[0]["student_name"]
+						"student_names": student_names
 					}
-					send_email_if_configured("Status Change Email Template", params, recipient_list)
-					for u in recipient_list:
-						notification = frappe.new_doc("Notification Log")
-						notification.subject = f"IRBProject \"{self.title}\" status has changed to \"{self.status}\""
-						#notification.email_content = f"The status of irb_project <b>{self.title}</b> for <b>{notification["full_name"]<b> was changed to <b>{self.status}</b>."
-						notification.for_user = u
-						notification.document_type = self.doctype
-						notification.document_name = self.name
-						notification.type = "Alert"
-						notification.from_user = frappe.session.user
-						notification.insert(ignore_permissions=True)
-						# Immediately push to UI (real-time popup)
-						frappe.publish_realtime(
-							"eval_js",
-							{"js": f"frappe.show_alert('Task {self.name} status changed to {self.status}');"},
-							user=u
-						)
+					if to_faculty:
+						send_email_if_configured("Status Change Email Template", params, faculty_recipient_list)
+					if to_students:
+						send_email_if_configured(template, params, student_email_list)
+					# for u in recipient_list:
+					# 	notification = frappe.new_doc("Notification Log")
+					# 	notification.subject = f"IRBProject \"{self.title}\" status has changed to \"{self.status}\""
+					# 	#notification.email_content = f"The status of irb_project <b>{self.title}</b> for <b>{notification["full_name"]<b> was changed to <b>{self.status}</b>."
+					# 	notification.for_user = u
+					# 	notification.document_type = self.doctype
+					# 	notification.document_name = self.name
+					# 	notification.type = "Alert"
+					# 	notification.from_user = frappe.session.user
+					# 	notification.insert(ignore_permissions=True)
+					# 	# Immediately push to UI (real-time popup)
+					# 	frappe.publish_realtime(
+					# 		"eval_js",
+					# 		{"js": f"frappe.show_alert('Task {self.name} status changed to {self.status}');"},
+					# 		user=u
+					# 	)
 		if self.status == "Approved":
 			sp_mappings = frappe.get_all("Student Project Mapping", filters = {
 				"irb_project": self.name,

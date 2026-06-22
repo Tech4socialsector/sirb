@@ -289,6 +289,58 @@ function get_sections_in_tab(frm, tab_fieldname) {
     return sections;
 }
 
+function handle_toggle_all_comment_sections(frm){
+    const allowed_open_all_comment_section_roles = ['Administrator', 'System Manager', "Primary IRB Reviewer", "Secondary IRB Reviewer"];
+    const sectionsToToggle = [];
+    // console.log("IN!")
+    frm.remove_custom_button(__('Toggle All Sections'));
+    //let allFieldnamesToToggle = [];
+    applicable_sections = []
+    if (["Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain))
+        applicable_sections.push(...get_sections_in_tab(frm, "animal_ethics_questionnaire_tab"));
+    if (["Humans", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain))
+        applicable_sections.push(...get_sections_in_tab(frm, "human_ethics_questionnaire_tab"));
+    // console.log(applicable_sections);
+    for (let fieldname of applicable_sections) {
+        // console.log(fieldname)
+        // console.log(fieldname.endsWith('_addons'))
+        if (fieldname.endsWith('_addons')) {
+            //console.log(fieldname)
+            base_section = fieldname.slice(0, -7); // -7 is the len("_addons")
+            //console.log(base_section)
+            base_section_field = frm.get_field(base_section);
+            console.log(base_section)
+            //console.log(base_section_field.df.hidden)
+            //console.log(base_section_field.wrapper)
+            //console.log(base_section_field.df.hidden === 0, base_section_field.wrapper.is(":visible"))
+            console.log(base_section_field.df)
+            //console.log(base_section_field.wrapper.is(":visible"))
+            if (base_section_field && ( base_section_field.wrapper.is(":visible")))
+                sectionsToToggle.push(fieldname);
+            //allFieldnamesToToggle.push(fieldname);
+        }
+    }
+    //console.log(sectionsToToggle);
+    if (frappe.user_roles.some(role => allowed_open_all_comment_section_roles.includes(role))) {
+        if (["Humans", "Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain)) {
+            frm.add_custom_button(__('Toggle All Sections'), () => {
+                frm._toggleAddonsState = !frm._toggleAddonsState;
+                const show = frm._toggleAddonsState;   // true = show sections, false = hide
+                // Apply hidden property to all collected fields
+                //console.log(show)
+                sectionsToToggle.forEach(fieldname => {
+                    const wrapper = $(frm.fields_dict[fieldname].wrapper);;
+                    if (show)
+                        wrapper.show();
+                    else
+                        wrapper.hide();
+                    frm.set_df_property(fieldname, 'hidden', !show);
+                });
+            })                
+        }
+    }
+}
+
 function toggle_tabs(frm) {
     //console.log("IN!!")
     const type = frm.doc.project_domain;
@@ -306,12 +358,11 @@ function toggle_tabs(frm) {
 
     if (type === 'BOTH Humans AND Non Humans') {
         tabs.forEach(t => {
-        //console.log(t)
-        sections = get_sections_in_tab(frm, t);
-        //console.log("Sections", sections)
-        sections.forEach(s => frm.toggle_display(s, true));
-    });
-        return;
+            //console.log(t)
+            sections = get_sections_in_tab(frm, t);
+            //console.log("Sections", sections)
+            sections.forEach(s => frm.toggle_display(s, true));
+        });
     }
     if (type === 'Non Human Species') {
         sections = get_sections_in_tab(frm, 'animal_ethics_questionnaire_tab');
@@ -321,6 +372,7 @@ function toggle_tabs(frm) {
         sections = get_sections_in_tab(frm, 'human_ethics_questionnaire_tab');
         sections.forEach(s => frm.toggle_display(s, true));
     }
+    handle_toggle_all_comment_sections(frm);
 }
 
 async function get_logged_in_role(frm) {
@@ -467,6 +519,15 @@ frappe.ui.form.on("IRB Project", {
         // Show/hide tabs based on the project domain field
         toggle_tabs(frm);
     },
+    research_type(frm) {
+        handle_toggle_all_comment_sections(frm);
+    },
+    minor_participants(frm) {
+        handle_toggle_all_comment_sections(frm);
+    },
+    will_data_be_gathered_through_digital_means(frm) {
+        handle_toggle_all_comment_sections(frm);
+    },
     status: function(frm) {
         // Whenever the status field changes, re-evaluate
         toggle_save_button(frm);
@@ -479,78 +540,6 @@ frappe.ui.form.on("IRB Project", {
             frm.save_button = frm.page.btn_primary;
         }
         toggle_save_button(frm);
-        if (frm.doc.__islocal) return; // Don't run on unsaved docs
-
-        if (!frm.doc.research_type)
-            frm.set_value('research_type', '-- Select --');
-        if (!frm.doc.project_domain)
-            frm.set_value('project_domain', '-- Select --');
-        if (!frm.doc.consent_for_people_interaction)
-            frm.set_value('consent_for_people_interaction', '-- Select --');
-        if (!frm.doc.minor_participants)
-            frm.set_value('minor_participants', '-- Select --'); 
-        if (!frm.doc.will_data_be_gathered_through_digital_means)
-            frm.set_value('will_data_be_gathered_through_digital_means', '-- Select --');
-        if (!frm.doc.manipulative_experiments_select)
-            frm.set_value('manipulative_experiments_select', '-- Select --');         
-
-        // SHOW FIELD UPDATES
-        clear_all_field_changes(frm);
-        if (frm.doc.status == "Awaiting student correction for mentor feedback") {
-            // SHOW STUDENT THE UPDATES FROM MENTOR
-            await update_field_changes(frm, "IRB Project", frm.doc.name, "Awaiting Faculty mentor approval");
-        }
-        else if (frm.doc.status == "Awaiting student correction for reviewer feedback") {
-            // SHOW STUDENT THE UPDATES FROM REVIEWER
-            await update_field_changes(frm, "IRB Project", frm.doc.name, "Awaiting reviewer feedback to student");
-        }
-        else if (frm.doc.status === "Awaiting Faculty mentor approval") {
-            // SHOW MENTOR THE UPDATES FROM STUDENT
-            await update_field_changes(frm, "IRB Project", frm.doc.name,"Awaiting student correction for mentor feedback");
-        }
-        else if (frm.doc.status ==="Awaiting reviewer feedback to student") {
-            // SHOW REVIEWER THE UPDATES FROM STUDENT
-            await update_field_changes(frm, "IRB Project", frm.doc.name,"Awaiting student correction for reviewer feedback")
-        }
-        frappe.call({
-            method: "sirb.api.get_project_students",
-            args: { project_name: frm.doc.name },
-            callback: function(r) {
-                if (r.message && r.message.length > 0) {
-                    // Create a simple, clean table
-                    let html = `
-                        <table class="table table-bordered table-condensed" style="background-color: #f8f9fa;">
-                            <thead>
-                                <tr>
-                                    <th>Student Name</th>
-                                    <th>Student Email</th>
-                                    <th>Student ID</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                    r.message.forEach(row => {
-                        html += `
-                            <tr>
-                                <td>${row.full_name}</td>
-                                <td>${row.user_email || ''}</td>
-                                <td>${row.student_id || ''}</td>
-                            </tr>
-                        `;
-                    });
-
-                    html += `</tbody></table>`;
-                    
-                    // Set the HTML into the field
-                    frm.set_df_property('student_information', 'options', html);
-                } else {
-                    frm.set_df_property('student_information', 'options', '<p class="text-muted">No students assigned to this project.</p>');
-                }
-            }
-        });
-
-
         // Get the roles of the currently logged in user
         const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
         if (is_student && ["Humans","Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain) && frm.doc.status !== "Awaiting proposal completion by student")
@@ -663,7 +652,89 @@ frappe.ui.form.on("IRB Project", {
                     "border-bottom": "1px solid #cdcfcc" // Separator line under title
                 });                
             }            
-        };
+        };        
+        if (frm.doc.__islocal) return; // Don't run on unsaved docs
+
+        if (frm._toggleAddonsState === undefined) {
+            frm._toggleAddonsState = false;   // false = sections are visible
+        }
+
+        //console.log(sectionsToToggle);
+        // sectionsToToggle.forEach(section => {
+        //     allFieldnamesToToggle.push(...get_fields_in_section(frm, section));
+        // });
+        // Remove duplicates (if any field belongs to more than one section – shouldn’t happen)
+        //allFieldnamesToToggle = [...new Set(allFieldnamesToToggle)];        
+        //console.log(sectionsToToggle);
+
+        if (!frm.doc.research_type)
+            frm.set_value('research_type', '-- Select --');
+        if (!frm.doc.project_domain)
+            frm.set_value('project_domain', '-- Select --');
+        if (!frm.doc.consent_for_people_interaction)
+            frm.set_value('consent_for_people_interaction', '-- Select --');
+        if (!frm.doc.minor_participants)
+            frm.set_value('minor_participants', '-- Select --'); 
+        if (!frm.doc.will_data_be_gathered_through_digital_means)
+            frm.set_value('will_data_be_gathered_through_digital_means', '-- Select --');
+        if (!frm.doc.manipulative_experiments_select)
+            frm.set_value('manipulative_experiments_select', '-- Select --');         
+
+        // SHOW FIELD UPDATES
+        clear_all_field_changes(frm);
+        if (frm.doc.status == "Awaiting student correction for mentor feedback") {
+            // SHOW STUDENT THE UPDATES FROM MENTOR
+            await update_field_changes(frm, "IRB Project", frm.doc.name, "Awaiting Faculty mentor approval");
+        }
+        else if (frm.doc.status == "Awaiting student correction for reviewer feedback") {
+            // SHOW STUDENT THE UPDATES FROM REVIEWER
+            await update_field_changes(frm, "IRB Project", frm.doc.name, "Awaiting reviewer feedback to student");
+        }
+        else if (frm.doc.status === "Awaiting Faculty mentor approval") {
+            // SHOW MENTOR THE UPDATES FROM STUDENT
+            await update_field_changes(frm, "IRB Project", frm.doc.name,"Awaiting student correction for mentor feedback");
+        }
+        else if (frm.doc.status ==="Awaiting reviewer feedback to student") {
+            // SHOW REVIEWER THE UPDATES FROM STUDENT
+            await update_field_changes(frm, "IRB Project", frm.doc.name,"Awaiting student correction for reviewer feedback")
+        }
+        frappe.call({
+            method: "sirb.api.get_project_students",
+            args: { project_name: frm.doc.name },
+            callback: function(r) {
+                if (r.message && r.message.length > 0) {
+                    // Create a simple, clean table
+                    let html = `
+                        <table class="table table-bordered table-condensed" style="background-color: #f8f9fa;">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Student Email</th>
+                                    <th>Student ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    r.message.forEach(row => {
+                        html += `
+                            <tr>
+                                <td>${row.full_name}</td>
+                                <td>${row.user_email || ''}</td>
+                                <td>${row.student_id || ''}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `</tbody></table>`;
+                    
+                    // Set the HTML into the field
+                    frm.set_df_property('student_information', 'options', html);
+                } else {
+                    frm.set_df_property('student_information', 'options', '<p class="text-muted">No students assigned to this project.</p>');
+                }
+            }
+        });
 
 
         //console.log(frm)

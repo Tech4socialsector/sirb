@@ -512,6 +512,7 @@
    "permlevel": 5
   },
   {
+   "depends_on": "eval: (frappe.user.has_role(\"System Manager\") || frappe.user.has_role(\"Administrator\")) && (doc.num_reviewers == 2)",
    "fieldname": "secondary_reviewer",
    "fieldtype": "Link",
    "label": "Secondary Reviewer",
@@ -2605,12 +2606,14 @@
    "permlevel": 3
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "primary_reviewers_comments_to_secondary_reviewer",
    "fieldtype": "Small Text",
    "label": "Primary reviewer's comments to secondary reviewer",
    "permlevel": 4
   },
   {
+   "depends_on": "eval: doc.num_reviewers == 2",
    "fieldname": "secondary_reviewers_comments_to_primary_reviewer",
    "fieldtype": "Small Text",
    "label": "Secondary reviewer's comments to primary reviewer",

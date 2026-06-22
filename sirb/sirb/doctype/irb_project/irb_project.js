@@ -309,13 +309,15 @@ function handle_toggle_all_comment_sections(frm){
             base_section = fieldname.slice(0, -7); // -7 is the len("_addons")
             //console.log(base_section)
             base_section_field = frm.get_field(base_section);
-            console.log(base_section)
+            //console.log(base_section)
             //console.log(base_section_field.df.hidden)
             //console.log(base_section_field.wrapper)
             //console.log(base_section_field.df.hidden === 0, base_section_field.wrapper.is(":visible"))
-            console.log(base_section_field.df)
-            //console.log(base_section_field.wrapper.is(":visible"))
-            if (base_section_field && ( base_section_field.wrapper.is(":visible")))
+            //console.log(base_section_field.df)
+            //console.log(base_section_field.wrapper)
+            let wrapper = $(base_section_field.wrapper);
+            //console.log(base_section_field.wrapper)
+            if (base_section_field && ( wrapper.css('display') === 'block'))
                 sectionsToToggle.push(fieldname);
             //allFieldnamesToToggle.push(fieldname);
         }

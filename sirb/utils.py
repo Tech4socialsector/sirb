@@ -195,3 +195,23 @@ def set_mentor_and_reviewer_roles():
                 user.remove_roles("Faculty Mentor")
 
 
+def send_email_if_configured(email_template, params, recipient_list):
+	# Fetch the default outgoing email account
+	default_email_account = frappe.db.get_value("Email Account", {
+		"default_outgoing": 1,
+		"enable_outgoing": 1
+	}, "name")
+
+	# Check if an account exists
+	if default_email_account:
+		email_template_doc = frappe.get_doc("Email Template", email_template)
+		rendered_content = frappe.render_template(email_template_doc.response_, params)
+		rendered_subject = frappe.render_template(email_template_doc.subject, params)
+		frappe.sendmail(
+			subject = rendered_subject,
+			content = rendered_content,
+			recipients=recipient_list,
+			delayed=False
+		)
+	else:
+		frappe.logger().info("Default email account not set")

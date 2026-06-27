@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from sirb.utils import set_mentor_and_reviewer_roles
+from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
 
 class IRBProject(Document):
 	def validate(self):
@@ -59,36 +59,41 @@ class IRBProject(Document):
 		# 		#print("In!")
 		# 		self.status = "Awaiting student correction for reviewer feedback"
 
-	def after_insert(self):
-
-		notification_info = frappe.db.sql(
-			f'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
-			f.name as mentor_id, 
-			f.system_user as mentor_email, p.primary_reviewer as pr_id, 
-			p.secondary_reviewer as sr_id 
-			from tabStudent as s join `tabStudent Project Mapping` as sp join 
-			`tabIRB Project` as p 
-			join tabFaculty as f on s.name = sp.student and 
-			sp.irb_project = p.name  and p.faculty_mentor=f.name where 
-			p.name="{self.name}"''', as_dict=1
-		)
-		print("NOTIFICATION INFO ", notification_info)
-		if notification_info:
-			params = {
-				"project_status": self.status,
-				"project_name": self.title,
-				"student_names": student_names
-			}			
-			student_name_list = []
-			student_email_list = []
-			for n in notification_info:
-				student_name_list.append(n["student_name"])
-				student_email_list.append(n["student_email"])
-			student_names = ",".join(student_name_list)
-			if student_names[-1] == ',':
-				student_names = student_names[:-1]
-
-			send_email_if_configured("New IRB Project Template", params, student_email_list)
+	# def after_insert(self):
+	# 	frappe.log_error("After Insert Triggered", "Debug")
+	# 	print("!!!")
+	# 	query = f'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
+	# 		f.name as mentor_id, 
+	# 		f.system_user as mentor_email, p.primary_reviewer as pr_id, 
+	# 		p.secondary_reviewer as sr_id 
+	# 		from tabStudent as s join `tabStudent Project Mapping` as sp join 
+	# 		`tabIRB Project` as p 
+	# 		join tabFaculty as f on s.name = sp.student and 
+	# 		sp.irb_project = p.name  and p.faculty_mentor=f.name where 
+	# 		p.name="{self.name}"'''
+	# 	frappe.log_error(query, "Debug")
+	# 	notification_info = frappe.db.sql(query, as_dict=1)
+	# 	frappe.log_error(str(notification_info), "Debug")
+	# 	print("NOTIFICATION INFO ", notification_info)
+	# 	if notification_info:
+	# 		params = {
+	# 			"project_status": self.status,
+	# 			"project_name": self.title,
+	# 			"student_names": student_names
+	# 		}			
+	# 		student_name_list = []
+	# 		student_email_list = []
+	# 		for n in notification_info:
+	# 			student_name_list.append(n["student_name"])
+	# 			student_email_list.append(n["student_email"])
+	# 		student_names = ",".join(student_name_list)
+	# 		if student_names[-1] == ',':
+	# 			student_names = student_names[:-1]
+	# 		print("SENDING EMAIL!!")
+	# 		print(params)
+	# 		print(student_email_list)
+	# 		frappe.log_error(str(student_email_list), "Debug")
+	# 		send_email_if_configured("New IRB Project Template", params, student_email_list)
 
 	def on_change(self):
 		# print("!!!!!")
@@ -236,27 +241,6 @@ class IRBProject(Document):
 		# 		after_commit=True
 		# 	)
 
-
-def send_email_if_configured(email_template, params, recipient_list):
-	# Fetch the default outgoing email account
-	default_email_account = frappe.db.get_value("Email Account", {
-		"default_outgoing": 1,
-		"enable_outgoing": 1
-	}, "name")
-
-	# Check if an account exists
-	if default_email_account:
-		email_template_doc = frappe.get_doc("Email Template", email_template)
-		rendered_content = frappe.render_template(email_template_doc.response_, params)
-		rendered_subject = frappe.render_template(email_template_doc.subject, params)
-		frappe.sendmail(
-			subject = rendered_subject,
-			content = rendered_content,
-			recipients=recipient_list,
-			delayed=False
-		)
-	else:
-		frappe.logger().info("Default email account not set")
 
 
         

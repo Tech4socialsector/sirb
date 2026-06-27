@@ -231,6 +231,7 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
                 #     message = {"progress": 10, "status": "Created project, etc"}
                 # )            
                 for s_info in student_info:
+                    status_msg = ""
                     try:                
                         print("Processing ", s_info)
                         existing_users = frappe.get_all("User", filters = {

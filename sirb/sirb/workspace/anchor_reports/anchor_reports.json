@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"5EUfkv82hE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Anchor reports</span>\",\"col\":12}},{\"id\":\"CiG1PECD1j\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Project Status Tracker\",\"col\":3}}]",
+ "content": "[{\"id\":\"5EUfkv82hE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Anchor reports</span>\",\"col\":12}},{\"id\":\"DU3FzJVdZU\",\"type\":\"card\",\"data\":{\"card_name\":\"Project Status Summary And Details\",\"col\":5}}]",
  "creation": "2026-05-21 12:43:41.624503",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,8 +12,39 @@
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Anchor reports",
- "links": [],
- "modified": "2026-05-22 18:14:06.854806",
+ "links": [
+  {
+   "description": "Click on the links below to view the summary or details of all projects.",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Project Status Summary And Details",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Project Status Summary",
+   "link_count": 0,
+   "link_to": "Project Summary By IRB Unit",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Project Status Details",
+   "link_count": 0,
+   "link_to": "Projects by IRB Unit",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-06-27 20:38:21.116403",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Anchor reports",
@@ -28,15 +59,6 @@
   }
  ],
  "sequence_id": 27.2,
- "shortcuts": [
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Project Status Tracker",
-   "link_to": "Projects by IRB Unit",
-   "report_ref_doctype": "IRB Project",
-   "type": "Report"
-  }
- ],
+ "shortcuts": [],
  "title": "Anchor reports"
 }

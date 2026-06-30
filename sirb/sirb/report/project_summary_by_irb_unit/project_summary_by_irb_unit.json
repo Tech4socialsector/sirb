@@ -18,7 +18,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-06-27 19:31:35.250704",
+ "modified": "2026-06-30 14:24:50.250173",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Project Summary By IRB Unit",
@@ -32,19 +32,10 @@
    "role": "System Manager"
   },
   {
-   "role": "Student"
-  },
-  {
    "role": "Administrator"
   },
   {
-   "role": "Faculty Member"
-  },
-  {
    "role": "Anchor"
-  },
-  {
-   "role": "Faculty Mentor"
   }
  ],
  "timeout": 0

@@ -14,11 +14,13 @@ class IRBProject(Document):
 			self.flags.ignore_mandatory = True
 			return
 
-		is_admin_edit = not self.is_new() and set(frappe.get_roles()) & {"System Manager"}
+		# Roles allowed to edit an existing IRB Project without filling the
+		# mandatory fields (e.g. status/reviewer/mentor changes on a project
+		# the student never finished). Add more roles here if needed later.
+		MANDATORY_BYPASS_ROLES = {"System Manager", "Administrator"}
+
+		is_admin_edit = not self.is_new() and set(frappe.get_roles()) & MANDATORY_BYPASS_ROLES
 		if is_admin_edit:
-			# Admins/Anchors make administrative edits (status, reviewer, mentor
-			# changes) on already-submitted projects and shouldn't be blocked by
-			# mandatory-field checks meant for the student's own questionnaire.
 			self.flags.ignore_mandatory = True
 			return
 

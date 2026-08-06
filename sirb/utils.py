@@ -162,7 +162,7 @@ def set_mentor_and_reviewer_roles():
         all_srs_docs = {s: frappe.get_doc("User", s) for s in all_srs}
         for _, user in all_srs_docs.items():
             if user not in secondary_reviewers:
-                user.remove_roles("Secondry IRB Reviewer")
+                user.remove_roles("Secondary IRB Reviewer")
 
     # Get all current mentors
     query = '''

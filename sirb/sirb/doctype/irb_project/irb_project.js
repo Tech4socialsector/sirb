@@ -542,6 +542,28 @@ frappe.ui.form.on("IRB Project", {
             frm.save_button = frm.page.btn_primary;
         }
         toggle_save_button(frm);
+
+        // System Manager / Administrator make administrative edits (status,
+        // reviewer, mentor changes) to already-submitted projects and
+        // shouldn't be blocked by mandatory-field checks meant for the
+        // student's own questionnaire. Add more roles here if needed later -
+        // keep this list in sync with MANDATORY_BYPASS_ROLES in irb_project.py.
+        // The server already skips these checks for this case (see
+        // irb_project.py validate()); this mirrors that on the client, since
+        // frappe's "Missing Fields" check runs before the save request is
+        // even sent to the server.
+        const MANDATORY_BYPASS_ROLES = ["System Manager", "Administrator"];
+        if (!frm.doc.__islocal && (frappe.session.user === "Administrator" ||
+            frappe.user_roles.some(role => MANDATORY_BYPASS_ROLES.includes(role)))) {
+            frm.meta.fields.forEach(df => {
+                if (df.reqd) {
+                    frm.set_df_property(df.fieldname, 'reqd', 0);
+                }
+                if (df.mandatory_depends_on) {
+                    frm.set_df_property(df.fieldname, 'mandatory_depends_on', '');
+                }
+            });
+        }
         // Get the roles of the currently logged in user
         const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
         if (is_student && ["Humans","Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain) && frm.doc.status !== "Awaiting proposal completion by student")

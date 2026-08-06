@@ -187,6 +187,7 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
                         "irb_cycle": irb_cycle,
                         "owner": logged_in_user
                     })
+                    project.flags.script_created = True
                     if mentor_required:
                         pr_reviewer, sr_reviewer = get_reviewers(irb_unit, faculty_mentor.name)
                         #frappe.log_error(title="Debug", message=f"{faculty_mentor.name} {pr_reviewer} {sr_reviewer}")

@@ -7,7 +7,21 @@ from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
 
 class IRBProject(Document):
 	def validate(self):
-        # Skip validation for new documents
+		if self.flags.script_created:
+			# Bulk import (see api.py:import_student_irb_information) creates a bare
+			# IRB Project with only irb_unit/irb_cycle/owner set; the student fills
+			# in the rest later, so skip mandatory checks for that creation only.
+			self.flags.ignore_mandatory = True
+			return
+
+		is_admin_edit = not self.is_new() and set(frappe.get_roles()) & {"System Manager"}
+		if is_admin_edit:
+			# Admins/Anchors make administrative edits (status, reviewer, mentor
+			# changes) on already-submitted projects and shouldn't be blocked by
+			# mandatory-field checks meant for the student's own questionnaire.
+			self.flags.ignore_mandatory = True
+			return
+
 		if not self.is_new():
 			if self.project_domain == "-- Select --":
 				frappe.throw("Please select a valid IRB project domain.")
@@ -22,13 +36,12 @@ class IRBProject(Document):
 				if self.research_type ==  "-- Select --":
 					frappe.throw("Please select a valid answer for the Research Type in the Non-Human Questionnaire.")
 				if self.research_type in ["Lab based experiments", "BOTH Lab AND Field based"] and self.manipulative_experiments_select ==  "-- Select --":
-					frappe.throw("Please select a valid answer for \"7. Are you performing manipulative experiments with animals?\" in the Non-Human Questionnaire.")					
-					
+					frappe.throw("Please select a valid answer for \"7. Are you performing manipulative experiments with animals?\" in the Non-Human Questionnaire.")
+
 				if self.research_type in ["Field-based research (plants, animals included)", "BOTH Lab AND Field based"] and self.consent_for_people_interaction ==  "-- Select --":
 					frappe.throw("Please select a valid answer for \"If data collection involves interaction with people, will consent be taken?\" in the Non-Human Questionnaire.")
-		else:
-			# Ignore mandatory checks since it is created by a script.
-			self.flags.ignore_mandatory = True
+		# else: new document, not script-created — core mandatory-field
+		# validation runs as normal.
 
 	def before_save(self):
 		# print("Before save")
@@ -45,7 +58,7 @@ class IRBProject(Document):
 		# 			if not fmf.facultys_role and "Faculty Mentor" in roles:
 		# 				fmf.facultys_role = "Faculty Mentor"
 		# 				fmf.facultys_name = faculty.display_full_name
-		# 	#print("Reviewers are ", self.primary_reviewer, self.secondary_reviewer, fentries[0]["name"], self.primary_reviewer == fentries[0]["name"])						
+		# 	#print("Reviewers are ", self.primary_reviewer, self.secondary_reviewer, fentries[0]["name"], self.primary_reviewer == fentries[0]["name"])
 		# 	if self.reviewers_comments:
 		# 		for fmf in self.reviewers_comments:
 		# 			if not fmf.facultys_role and ("Primarary Reviewer" in roles or "Secondary Reviewer in roles"):
@@ -63,13 +76,13 @@ class IRBProject(Document):
 	# 	frappe.log_error("After Insert Triggered", "Debug")
 	# 	print("!!!")
 	# 	query = f'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
-	# 		f.name as mentor_id, 
-	# 		f.system_user as mentor_email, p.primary_reviewer as pr_id, 
-	# 		p.secondary_reviewer as sr_id 
-	# 		from tabStudent as s join `tabStudent Project Mapping` as sp join 
-	# 		`tabIRB Project` as p 
-	# 		join tabFaculty as f on s.name = sp.student and 
-	# 		sp.irb_project = p.name  and p.faculty_mentor=f.name where 
+	# 		f.name as mentor_id,
+	# 		f.system_user as mentor_email, p.primary_reviewer as pr_id,
+	# 		p.secondary_reviewer as sr_id
+	# 		from tabStudent as s join `tabStudent Project Mapping` as sp join
+	# 		`tabIRB Project` as p
+	# 		join tabFaculty as f on s.name = sp.student and
+	# 		sp.irb_project = p.name  and p.faculty_mentor=f.name where
 	# 		p.name="{self.name}"'''
 	# 	frappe.log_error(query, "Debug")
 	# 	notification_info = frappe.db.sql(query, as_dict=1)
@@ -80,7 +93,7 @@ class IRBProject(Document):
 	# 			"project_status": self.status,
 	# 			"project_name": self.title,
 	# 			"student_names": student_names
-	# 		}			
+	# 		}
 	# 		student_name_list = []
 	# 		student_email_list = []
 	# 		for n in notification_info:
@@ -109,13 +122,13 @@ class IRBProject(Document):
 
 				notification_info = frappe.db.sql(
 					f'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
-					f.name as mentor_id, 
-					f.system_user as mentor_email, p.primary_reviewer as pr_id, 
-					p.secondary_reviewer as sr_id 
-					from tabStudent as s join `tabStudent Project Mapping` as sp join 
-					`tabIRB Project` as p 
-					join tabFaculty as f on s.name = sp.student and 
-					sp.irb_project = p.name  and p.faculty_mentor=f.name where 
+					f.name as mentor_id,
+					f.system_user as mentor_email, p.primary_reviewer as pr_id,
+					p.secondary_reviewer as sr_id
+					from tabStudent as s join `tabStudent Project Mapping` as sp join
+					`tabIRB Project` as p
+					join tabFaculty as f on s.name = sp.student and
+					sp.irb_project = p.name  and p.faculty_mentor=f.name where
 					p.name="{self.name}"''', as_dict=1
 				)
 				print("NOTIFICATION INFO ", notification_info)
@@ -207,7 +220,7 @@ class IRBProject(Document):
 				sp_doc.status = "inactive"
 				sp_doc.save()
 				frappe.db.commit()
-						
+
 		versions = frappe.get_all(
 			"Version",
 			filters={
@@ -243,8 +256,8 @@ class IRBProject(Document):
 
 
 
-        
 
-				
+
+
 
 

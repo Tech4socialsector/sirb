@@ -242,9 +242,9 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 # --------
 # List of fixtures to be imported when app is installed
 
-# fixtures = [
-# 	"Workspace"
-# ]
+fixtures = [
+	{"dt": "Custom HTML Block", "filters": [["name", "in", ["SIRB Uploads Card Grid"]]]}
+]
 
 
 # Automatically update python controller files with type annotations for this app.

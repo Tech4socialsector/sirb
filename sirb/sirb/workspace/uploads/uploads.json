@@ -1,8 +1,13 @@
 {
  "charts": [],
- "content": "[{\"id\":\"1JBGD9263Z\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"HqX5hu4zlt\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><i>Click on the link below to upload a list students and their faculty mentors as part of the IRB process.</i></span>\",\"col\":12}},{\"id\":\"ww90NQt27I\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"IRB Student List Upload\",\"col\":3}},{\"id\":\"8PqByogxBZ\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"tZPNfPsBgO\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><i>Click on the link below to upload a list of faculty members and associate them with an academic organizational unit.</i></span>\",\"col\":12}},{\"id\":\"BhAshQLXBN\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Faculty Members Upload\",\"col\":3}}]",
+ "content": "[{\"id\":\"1JBGD9263Z\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"sirbUploadsHeader\",\"type\":\"header\",\"data\":{\"text\":\"Uploads\",\"col\":12}},{\"id\":\"sirbUploadsSub\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"text-muted\\\">Choose an upload below to import records for the IRB process.</span>\",\"col\":12}},{\"id\":\"sirbUploadsBlock\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"SIRB Uploads Card Grid\",\"col\":12}}]",
  "creation": "2025-12-30 16:59:43.009198",
- "custom_blocks": [],
+ "custom_blocks": [
+  {
+   "custom_block_name": "SIRB Uploads Card Grid",
+   "label": "SIRB Uploads Card Grid"
+  }
+ ],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
@@ -13,7 +18,7 @@
  "is_hidden": 0,
  "label": "Uploads",
  "links": [],
- "modified": "2026-02-16 11:26:42.814586",
+ "modified": "2026-08-06 18:30:00",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "Uploads",

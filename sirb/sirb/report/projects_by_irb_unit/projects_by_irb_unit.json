@@ -57,6 +57,13 @@
  "doctype": "Report",
  "filters": [
   {
+   "fieldname": "campus",
+   "fieldtype": "Link",
+   "label": "Campus",
+   "options": "Academic Organizational Unit",
+   "wildcard_filter": 0
+  },
+  {
    "fieldname": "irb_unit",
    "fieldtype": "Data",
    "label": "School/Programme",

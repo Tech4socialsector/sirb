@@ -336,7 +336,9 @@ def enque_student_upload(file_url, irb_unit, irb_cycle):
         logged_in_user = frappe.session.user,
         file_url=file_url,
         irb_unit = irb_unit,
-        irb_cycle = irb_cycle
+        irb_cycle = irb_cycle,
+        queue = "long",
+        timeout= 3600
     )
     return "Upload Started"
 
@@ -447,6 +449,8 @@ def enque_faculty_upload(file_url, ao_unit):
         logged_in_user = frappe.session.user,
         file_url=file_url,
         ao_unit = ao_unit,
+        queue = "long",
+        timeout= 3600
     )
     return "Upload Started"
 

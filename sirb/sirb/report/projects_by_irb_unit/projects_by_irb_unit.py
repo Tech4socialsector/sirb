@@ -125,6 +125,17 @@ def execute(filters=None):
 					q2 += f' and p.irb_unit = "{filters["irb_unit"]}"'
 				if "status" in filters:
 					q2 += f' and p.status = "{filters["status"]}"'
+				if filters.get("campus"):
+					campus_bounds = frappe.db.get_value(
+						"Academic Organizational Unit", filters["campus"], ["lft", "rgt"]
+					)
+					if campus_bounds:
+						lft, rgt = campus_bounds
+						q2 += f''' and p.irb_unit in (
+							select iu.name from `tabIRB Unit` as iu
+							join `tabAcademic Organizational Unit` as a on iu.ao_unit = a.name
+							where a.lft >= {lft} and a.rgt <= {rgt}
+						)'''
 			print(q2)
 			project_data = frappe.db.sql(q2, as_dict = 1)
 			print('Project data ', project_data)

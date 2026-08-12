@@ -27,6 +27,17 @@ async function get_select_field_options(doctype, fieldname) {
 frappe.query_reports["Projects by IRB Unit"] = {
 	"filters": [
         {
+            "fieldname": "campus",
+            "label": __("Filter by Campus"),
+            "fieldtype": "Link",
+            "options": "Academic Organizational Unit",
+            "get_query": function() {
+                return {
+                    filters: { "ao_type": "Campus" }
+                };
+            }
+        },
+        {
             "fieldname": "irb_unit",
             "label": __("Filter by School/Programme"),
             "fieldtype": "Link",
@@ -35,7 +46,7 @@ frappe.query_reports["Projects by IRB Unit"] = {
         },
 		{
             "fieldname": "status",
-            "label": __("Filter by project status"),			
+            "label": __("Filter by project status"),
             "fieldtype": "Select", // Use Select fieldtype
 		}
 	],

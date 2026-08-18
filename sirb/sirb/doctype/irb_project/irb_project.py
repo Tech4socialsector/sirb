@@ -24,6 +24,9 @@ class IRBProject(Document):
 			self.flags.ignore_mandatory = True
 			return
 
+		if not self.i_hereby_confirm_the_above:
+			frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
+
 		if not self.is_new():
 			if self.project_domain == "-- Select --":
 				frappe.throw("Please select a valid IRB project domain.")
@@ -32,8 +35,6 @@ class IRBProject(Document):
 					frappe.throw("Please select a valid answer for 4. Minors check")
 				if self.will_data_be_gathered_through_digital_means == "-- Select --":
 					frappe.throw("Please select a valid answer for 13.Gathering of Audio, Photographic and Video Data")
-				if not self.i_hereby_confirm_the_above:
-					frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
 			elif self.project_domain in ["Non Human Species", "BOTH Humans AND Non Humans"]:
 				if self.research_type ==  "-- Select --":
 					frappe.throw("Please select a valid answer for the Research Type in the Non-Human Questionnaire.")

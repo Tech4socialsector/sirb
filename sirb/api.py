@@ -112,7 +112,7 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
         # print(logged_in_user)
         err, num_students = analyze_student_headers(file_path)
         if err:
-            frappe.log_error(frappe.get_traceback(), title="Student upload failure", message = err)
+            frappe.log_error(title="Student upload failure", message=err)
             frappe.publish_realtime(
                 event = "sirb_student_import_progress",
                 user = logged_in_user,

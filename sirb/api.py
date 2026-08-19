@@ -5,6 +5,27 @@ import frappe
 import csv, re
 from frappe.utils.file_manager import get_file_path
 
+def detect_csv_encoding(csv_path):
+    """
+    Detect the text encoding of an uploaded CSV file.
+
+    Excel commonly saves "CSV" exports as UTF-8 with a BOM, or as
+    Windows-1252 (cp1252) rather than plain UTF-8, which raises
+    UnicodeDecodeError if we assume utf-8. Try the common encodings in
+    order and fall back to latin-1, which never raises on any byte value.
+    """
+    with open(csv_path, 'rb') as f:
+        raw = f.read()
+    if raw.startswith(b'\xef\xbb\xbf'):
+        return 'utf-8-sig'
+    for encoding in ('utf-8', 'cp1252'):
+        try:
+            raw.decode(encoding)
+            return encoding
+        except UnicodeDecodeError:
+            continue
+    return 'latin-1'
+
 def analyze_student_headers(csv_path):
     """
     Parse CSV headers to determine:
@@ -13,7 +34,8 @@ def analyze_student_headers(csv_path):
     Returns:
         Tuple: (Error string or None, Number of students in the CSV)
     """
-    with open(csv_path, 'r', newline='', encoding='utf-8') as f:
+    encoding = detect_csv_encoding(csv_path)
+    with open(csv_path, 'r', newline='', encoding=encoding) as f:
         headers = next(csv.reader(f))
 
     # Case‑insensitive patterns
@@ -96,9 +118,10 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
                 user = logged_in_user,
                 message = {"progress": 100, "status": err}
             )
-            print("Sent realtime")                
-            return        
-        with open(file_path, 'r') as f:
+            print("Sent realtime")
+            return
+        encoding = detect_csv_encoding(file_path)
+        with open(file_path, 'r', newline='', encoding=encoding) as f:
             # We read lines first to get the total count for the progress bar
             rows = list(csv.DictReader(f))
             total_rows = len(rows)
@@ -347,7 +370,8 @@ def import_faculty_list(logged_in_user, file_url, ao_unit):
     faculty_email_field = "Faculty's email ID"
     file_path = get_file_path(file_url.split('/')[-1])
     #limit_faculty_count = 5
-    with open(file_path, 'r') as f:
+    encoding = detect_csv_encoding(file_path)
+    with open(file_path, 'r', newline='', encoding=encoding) as f:
         rows = list(csv.DictReader(f))
         total_rows = len(rows)
         successful_faculty_count = 0

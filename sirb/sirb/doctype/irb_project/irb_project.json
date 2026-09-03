@@ -3178,6 +3178,274 @@
    "role": "Secondary IRB Reviewer",
    "share": 1,
    "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Student",
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Faculty Mentor"
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Primary IRB Reviewer"
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Secondary IRB Reviewer"
+  },
+  {
+   "permlevel": 2,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 2,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 2,
+   "read": 1,
+   "role": "Student"
+  },
+  {
+   "permlevel": 2,
+   "read": 1,
+   "role": "Faculty Mentor",
+   "write": 1
+  },
+  {
+   "permlevel": 2,
+   "read": 1,
+   "role": "Primary IRB Reviewer"
+  },
+  {
+   "permlevel": 2,
+   "read": 1,
+   "role": "Secondary IRB Reviewer"
+  },
+  {
+   "permlevel": 3,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 3,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 3,
+   "read": 1,
+   "role": "Student"
+  },
+  {
+   "permlevel": 3,
+   "read": 1,
+   "role": "Faculty Mentor"
+  },
+  {
+   "permlevel": 3,
+   "read": 1,
+   "role": "Primary IRB Reviewer",
+   "write": 1
+  },
+  {
+   "permlevel": 3,
+   "read": 1,
+   "role": "Secondary IRB Reviewer",
+   "write": 1
+  },
+  {
+   "permlevel": 4,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 4,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 4,
+   "read": 1,
+   "role": "Student"
+  },
+  {
+   "permlevel": 4,
+   "read": 1,
+   "role": "Faculty Mentor"
+  },
+  {
+   "permlevel": 4,
+   "read": 1,
+   "role": "Primary IRB Reviewer",
+   "write": 1
+  },
+  {
+   "permlevel": 4,
+   "read": 1,
+   "role": "Secondary IRB Reviewer"
+  },
+  {
+   "permlevel": 5,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 5,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 5,
+   "read": 1,
+   "role": "Student"
+  },
+  {
+   "permlevel": 5,
+   "read": 1,
+   "role": "Faculty Mentor"
+  },
+  {
+   "permlevel": 5,
+   "read": 1,
+   "role": "Primary IRB Reviewer"
+  },
+  {
+   "permlevel": 5,
+   "read": 1,
+   "role": "Secondary IRB Reviewer",
+   "write": 1
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "Student",
+   "write": 1
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "Faculty Mentor",
+   "write": 1
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "Primary IRB Reviewer",
+   "write": 1
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "Secondary IRB Reviewer",
+   "write": 1
+  },
+  {
+   "permlevel": 7,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 7,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 7,
+   "read": 1,
+   "role": "Student",
+   "write": 1
+  },
+  {
+   "permlevel": 7,
+   "read": 1,
+   "role": "Faculty Mentor"
+  },
+  {
+   "permlevel": 7,
+   "read": 1,
+   "role": "Primary IRB Reviewer"
+  },
+  {
+   "permlevel": 7,
+   "read": 1,
+   "role": "Secondary IRB Reviewer"
+  },
+  {
+   "permlevel": 8,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 8,
+   "read": 1,
+   "role": "Administrator",
+   "write": 1
+  },
+  {
+   "permlevel": 8,
+   "read": 1,
+   "role": "Student"
+  },
+  {
+   "permlevel": 8,
+   "read": 1,
+   "role": "Faculty Mentor",
+   "write": 1
+  },
+  {
+   "permlevel": 8,
+   "read": 1,
+   "role": "Primary IRB Reviewer"
+  },
+  {
+   "permlevel": 8,
+   "read": 1,
+   "role": "Secondary IRB Reviewer"
   }
  ],
  "row_format": "Dynamic",

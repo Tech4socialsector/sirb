@@ -27,15 +27,16 @@ def execute(filters=None):
 		},
 	]
 	doc = get_logged_in_doc("Student")
-	print(doc.system_user)
 	if doc:
 		data = frappe.db.sql(
-			f'''select p.title as project_title, p.name as project_id, p.status as project_status 
-			from tabStudent as s join `tabStudent Project Mapping` 
-			as sp join `tabIRB Project` as p on s.name = sp.student and 
-			sp.irb_project = p.name where s.system_user="{doc.system_user}" and sp.status="active"''', as_dict=1
+			'''select p.title as project_title, p.name as project_id, p.status as project_status
+			from tabStudent as s join `tabStudent Project Mapping`
+			as sp join `tabIRB Project` as p on s.name = sp.student and
+			sp.irb_project = p.name where s.system_user=%(system_user)s
+			and (sp.status="active" or p.status="Approved")''',
+			{"system_user": doc.system_user},
+			as_dict=1,
 		)
-		print("DATA", data)
 	else:
 		data = []
 

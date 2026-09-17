@@ -134,7 +134,7 @@ BASE_JOIN = """
 	join `tabIRB Project` as p on sp.irb_project = p.name
 	join `tabStudent` as s on sp.student = s.name
 	join `tabIRB Unit` as iu on p.irb_unit = iu.name
-	where sp.status = "active"
+	where (sp.status = "active" or p.status = "Approved")
 """
 
 
@@ -376,7 +376,7 @@ def get_drilldown_students(filters=None, status=None, irb_unit=None, pending_gro
 		left join `tabFaculty` as fm on p.faculty_mentor = fm.name
 		left join `tabFaculty` as pr on p.primary_reviewer = pr.name
 		left join `tabFaculty` as sr on p.secondary_reviewer = sr.name
-		where sp.status = "active"
+		where (sp.status = "active" or p.status = "Approved")
 		{where_extra}{extra_clause}
 		order by p.modified desc
 		limit 1000
@@ -458,7 +458,8 @@ def get_recent_activity(filters=None, limit=25):
 			group_concat(s.full_name separator ', ') as student_names
 		from `tabIRB Project` as p
 		join `tabIRB Unit` as iu on p.irb_unit = iu.name
-		left join `tabStudent Project Mapping` as sp on sp.irb_project = p.name and sp.status = "active"
+		left join `tabStudent Project Mapping` as sp on sp.irb_project = p.name
+			and (sp.status = "active" or p.status = "Approved")
 		left join `tabStudent` as s on sp.student = s.name
 		where p.name in %(names)s
 		group by p.name

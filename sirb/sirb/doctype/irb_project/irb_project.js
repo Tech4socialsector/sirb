@@ -467,7 +467,7 @@ async function update_status(frm, status) {
         },
         callback: function(r) {
             if (!r.exc) {
-                //frappe.msgprint("API executed successfully!");
+                frappe.show_alert({ message: __('Submitted successfully.'), indicator: 'green' });
                 frm.reload_doc();
                 //frappe.set_route("app", "irb-projects")
             }
@@ -787,6 +787,13 @@ frappe.ui.form.on("IRB Project", {
                 __('You are the '+intro_role+' for this IRB project.'),
                 'orange', { no_dirty: true }
             );
+
+        if (is_student && ["Awaiting student correction for mentor feedback", "Awaiting student correction for reviewer feedback"].includes(frm.doc.status)) {
+            frm.set_intro(
+                __('Saving this form only stores your changes. To send your updated documents/answers back to the reviewer, you must also click "Submit Corrections" under the Actions menu once you are done making changes.'),
+                'orange', { no_dirty: true }
+            );
+        }
 
 
 

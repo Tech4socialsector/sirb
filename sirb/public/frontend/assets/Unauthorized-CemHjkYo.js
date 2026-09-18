@@ -1,0 +1,2 @@
+import{$ as e,H as t,Rt as n,Z as r,_n as i}from"./runtime-dom.esm-bundler-BJ-qJ23c.js";import{t as a}from"./AppShell-SZPnJAqW.js";import{t as o}from"./EmptyState-UTSOJdTG.js";var s=e({__name:`Unauthorized`,setup(e){return(e,s)=>(n(),t(a,null,{default:i(()=>[r(o,{icon:`lock`,title:`You do not have permission to view this page`,description:`If you believe this is a mistake, contact your IRB administrator.`})]),_:1}))}});export{s as default};
+//# sourceMappingURL=Unauthorized-CemHjkYo.js.map

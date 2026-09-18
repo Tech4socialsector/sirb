@@ -1,0 +1,2 @@
+import{$ as e,H as t,Rt as n,Z as r,_n as i}from"./runtime-dom.esm-bundler-BJ-qJ23c.js";import{t as a}from"./AppShell-SZPnJAqW.js";import{t as o}from"./EmptyState-UTSOJdTG.js";var s=e({__name:`NotFound`,setup(e){return(e,s)=>(n(),t(a,null,{default:i(()=>[r(o,{icon:`map-pin`,title:`Page not found`,description:`The page you're looking for doesn't exist or may have moved.`})]),_:1}))}});export{s as default};
+//# sourceMappingURL=NotFound-BtoUEUTr.js.map

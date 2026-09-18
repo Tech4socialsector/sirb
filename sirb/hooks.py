@@ -66,6 +66,15 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 # 	"Role": "home_page"
 # }
 
+# Website Route Rules
+# --------------------
+# Serves the Vue SPA (frontend/) for every /sirb/<path> sub-route so that
+# client-side (Vue Router) navigation, direct URL access, and browser
+# refresh all resolve to the same built index page.
+website_route_rules = [
+	{"from_route": "/sirb/<path:app_path>", "to_route": "sirb"},
+]
+
 # Generators
 # ----------
 

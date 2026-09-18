@@ -350,8 +350,20 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
         )        
         return
 
+UPLOADER_ROLES = {"Anchor", "System Manager", "Administrator"}
+
+
+def _check_uploader_permission():
+    if not (set(frappe.get_roles()) & UPLOADER_ROLES):
+        frappe.throw(
+            "You do not have permission to perform bulk uploads.",
+            frappe.PermissionError,
+        )
+
+
 @frappe.whitelist()
 def enque_student_upload(file_url, irb_unit, irb_cycle):
+    _check_uploader_permission()
     # 1. Enqueue the job to the background worker
     frappe.enqueue(
         import_student_irb_information,
@@ -466,6 +478,7 @@ def import_faculty_list(logged_in_user, file_url, ao_unit):
 
 @frappe.whitelist()
 def enque_faculty_upload(file_url, ao_unit):
+    _check_uploader_permission()
     # 1. Enqueue the job to the background worker
     frappe.enqueue(
         import_faculty_list,

@@ -16,6 +16,9 @@
   },
   {
    "role": "Administrator"
+  },
+  {
+   "role": "IRB Dashboard Viewer"
   }
  ],
  "script": null,

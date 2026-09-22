@@ -28,6 +28,9 @@
   },
   {
    "role": "Administrator"
+  },
+  {
+   "role": "IRB Dashboard Viewer"
   }
  ],
  "sequence_id": 1.0,

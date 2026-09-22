@@ -62,7 +62,7 @@ PRIMARY_REVIEWER_PENDING_STATUSES = [
 ]
 SECONDARY_REVIEWER_PENDING_STATUSES = ["Awaiting secondary reviewer comments to primary reviewer"]
 
-ALLOWED_ROLES = {"System Manager", "Administrator"}
+ALLOWED_ROLES = {"System Manager", "Administrator", "IRB Dashboard Viewer"}
 
 
 def _check_permission():

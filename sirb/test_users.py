@@ -16,6 +16,9 @@ TEST_USERS = [
 	("sirb.admin@example.com", "Test Admin", ["System Manager"], None),
 	("sirb.anchor@example.com", "Test Anchor", ["Faculty Member", "Anchor"], "Faculty"),
 	("sirb.student@example.com", "Test Student", ["Student"], "Student"),
+	# Teammates for the group projects below.
+	("sirb.student2@example.com", "Test Student Two", ["Student"], "Student"),
+	("sirb.student3@example.com", "Test Student Three", ["Student"], "Student"),
 	("sirb.mentor@example.com", "Test Mentor", ["Faculty Member", "Faculty Mentor"], "Faculty"),
 	(
 		"sirb.primary@example.com",
@@ -34,6 +37,25 @@ TEST_USERS = [
 # Reviewers are added to the Test IRB Unit committee so they can be auto-assigned.
 COMMITTEE_USERS = ["sirb.primary@example.com", "sirb.secondary@example.com"]
 
+PROJECT_PREFIX = "[TEST] "
+# title, status, member emails, has primary reviewer
+TEST_PROJECTS = [
+	("Solo: Reading habits survey", "Awaiting proposal completion by student", ["sirb.student@example.com"], False),
+	("Solo: Campus water audit", "Awaiting Faculty mentor approval", ["sirb.student@example.com"], False),
+	(
+		"Group: Street vendor livelihoods",
+		"Awaiting reviewer feedback to student",
+		["sirb.student@example.com", "sirb.student2@example.com", "sirb.student3@example.com"],
+		True,
+	),
+	(
+		"Group: Bird census of Sarjapur lake",
+		"Approved",
+		["sirb.student@example.com", "sirb.student2@example.com"],
+		True,
+	),
+]
+
 
 def create():
 	frappe.flags.mute_emails = True
@@ -42,6 +64,7 @@ def create():
 		if person_doctype:
 			_ensure_person(person_doctype, user.name, full_name)
 	_ensure_committee_members()
+	_ensure_projects()
 	frappe.db.commit()
 	for email, _, roles, _ in TEST_USERS:
 		print(f"{email:32} {', '.join(roles)}")
@@ -50,6 +73,10 @@ def create():
 
 def remove():
 	emails = [u[0] for u in TEST_USERS]
+	projects = frappe.get_all("IRB Project", filters={"title": ["like", PROJECT_PREFIX + "%"]}, pluck="name")
+	if projects:
+		frappe.db.delete("Student Project Mapping", {"irb_project": ["in", projects]})
+		frappe.db.delete("IRB Project", {"name": ["in", projects]})
 	faculty = frappe.get_all("Faculty", filters={"system_user": ["in", emails]}, pluck="name")
 	aou = frappe.get_all(
 		"Faculty Academic Organizational Unit", filters={"faculty_member": ["in", faculty]}, pluck="name"
@@ -91,6 +118,51 @@ def _ensure_person(doctype, user, full_name):
 	if doctype == "Student":
 		doc.student_id = full_name
 	doc.insert(ignore_permissions=True)
+
+
+def _ensure_projects():
+	# db_insert() skips the controllers on purpose: IRB Project.on_change re-syncs
+	# mentor/reviewer roles for every user on the site, and Student Project
+	# Mapping.after_insert emails the students.
+	irb_unit = frappe.db.get_value("IRB Unit", {"ao_unit": TEST_AO_UNIT})
+	if not irb_unit:
+		return
+	mentor = frappe.db.get_value("Faculty", {"system_user": "sirb.mentor@example.com"})
+	primary = frappe.db.get_value("Faculty", {"system_user": "sirb.primary@example.com"})
+	for title, status, members, has_reviewer in TEST_PROJECTS:
+		title = PROJECT_PREFIX + title
+		if frappe.db.exists("IRB Project", {"title": title}):
+			continue
+		project = frappe.new_doc("IRB Project")
+		project.update(
+			{
+				"title": title,
+				"topic": title,
+				"abstract": "Dummy project for manual testing.",
+				"status": status,
+				"irb_unit": irb_unit,
+				"irb_cycle": "August 2026",
+				"faculty_mentor": mentor,
+				"primary_reviewer": primary if has_reviewer else None,
+				"num_reviewers": "1",
+				"project_domain": "Humans",
+				"i_hereby_confirm_the_above": 1,
+			}
+		)
+		project.set_user_and_timestamp()
+		project.db_insert()
+		for email in members:
+			mapping = frappe.new_doc("Student Project Mapping")
+			mapping.update(
+				{
+					"student": frappe.db.get_value("Student", {"system_user": email}),
+					"irb_project": project.name,
+					# Approved projects have their mappings deactivated (IRB Project.on_change).
+					"status": "inactive" if status == "Approved" else "active",
+				}
+			)
+			mapping.set_user_and_timestamp()
+			mapping.db_insert()
 
 
 def _ensure_committee_members():

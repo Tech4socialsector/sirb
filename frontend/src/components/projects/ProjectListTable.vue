@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { FeatherIcon } from 'frappe-ui'
+import { Badge, FeatherIcon } from 'frappe-ui'
 import DataTable, { type DataTableColumn } from '@/components/common/DataTable.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import { fetchStatusChangeHistory } from '@/services/projects'
@@ -61,6 +61,10 @@ const hasStudentColumn = computed(() => props.rows.some((r) => r.student_name))
 // DataTable always has something unique to key rows on.
 const normalizedRows = computed(() => props.rows.map((r) => ({ ...r, _key: r.project_id || r.project_name })))
 
+function isGroup(row: Record<string, unknown>) {
+  return Number(row.student_count) > 1
+}
+
 const columns = computed<DataTableColumn[]>(() => [
   ...(hasStudentColumn.value ? [{ key: 'student', label: 'Student', path: 'student_name', sortable: true }] : []),
   { key: 'project', label: 'Project', path: 'project_title', sortable: true },
@@ -85,8 +89,22 @@ const columns = computed<DataTableColumn[]>(() => [
       :empty-description="emptyDescription"
       @row-click="openProject"
     >
-      <template #cell-project="{ value }">
+      <template #cell-student="{ row, value }">
+        <div class="flex min-w-0 flex-col gap-1">
+          <span class="block w-32 whitespace-normal text-charcoal">{{ value }}</span>
+          <Badge v-if="isGroup(row)" theme="blue" variant="subtle" size="sm" class="self-start">
+            Group · {{ row.student_count }}
+          </Badge>
+        </div>
+      </template>
+      <template #cell-project="{ row, value }">
         <span class="font-medium text-charcoal">{{ value || '(Untitled)' }}</span>
+        <!-- The student's own list has no Student column, so name the teammates
+             under the title (worklists show them in the Student column instead). -->
+        <div v-if="!hasStudentColumn && isGroup(row)" class="mt-1 flex items-start gap-1.5 whitespace-normal text-xs text-muted">
+          <FeatherIcon name="users" class="mt-px h-3.5 w-3.5 shrink-0" />
+          <span>{{ row.student_count }} members<template v-if="row.teammates"> · with {{ row.teammates }}</template></span>
+        </div>
       </template>
       <template #cell-cycle="{ value }">{{ value || '—' }}</template>
       <template #cell-status="{ value }">

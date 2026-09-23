@@ -21,7 +21,12 @@ export interface ProjectListRow {
   irb_cycle?: string
   last_updated?: string
   student_id?: string
+  /** Worklists: every active member, comma-separated (one row per project). */
   student_name?: string
+  /** Number of students mapped to the project; > 1 means a group project. */
+  student_count?: number
+  /** My Projects only: the other members of a group project. */
+  teammates?: string | null
 }
 
 export interface ProjectRoles {

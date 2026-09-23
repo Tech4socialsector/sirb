@@ -20,6 +20,13 @@ const hasAnyWork = computed(
   () => isStudent.value || isFacultyMentor.value || isPrimaryReviewer.value || isSecondaryReviewer.value || isAdmin.value || isAnchor.value,
 )
 
+const studentProjectsSupport = computed(() => {
+  const total = counts.value.student_projects ?? 0
+  if (!total) return undefined
+  const group = counts.value.student_group_projects ?? 0
+  return `${total - group} individual · ${group} group`
+})
+
 onMounted(async () => {
   try {
     counts.value = await fetchMyPendingCounts()
@@ -42,6 +49,7 @@ onMounted(async () => {
         v-if="isStudent"
         label="My Projects"
         :value="counts.student_projects ?? 0"
+        :support="studentProjectsSupport"
         icon="folder"
         action-label="View Projects"
         clickable

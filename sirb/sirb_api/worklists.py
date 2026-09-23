@@ -25,8 +25,12 @@ PRIMARY_REVIEWER_PENDING_STATUSES = [
 SECONDARY_REVIEWER_PENDING_STATUS = "Awaiting secondary reviewer comments to primary reviewer"
 MENTOR_PENDING_STATUS = "Awaiting Faculty mentor approval"
 
+# One row per project: a group project has several Student Project Mapping
+# rows, so members are aggregated rather than returned as duplicate rows.
 PROJECT_ROW_FIELDS = """
-	select s.name as student_id, s.full_name as student_name,
+	select min(s.name) as student_id,
+		group_concat(distinct s.full_name order by s.full_name separator ', ') as student_name,
+		count(distinct s.name) as student_count,
 		p.title as project_title, p.name as project_name, p.status as project_status,
 		p.irb_cycle as irb_cycle, p.modified as last_updated
 	from tabStudent as s
@@ -46,6 +50,7 @@ def _role_scoped_projects(role_field, doc, status_clause, status_params=None):
 	query = (
 		PROJECT_ROW_FIELDS.format(role_join=f"p.{role_field} = f.name")
 		+ " where f.system_user = %(system_user)s and sp.status = 'active' " + status_clause
+		+ " group by p.name order by p.modified desc"
 	)
 	return frappe.db.sql(query, params, as_dict=True)
 
@@ -59,12 +64,18 @@ def get_student_projects():
 		return []
 	return frappe.db.sql(
 		"""select p.title as project_title, p.name as project_id, p.status as project_status,
-			p.irb_cycle as irb_cycle, p.modified as last_updated
+			p.irb_cycle as irb_cycle, p.modified as last_updated,
+			(select count(distinct m.student) from `tabStudent Project Mapping` as m
+				where m.irb_project = p.name) as student_count,
+			(select group_concat(distinct o.full_name order by o.full_name separator ', ')
+				from `tabStudent Project Mapping` as m join tabStudent as o on o.name = m.student
+				where m.irb_project = p.name and o.name != s.name) as teammates
 		from tabStudent as s
 		join `tabStudent Project Mapping` as sp on sp.student = s.name
 		join `tabIRB Project` as p on sp.irb_project = p.name
 		where s.system_user = %(system_user)s
 		and (sp.status = 'active' or p.status = 'Approved')
+		group by p.name
 		order by p.modified desc""",
 		{"system_user": doc.system_user},
 		as_dict=True,
@@ -157,6 +168,8 @@ def get_my_pending_counts():
 
 	student_doc = get_logged_in_doc("Student")
 	if student_doc:
-		counts["student_projects"] = len(get_student_projects())
+		student_projects = get_student_projects()
+		counts["student_projects"] = len(student_projects)
+		counts["student_group_projects"] = sum(1 for p in student_projects if p.student_count > 1)
 
 	return counts

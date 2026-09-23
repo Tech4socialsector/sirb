@@ -11,15 +11,16 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "sirb",
-# 		"logo": "/assets/sirb/logo.png",
-# 		"title": "Sirb",
-# 		"route": "/sirb",
-# 		"has_permission": "sirb.api.permission.has_app_permission"
-# 	}
-# ]
+# Registering the app also makes Frappe's login send users to "/sirb"
+# (frappe.apps.get_default_path) instead of the Desk at "/app".
+add_to_apps_screen = [
+	{
+		"name": "sirb",
+		"logo": "/assets/sirb/frontend/favicon.svg",
+		"title": "SIRB",
+		"route": "/sirb",
+	}
+]
 
 # Includes in <head>
 # ------------------

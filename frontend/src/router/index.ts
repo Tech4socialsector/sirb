@@ -70,6 +70,15 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/sirb/admin/setup',
+    name: 'setup',
+    component: () => import('@/pages/Setup.vue'),
+    meta: {
+      title: 'Setup',
+      requiresRole: (s) => s.isAdmin,
+    },
+  },
+  {
     path: '/sirb/admin/students',
     name: 'student-project-management',
     component: () => import('@/pages/StudentProjectManagement.vue'),

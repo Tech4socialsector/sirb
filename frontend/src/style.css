@@ -60,3 +60,12 @@ body {
 .sirb-scrollbar {
   scrollbar-width: thin;
 }
+
+/* frappe-ui's <Select> trigger sizes itself to its widest option and
+   FormControl doesn't forward `class` to it, so long option labels
+   (e.g. unit paths) overflow their column. Wrap a form in this class to
+   make select triggers fill their container instead. */
+.sirb-fill-select [data-slot='trigger'] {
+  width: 100%;
+  min-width: 0;
+}

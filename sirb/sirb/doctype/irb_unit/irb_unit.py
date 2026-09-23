@@ -6,6 +6,26 @@ from frappe.model.document import Document
 
 
 class IRBUnit(Document):
+	def validate(self):
+		self.validate_unique_committee_members()
+
+	def validate_unique_committee_members(self):
+		# The same person twice (same membership row, or two memberships of
+		# one faculty) inflates the committee size without adding a reviewer.
+		seen = {}
+		for row in self.irb_committee_faculty_members:
+			if not row.faculty_member:
+				continue
+			faculty = frappe.db.get_value("Faculty Academic Organizational Unit", row.faculty_member, "faculty_member")
+			key = str(faculty or row.faculty_member)
+			if key in seen:
+				label = frappe.db.get_value("Faculty Academic Organizational Unit", row.faculty_member, "title") or row.faculty_member
+				frappe.throw(
+					f"Row {row.idx}: {label} is already on this committee (row {seen[key]}).",
+					title="Duplicate committee member",
+				)
+			seen[key] = row.idx
+
 	def on_update(self):
 		self.update_reviewer_roles()
 		#self.revoke_roles_if_not_needed(None)

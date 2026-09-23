@@ -39,6 +39,7 @@ const groups = computed<NavGroup[]>(() => {
   const admin: NavItem[] = []
   if (isAdmin.value) {
     admin.push({ label: 'Admin Console', to: '/sirb/admin', icon: 'grid' })
+    admin.push({ label: 'Setup', to: '/sirb/admin/setup', icon: 'settings' })
     admin.push({ label: 'Student & Project Management', to: '/sirb/admin/students', icon: 'users' })
   }
   if (isAnchor.value) {

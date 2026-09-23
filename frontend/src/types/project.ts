@@ -79,3 +79,14 @@ export interface FieldChangeEntry {
   new_value: unknown
   date: string
 }
+
+/** An unanswered question that blocks submission (sirb.proposal_checks). */
+export interface ProposalIssue {
+  fieldname: string
+  tab: string | null
+  tab_label: string | null
+  section: string | null
+  question: string
+  kind: 'choose' | 'confirm' | 'write'
+  message: string
+}

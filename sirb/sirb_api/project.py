@@ -130,3 +130,15 @@ def get_field_changes_since_status(project_name, since_status):
 				{"old_value": change[1], "new_value": change[2], "date": v["date"]}
 			)
 	return field_changes
+
+
+@frappe.whitelist()
+def get_proposal_issues(project_name):
+	"""Unanswered questions that would block the student from submitting,
+	using the exact rules IRBProject.validate enforces on submit (see
+	sirb.proposal_checks). Read-only; evaluated against the saved doc."""
+	from sirb.proposal_checks import get_proposal_issues as _issues
+
+	doc = frappe.get_doc("IRB Project", project_name)
+	doc.check_permission("read")
+	return _issues(doc)

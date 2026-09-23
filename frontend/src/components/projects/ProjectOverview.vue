@@ -2,7 +2,7 @@
 import { FormControl } from 'frappe-ui'
 import type { IrbProjectDoc } from '@/types/project'
 
-const props = defineProps<{ doc: IrbProjectDoc; disabled: boolean }>()
+const props = defineProps<{ doc: IrbProjectDoc; disabled: boolean; issueMessages?: Map<string, string> }>()
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
 
 const domainOptions = [
@@ -12,46 +12,54 @@ const domainOptions = [
   { label: 'Non Human Species', value: 'Non Human Species' },
   { label: 'BOTH Humans AND Non Humans', value: 'BOTH Humans AND Non Humans' },
 ]
+
+const textFields = [
+  { fieldname: 'title', label: 'Title', wide: false },
+  { fieldname: 'topic', label: 'Topic', wide: false },
+  { fieldname: 'abstract', label: 'Abstract', wide: true },
+]
 </script>
 
 <template>
   <div class="rounded-lg border border-line bg-paper p-5">
     <h3 class="mb-4 text-sm font-semibold text-charcoal">Basic Project Details</h3>
     <div class="grid gap-4 md:grid-cols-2">
-      <FormControl
-        type="select"
-        label="IRB Project Domain"
-        :options="domainOptions"
-        :disabled="disabled"
-        :model-value="props.doc.project_domain"
-        @update:model-value="(v: unknown) => emit('update', 'project_domain', v)"
-      />
+      <div
+        id="field-project_domain"
+        class="scroll-mt-24 rounded-md"
+        :class="issueMessages?.has('project_domain') ? 'p-3 ring-2 ring-danger/60' : ''"
+      >
+        <FormControl
+          type="select"
+          label="IRB Project Domain"
+          :options="domainOptions"
+          :disabled="disabled"
+          :model-value="props.doc.project_domain"
+          @update:model-value="(v: unknown) => emit('update', 'project_domain', v)"
+        />
+        <p v-if="issueMessages?.has('project_domain')" class="mt-1.5 text-xs font-medium text-danger">
+          {{ issueMessages.get('project_domain') }}
+        </p>
+      </div>
       <div />
-      <FormControl
-        type="textarea"
-        label="Title"
-        required
-        :disabled="disabled"
-        :model-value="props.doc.title"
-        @update:model-value="(v: unknown) => emit('update', 'title', v)"
-      />
-      <FormControl
-        type="textarea"
-        label="Topic"
-        required
-        :disabled="disabled"
-        :model-value="props.doc.topic"
-        @update:model-value="(v: unknown) => emit('update', 'topic', v)"
-      />
-      <div class="md:col-span-2">
+      <div
+        v-for="f in textFields"
+        :id="`field-${f.fieldname}`"
+        :key="f.fieldname"
+        class="scroll-mt-24 rounded-md"
+        :class="[f.wide ? 'md:col-span-2' : '', issueMessages?.has(f.fieldname) ? 'p-3 ring-2 ring-danger/60' : '']"
+      >
         <FormControl
           type="textarea"
-          label="Abstract"
+          :label="f.label"
           required
           :disabled="disabled"
-          :model-value="props.doc.abstract"
-          @update:model-value="(v: unknown) => emit('update', 'abstract', v)"
+          :model-value="props.doc[f.fieldname]"
+          @update:model-value="(v: unknown) => emit('update', f.fieldname, v)"
         />
+        <p v-if="issueMessages?.has(f.fieldname)" class="mt-1.5 text-xs font-medium text-danger">
+          {{ issueMessages.get(f.fieldname) }}
+        </p>
       </div>
     </div>
   </div>

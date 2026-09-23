@@ -1,6 +1,6 @@
 import { computed, ref, type Ref } from 'vue'
 import { fetchProjectSchema } from '@/services/schema'
-import type { ProjectSchema, SchemaField, SchemaTab } from '@/types/schema'
+import type { ProjectSchema, SchemaField, SchemaSection, SchemaTab } from '@/types/schema'
 import type { IrbProjectDoc } from '@/types/project'
 
 function groupIntoTabs(schema: ProjectSchema): SchemaTab[] {
@@ -10,7 +10,7 @@ function groupIntoTabs(schema: ProjectSchema): SchemaTab[] {
 
   const tabs: SchemaTab[] = []
   let currentTab: SchemaTab | null = null
-  let currentSection: { fieldname: string; label: string | null; columns: SchemaField[][] } | null = null
+  let currentSection: SchemaSection | null = null
   let currentColumn: SchemaField[] = []
 
   function pushSection() {
@@ -39,7 +39,7 @@ function groupIntoTabs(schema: ProjectSchema): SchemaTab[] {
     }
     if (field.fieldtype === 'Section Break') {
       pushSection()
-      currentSection = { fieldname: field.fieldname, label: field.label, columns: [] }
+      currentSection = { fieldname: field.fieldname, label: field.label, depends_on: field.depends_on, columns: [] }
       continue
     }
     if (field.fieldtype === 'Column Break') {
@@ -114,6 +114,11 @@ export function useProjectSchema(doc: Ref<IrbProjectDoc | null>) {
     return evalDependsOn(field.mandatory_depends_on, doc.value)
   }
 
+  function isSectionVisible(section: SchemaSection): boolean {
+    if (!doc.value) return false
+    return evalDependsOn(section.depends_on ?? null, doc.value)
+  }
+
   function isTabVisible(tab: SchemaTab): boolean {
     if (!doc.value) return false
     if (tab.fieldname === 'basic_details_tab') return true
@@ -126,5 +131,5 @@ export function useProjectSchema(doc: Ref<IrbProjectDoc | null>) {
     return true
   }
 
-  return { schema, tabs, loading, load, isFieldVisible, isFieldMandatory, isTabVisible }
+  return { schema, tabs, loading, load, isFieldVisible, isFieldMandatory, isSectionVisible, isTabVisible }
 }

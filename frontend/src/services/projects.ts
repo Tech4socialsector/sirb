@@ -3,6 +3,7 @@ import type {
   FieldChangeEntry,
   ProjectDetailPayload,
   ProjectListRow,
+  ProposalIssue,
   StatusChangeEntry,
 } from '@/types/project'
 
@@ -57,4 +58,8 @@ export function saveProjectFields(projectName: string, fields: Record<string, un
     name: projectName,
     fieldname: fields,
   })
+}
+
+export function fetchProposalIssues(projectName: string) {
+  return call<ProposalIssue[]>('sirb.sirb_api.project.get_proposal_issues', { project_name: projectName })
 }

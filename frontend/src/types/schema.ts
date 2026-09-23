@@ -27,5 +27,7 @@ export interface SchemaTab {
 export interface SchemaSection {
   fieldname: string
   label: string | null
+  /** The Section Break's own depends_on — hides the whole section, as in Desk. */
+  depends_on?: string | null
   columns: SchemaField[][]
 }

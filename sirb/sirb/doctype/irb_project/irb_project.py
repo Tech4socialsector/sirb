@@ -3,7 +3,19 @@
 
 import frappe
 from frappe.model.document import Document
+from sirb.proposal_checks import format_issues, get_proposal_issues
 from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
+
+# Statuses in which the student is filling in or correcting the proposal.
+STUDENT_DRAFT_STATUSES = (
+	"Awaiting proposal completion by student",
+	"Awaiting student correction for mentor feedback",
+	"Awaiting student correction for reviewer feedback",
+)
+
+
+class ProposalIncompleteError(frappe.ValidationError):
+	pass
 
 class IRBProject(Document):
 	def validate(self):
@@ -24,27 +36,27 @@ class IRBProject(Document):
 			self.flags.ignore_mandatory = True
 			return
 
-		if not self.i_hereby_confirm_the_above:
-			frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
+		if self.is_new():
+			# Not script-created: core mandatory validation runs as normal.
+			if not self.i_hereby_confirm_the_above:
+				frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
+			return
 
-		if not self.is_new():
-			if self.project_domain == "-- Select --":
-				frappe.throw("Please select a valid IRB project domain.")
-			elif self.project_domain in ["Humans", "BOTH Humans AND Non Humans"]:
-				if self.minor_participants == "-- Select --":
-					frappe.throw("Please select a valid answer for 4. Minors check")
-				if self.will_data_be_gathered_through_digital_means == "-- Select --":
-					frappe.throw("Please select a valid answer for 13.Gathering of Audio, Photographic and Video Data")
-			elif self.project_domain in ["Non Human Species", "BOTH Humans AND Non Humans"]:
-				if self.research_type ==  "-- Select --":
-					frappe.throw("Please select a valid answer for the Research Type in the Non-Human Questionnaire.")
-				if self.research_type in ["Lab based experiments", "BOTH Lab AND Field based"] and self.manipulative_experiments_select ==  "-- Select --":
-					frappe.throw("Please select a valid answer for \"7. Are you performing manipulative experiments with animals?\" in the Non-Human Questionnaire.")
+		if self.status in STUDENT_DRAFT_STATUSES:
+			# The student is still writing (or correcting) the proposal: let
+			# them save partial progress. Completeness is enforced when they
+			# submit, below.
+			self.flags.ignore_mandatory = True
+			return
 
-				if self.research_type in ["Field-based research (plants, animals included)", "BOTH Lab AND Field based"] and self.consent_for_people_interaction ==  "-- Select --":
-					frappe.throw("Please select a valid answer for \"If data collection involves interaction with people, will consent be taken?\" in the Non-Human Questionnaire.")
-		# else: new document, not script-created — core mandatory-field
-		# validation runs as normal.
+		previous = self.get_doc_before_save()
+		if previous and previous.status in STUDENT_DRAFT_STATUSES:
+			# Leaving a student-editing status = the student is submitting.
+			# Check every rule at once so they get the full list, not one
+			# error per attempt.
+			issues = get_proposal_issues(self)
+			if issues:
+				frappe.throw(format_issues(issues), exc=ProposalIncompleteError, title="Proposal incomplete")
 
 	def before_save(self):
 		# print("Before save")

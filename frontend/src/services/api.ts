@@ -42,7 +42,7 @@ function friendlyMessage(status: number, serverMessage?: string): { message: str
  *   "frappe.exceptions.AuthenticationError") with no message text of
  *   its own — never shown directly to the user.
  */
-function extractServerMessage(body: unknown): string | undefined {
+export function extractServerMessage(body: unknown): string | undefined {
   if (!body || typeof body !== 'object') return undefined
   const b = body as Record<string, unknown>
 

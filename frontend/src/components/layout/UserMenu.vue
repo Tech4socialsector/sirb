@@ -3,6 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Avatar, FeatherIcon } from 'frappe-ui'
 import { useAuth } from '@/composables/useAuth'
 import { useRoleLabel } from '@/composables/useRoleLabel'
+import { call } from '@/services/api'
 
 const { currentUser } = useAuth()
 const { roleLabel } = useRoleLabel()
@@ -18,8 +19,21 @@ function handleOutsideClick(event: MouseEvent) {
 onMounted(() => document.addEventListener('click', handleOutsideClick))
 onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
 
-function logout() {
-  window.location.href = '/api/method/logout'
+const loggingOut = ref(false)
+
+// `logout` is a JSON API endpoint — navigating to it directly leaves the
+// user staring at the raw response. Call it in the background, then do a
+// full page load of the login page so all in-memory session state is dropped.
+async function logout() {
+  if (loggingOut.value) return
+  loggingOut.value = true
+  try {
+    await call('logout')
+  } catch {
+    // Even if the request fails (e.g. session already expired), the user
+    // asked to leave — send them to the login page regardless.
+  }
+  window.location.replace('/login')
 }
 </script>
 
@@ -56,7 +70,8 @@ function logout() {
           Profile
         </RouterLink>
         <button
-          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-danger transition-colors hover:bg-canvas"
+          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-danger transition-colors hover:bg-canvas disabled:opacity-60"
+          :disabled="loggingOut"
           @click="logout"
         >
           <FeatherIcon name="log-out" class="h-4 w-4" />

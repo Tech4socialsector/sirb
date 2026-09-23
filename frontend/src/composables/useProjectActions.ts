@@ -10,15 +10,17 @@ export interface ProjectAction {
 /**
  * Reproduces the exact status -> role -> available-actions table from the
  * legacy IRB Project DocType JS (frm.add_custom_button(...) blocks under
- * "Actions"). This is the single source of truth for which buttons render;
- * the server's set_project_status has no independent notion of "valid
- * transition" today, so keeping this table correct is what preserves the
- * existing workflow behavior in the new UI.
+ * "Actions"). The server enforces the same table in sirb/workflow.py
+ * (IRBProject.validate rejects any other status change), so keep the two
+ * in sync — a button missing here just isn't offered; one added here
+ * without the server rule will be refused.
  */
 export function useProjectActions(
   doc: Ref<IrbProjectDoc | null>,
   roles: Ref<ProjectRoles | null>,
   hasSecondaryReviewer: Ref<boolean>,
+  /** From get_project_detail; when present, only these targets are offered. */
+  allowedStatuses?: Ref<string[] | null | undefined>,
 ) {
   const actions = computed<ProjectAction[]>(() => {
     if (!doc.value || !roles.value) return []
@@ -28,17 +30,15 @@ export function useProjectActions(
 
     if (r.is_student) {
       if (status === 'Awaiting proposal completion by student') {
-        const mentorRequired = Boolean(doc.value.faculty_mentor) || hasSecondaryReviewer.value
-        if (mentorRequired) {
-          list.push({ label: 'Request Faculty Mentor Approval', targetStatus: 'Awaiting Faculty mentor approval' })
-        } else {
-          list.push({
-            label: 'Request Reviewer Approval',
-            targetStatus: hasSecondaryReviewer.value
-              ? 'Awaiting primary reviewer comments to secondary reviewer'
-              : 'Awaiting reviewer feedback to student',
-          })
-        }
+        // Where a proposal goes next depends on the IRB Unit's rules
+        // (mentor required, 1 or 2 reviewers), which the server resolves.
+        const next =
+          allowedStatuses?.value?.[0] ??
+          (doc.value.faculty_mentor ? 'Awaiting Faculty mentor approval' : 'Awaiting reviewer feedback to student')
+        list.push({
+          label: next === 'Awaiting Faculty mentor approval' ? 'Request Faculty Mentor Approval' : 'Request Reviewer Approval',
+          targetStatus: next,
+        })
       } else if (status === 'Awaiting student correction for mentor feedback') {
         list.push({ label: 'Submit corrections', targetStatus: 'Awaiting Faculty mentor approval' })
       } else if (status === 'Awaiting student correction for reviewer feedback') {
@@ -83,7 +83,9 @@ export function useProjectActions(
       }
     }
 
-    return list
+    // Never offer a transition the server would refuse.
+    const allowed = allowedStatuses?.value
+    return allowed ? list.filter((a) => allowed.includes(a.targetStatus)) : list
   })
 
   /** Mirrors toggle_save_button(): whether the current status/role

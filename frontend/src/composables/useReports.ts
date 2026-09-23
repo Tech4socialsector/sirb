@@ -1,7 +1,7 @@
-import { computed, ref } from 'vue'
-import { fetchProjectsByIrbUnit, fetchProjectSummaryByIrbUnit } from '@/services/reports'
+import { computed, ref, type Ref } from 'vue'
+import { fetchProjectsByIrbUnit } from '@/services/reports'
 import { ApiError } from '@/services/api'
-import type { ProjectReportRow, ProgrammeSummaryRow } from '@/types/reports'
+import type { ProjectReportRow } from '@/types/reports'
 
 // Mirrors IRB Project's real `status` Select options (see types/project.ts
 // PROJECT_STATUSES, the same canonical list) to a short bucket key —
@@ -29,31 +29,35 @@ export const BUCKET_LABELS: Record<string, string> = {
   final_approval: 'Final Approval',
   approved: 'Approved',
 }
-const BUCKET_ORDER = ['student_action', 'mentor_review', 'primary_review', 'secondary_review', 'final_approval', 'approved']
+export const BUCKET_ORDER = ['student_action', 'mentor_review', 'primary_review', 'secondary_review', 'final_approval', 'approved']
 
 export interface AgingRow extends ProjectReportRow {
   bucket: '0-2' | '3-5' | '6-10' | '10+'
 }
 
-export function useReports() {
-  const detailRows = ref<ProjectReportRow[]>([])
-  const summaryRows = ref<ProgrammeSummaryRow[]>([])
+export interface ReportFilters {
+  programmes: string[]
+  statuses: string[]
+  cycles: string[]
+  search: string
+}
+
+export function useReports(filters: Ref<ReportFilters>) {
+  const allRows = ref<ProjectReportRow[]>([])
   const loading = ref(false)
   const error = ref<ApiError | null>(null)
   const lastRefreshed = ref<Date | null>(null)
 
-  // Both calls run once per refresh — every KPI/chart/table below is
-  // derived client-side from these two arrays, not a separate request.
-  async function refresh(irbUnit?: string) {
+  // One unfiltered fetch per refresh; every filter is applied client-side
+  // below. The server's `irb_unit` parameter expects the IRB Unit doc name
+  // while rows carry the programme's display name, so filtering server-side
+  // by the dropdown value silently matched nothing — and it only takes one
+  // value, which multi-select can't use anyway.
+  async function refresh() {
     loading.value = true
     error.value = null
     try {
-      const [detail, summary] = await Promise.all([
-        fetchProjectsByIrbUnit({ irb_unit: irbUnit }),
-        fetchProjectSummaryByIrbUnit(irbUnit),
-      ])
-      detailRows.value = detail
-      summaryRows.value = summary.rows
+      allRows.value = await fetchProjectsByIrbUnit()
       lastRefreshed.value = new Date()
     } catch (e) {
       error.value = e instanceof ApiError ? e : new ApiError('Failed to load reports.', 'server')
@@ -62,9 +66,28 @@ export function useReports() {
     }
   }
 
-  const programmeOptions = computed(() => [...new Set(detailRows.value.map((r) => r.irb_unit))].filter(Boolean).sort())
-  const statusOptions = computed(() => [...new Set(detailRows.value.map((r) => r.project_status))].sort())
-  const cycleOptions = computed(() => [...new Set(detailRows.value.map((r) => r.irb_cycle))].filter(Boolean).sort() as string[])
+  const programmeOptions = computed(() => [...new Set(allRows.value.map((r) => r.irb_unit))].filter(Boolean).sort())
+  const statusOptions = computed(() => [...new Set(allRows.value.map((r) => r.project_status))].filter(Boolean).sort())
+  const cycleOptions = computed(() => [...new Set(allRows.value.map((r) => r.irb_cycle))].filter(Boolean).sort() as string[])
+
+  // Every KPI, chart, table and drill-down reads this, so they always agree
+  // with each other and with the filter bar. An empty selection = "all".
+  const detailRows = computed(() => {
+    const { programmes, statuses, cycles, search } = filters.value
+    let rows = allRows.value
+    if (programmes.length) rows = rows.filter((r) => programmes.includes(r.irb_unit))
+    if (statuses.length) rows = rows.filter((r) => statuses.includes(r.project_status))
+    if (cycles.length) rows = rows.filter((r) => !!r.irb_cycle && cycles.includes(r.irb_cycle))
+    const term = search.trim().toLowerCase()
+    if (term) {
+      rows = rows.filter((r) =>
+        [r.project_title, r.irb_unit, r.mentor_name, r.primary_reviewer_name, r.secondary_reviewer_name, String(r.project_name), ...r.students.map((s) => s.name)]
+          .filter(Boolean)
+          .some((v) => v!.toLowerCase().includes(term)),
+      )
+    }
+    return rows
+  })
 
   const bucketCounts = computed(() => {
     const counts: Record<string, number> = Object.fromEntries(BUCKET_ORDER.map((k) => [k, 0]))
@@ -77,16 +100,18 @@ export function useReports() {
 
   const totalProjects = computed(() => detailRows.value.length)
 
-  // Long (irb_unit, status, count) rows pivoted into one row per
-  // programme with a bucket-count map — same shape the Admin Console's
-  // programme table already uses, built from this report's own summary.
+  // One row per programme with a count per workflow stage. Built from the
+  // project rows (one per project) rather than the summary report, which
+  // counts Student Project Mapping rows and so counted a group project
+  // once per student.
   const programmeMatrix = computed(() => {
     const byProgramme = new Map<string, Record<string, number>>()
-    for (const r of summaryRows.value) {
+    for (const r of detailRows.value) {
       const bucket = STATUS_BUCKET[r.project_status]
       if (!bucket) continue
-      if (!byProgramme.has(r.irb_unit)) byProgramme.set(r.irb_unit, Object.fromEntries(BUCKET_ORDER.map((k) => [k, 0])))
-      byProgramme.get(r.irb_unit)![bucket] += r.project_count
+      const programme = r.irb_unit || 'Unassigned'
+      if (!byProgramme.has(programme)) byProgramme.set(programme, Object.fromEntries(BUCKET_ORDER.map((k) => [k, 0])))
+      byProgramme.get(programme)![bucket] += 1
     }
     return [...byProgramme.entries()]
       .map(([programme, buckets]) => ({
@@ -152,8 +177,8 @@ export function useReports() {
   const secondaryReviewerWorkload = computed(() => workloadFor('secondary_reviewer'))
 
   return {
+    allRows,
     detailRows,
-    summaryRows,
     loading,
     error,
     lastRefreshed,

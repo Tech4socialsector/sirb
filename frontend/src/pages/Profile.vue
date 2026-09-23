@@ -6,7 +6,7 @@ import PageHeader from '@/components/common/PageHeader.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRoleLabel } from '@/composables/useRoleLabel'
-import { fetchFacultyRecord, fetchStudentRecord, type FacultyRecord, type StudentRecord } from '@/services/profile'
+import { fetchMyProfile, type FacultyRecord, type StudentRecord } from '@/services/profile'
 
 const { currentUser } = useAuth()
 const { roleLabel } = useRoleLabel()
@@ -19,11 +19,10 @@ onMounted(async () => {
   if (!currentUser.value) return
   loadingDetail.value = true
   try {
-    if (currentUser.value.is_student && currentUser.value.student_id) {
-      student.value = await fetchStudentRecord(currentUser.value.student_id)
-    }
-    if (currentUser.value.is_faculty && currentUser.value.faculty_id) {
-      faculty.value = await fetchFacultyRecord(currentUser.value.faculty_id)
+    if (currentUser.value.is_student || currentUser.value.is_faculty) {
+      const profile = await fetchMyProfile()
+      student.value = profile.student
+      faculty.value = profile.faculty
     }
   } catch {
     // Profile detail is a nice-to-have supplement to the session data

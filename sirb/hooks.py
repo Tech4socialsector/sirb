@@ -129,13 +129,14 @@ website_route_rules = [
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+# Row-level access: people only see IRB Projects they're on (sirb/permissions.py).
+permission_query_conditions = {
+	"IRB Project": "sirb.permissions.irb_project_query_conditions",
+}
+
+has_permission = {
+	"IRB Project": "sirb.permissions.has_irb_project_permission",
+}
 
 # DocType Class
 # ---------------

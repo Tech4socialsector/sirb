@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from sirb.proposal_checks import format_issues, get_proposal_issues
+from sirb.workflow import validate_status_change
 from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
 
 # Statuses in which the student is filling in or correcting the proposal.
@@ -25,6 +26,10 @@ class IRBProject(Document):
 			# in the rest later, so skip mandatory checks for that creation only.
 			self.flags.ignore_mandatory = True
 			return
+
+		# Only the transitions the user's role on this project allows
+		# (status is read-only in the form but not enforced by Frappe).
+		validate_status_change(self)
 
 		# Roles allowed to edit an existing IRB Project without filling the
 		# mandatory fields (e.g. status/reviewer/mentor changes on a project
@@ -230,11 +235,15 @@ class IRBProject(Document):
 			})
 			# print("Mappings - ", sp_mappings)
 			for sp in sp_mappings:
-				# print("Mapping name ", sp["name"])
+				# Closing the student's mapping is a system consequence of the
+				# approval, not an edit by the approver — reviewers have no
+				# write access to Student Project Mapping, which made "Grant
+				# FINAL approval" fail with a PermissionError. Committing is left
+				# to the request so a later failure can't leave it half-done.
 				sp_doc = frappe.get_doc("Student Project Mapping", sp["name"])
 				sp_doc.status = "inactive"
+				sp_doc.flags.ignore_permissions = True
 				sp_doc.save()
-				frappe.db.commit()
 
 		versions = frappe.get_all(
 			"Version",

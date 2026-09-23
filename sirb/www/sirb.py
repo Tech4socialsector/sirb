@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 import frappe
 
 no_cache = 1
@@ -5,7 +7,16 @@ no_cache = 1
 
 def get_context(context):
 	if frappe.session.user == "Guest":
-		frappe.throw("Log in to continue", frappe.PermissionError)
+		# Send guests to the login page and back to the page they asked for
+		# (e.g. a /sirb/projects/<id> link from an email), rather than a bare
+		# "not permitted" error page.
+		path = frappe.request.path if getattr(frappe, "request", None) else "/sirb"
+		if frappe.request and frappe.request.query_string:
+			path += "?" + frappe.request.query_string.decode()
+		frappe.local.flags.redirect_location = "/login?redirect-to=" + quote(path, safe="")
+		# 302, not the default 301: a cached permanent redirect would keep
+		# bouncing the browser to /login even after the user signs in.
+		raise frappe.Redirect(302)
 
 	csrf_token = frappe.sessions.get_csrf_token()
 	frappe.db.commit()  # nosemgrep

@@ -14,6 +14,7 @@ import ProposalIssues from '@/components/projects/ProposalIssues.vue'
 import { useProject } from '@/composables/useProject'
 import { useProjectActions } from '@/composables/useProjectActions'
 import { useTimelineDrawer } from '@/composables/useTimelineDrawer'
+import { ApiError } from '@/services/api'
 import { fetchProposalIssues } from '@/services/projects'
 import type { IrbProjectDoc, ProposalIssue } from '@/types/project'
 
@@ -53,11 +54,26 @@ watch(
 
 onUnmounted(() => clearContext())
 
+// Clearer than the generic API messages for the two cases people hit by
+// following an old link or typing an ID into "Go to project".
+const projectError = computed(() => {
+  if (!error.value) return null
+  if (error.value.kind === 'permission')
+    return new ApiError(
+      "You don't have access to this project. You can open projects you're a student on, mentoring or reviewing.",
+      'permission',
+    )
+  if (error.value.kind === 'not_found')
+    return new ApiError(`There's no project with ID “${props.name}”. Check the number and try again.`, 'not_found')
+  return null
+})
+
 const roles = computed(() => detail.value?.roles ?? null)
 const hasSecondaryReviewer = computed(() => Boolean(localDoc.value?.secondary_reviewer))
 const docRef = computed(() => localDoc.value)
 
-const { actions, canEdit } = useProjectActions(docRef, roles, hasSecondaryReviewer)
+const allowedStatuses = computed(() => detail.value?.allowed_statuses)
+const { actions, canEdit } = useProjectActions(docRef, roles, hasSecondaryReviewer, allowedStatuses)
 
 // Statuses in which the student is writing/correcting the proposal —
 // must match STUDENT_DRAFT_STATUSES in irb_project.py.
@@ -196,7 +212,7 @@ const correctionNoticeStatuses = [
 <template>
   <AppShell>
     <LoadingState v-if="loading && !detail" label="Loading project…" />
-    <ErrorState v-else-if="error" :error="error" @retry="load" />
+    <ErrorState v-else-if="error" :error="projectError ?? error" @retry="load" />
     <template v-else-if="detail && localDoc && roles">
       <ProjectHeader :doc="localDoc" :roles="roles" />
 

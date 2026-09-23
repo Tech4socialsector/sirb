@@ -816,7 +816,7 @@ frappe.ui.form.on("IRB Project", {
                         next_status = "Awaiting Faculty mentor approval"
                     } else if (num_reviewers == 1) {
                         btn_msg = "Request Reviewer Approval"
-                        next_ststus = "Awaiting reviewer feedback to student"
+                        next_status = "Awaiting reviewer feedback to student"
                     } else { 
                         btn_msg = "Request Reviewer Approval"
                         next_status = "Awaiting primary reviewer comments to secondary reviewer"

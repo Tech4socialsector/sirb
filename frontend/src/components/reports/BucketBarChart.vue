@@ -18,13 +18,15 @@ const hasData = computed(() => props.values.some((v) => v > 0))
 
 <template>
   <div>
-    <!-- AxisChart/ECharts doesn't expose a typed per-bar click handler
+    <!-- h-[300px] matches AxisChart's own min-h-[300px]; a shorter box let
+     the chart overflow under the pills below.
+     AxisChart/ECharts doesn't expose a typed per-bar click handler
      through this wrapper, so the pills below (same data) are what's
      actually clickable for drill-down, not the bars themselves. -->
-    <div v-if="hasData" class="h-56">
+    <div v-if="hasData" class="h-[300px]">
       <AxisChart :config="config" />
     </div>
-    <div v-else class="flex h-56 items-center justify-center text-sm text-muted">No data for this selection.</div>
+    <div v-else class="flex h-[300px] items-center justify-center text-sm text-muted">No data for this selection.</div>
     <div class="mt-3 flex flex-wrap gap-2">
       <button
         v-for="(label, i) in labels"

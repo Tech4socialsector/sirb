@@ -6,6 +6,7 @@ import DataTable, { type DataTableColumn } from '@/components/common/DataTable.v
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import { fetchStatusChangeHistory } from '@/services/projects'
 import { useTimelineDrawer } from '@/composables/useTimelineDrawer'
+import { useRoles } from '@/composables/useRoles'
 import type { DrilldownRow } from '@/types/admin'
 
 const props = withDefaults(
@@ -75,7 +76,16 @@ function clearFilters() {
   programmeFilter.value = ''
 }
 
-const columns: DataTableColumn[] = [
+// Project details and timelines are only readable with an IRB Project
+// role (and then only for projects the user is on — sirb/permissions.py).
+// Anchor-only users see the report rows but have nothing to open, so the
+// View / timeline actions would only ever fail for them.
+const { hasRole } = useRoles()
+const canOpenProjects = computed(() =>
+  hasRole('System Manager', 'Administrator', 'Student', 'Faculty Mentor', 'Primary IRB Reviewer', 'Secondary IRB Reviewer'),
+)
+
+const allColumns: DataTableColumn[] = [
   { key: 'student', label: 'Student', path: 'student_name', sortable: true },
   { key: 'project', label: 'Project', path: 'project_title', sortable: true },
   { key: 'programme', label: 'Programme', sortable: true },
@@ -84,6 +94,7 @@ const columns: DataTableColumn[] = [
   { key: 'updated', label: 'Last Updated', path: 'last_updated', sortable: true },
   { key: 'actions', label: '', align: 'right' },
 ]
+const columns = computed(() => (canOpenProjects.value ? allColumns : allColumns.filter((c) => c.key !== 'actions')))
 
 function close() {
   emit('update:modelValue', false)

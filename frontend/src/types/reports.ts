@@ -1,7 +1,7 @@
 // Row/response shapes for sirb.sirb_api.anchor_reports — the existing
 // Anchor-facing report APIs (ported from the "Projects by IRB Unit" /
 // "Project Summary by IRB Unit" Script Reports). This page derives every
-// KPI/chart/table from these two calls; it never re-implements their SQL.
+// KPI/chart/table from the project-level call; it never re-implements their SQL.
 
 export interface ReportStudent {
   name: string
@@ -29,16 +29,3 @@ export interface ProjectReportRow {
   project_name: string
 }
 
-export interface ProgrammeSummaryRow {
-  irb_unit: string
-  project_status: string
-  project_count: number
-}
-
-export interface ProjectSummaryResponse {
-  rows: ProgrammeSummaryRow[]
-  chart: {
-    type: string
-    data: { labels: string[]; datasets: { values: number[] }[] }
-  }
-}

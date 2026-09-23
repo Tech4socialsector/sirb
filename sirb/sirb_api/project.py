@@ -11,6 +11,7 @@ import json
 import frappe
 
 from sirb.api import get_irb_project_roles, get_project_students
+from sirb.workflow import allowed_transitions
 
 
 def _link_titles(doc):
@@ -55,6 +56,9 @@ def get_project_detail(project_name):
 		"meta": {
 			"can_write": doc.has_permission("write"),
 		},
+		# Status changes this user may make right now — the server enforces
+		# exactly this set (sirb.workflow), so the UI shows only these.
+		"allowed_statuses": sorted(allowed_transitions(doc, roles or {})),
 	}
 
 

@@ -12,10 +12,7 @@ export interface FacultyRecord {
   full_name: string
 }
 
-export function fetchStudentRecord(name: string) {
-  return call<StudentRecord>('frappe.client.get', { doctype: 'Student', name })
-}
-
-export function fetchFacultyRecord(name: string) {
-  return call<FacultyRecord>('frappe.client.get', { doctype: 'Faculty', name })
+/** The signed-in user's own Student / Faculty record (sirb_api.auth.get_my_profile). */
+export function fetchMyProfile() {
+  return call<{ student: StudentRecord | null; faculty: FacultyRecord | null }>('sirb.sirb_api.auth.get_my_profile')
 }

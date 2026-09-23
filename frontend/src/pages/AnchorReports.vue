@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { Button, FeatherIcon } from 'frappe-ui'
+import { Button, FeatherIcon, MultiSelect } from 'frappe-ui'
 import AppShell from '@/components/layout/AppShell.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import ErrorState from '@/components/common/ErrorState.vue'
@@ -11,12 +11,17 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
 import KpiCard from '@/components/dashboard/KpiCard.vue'
 import PipelineFlow, { type PipelineStage } from '@/components/dashboard/PipelineFlow.vue'
 import BucketBarChart from '@/components/reports/BucketBarChart.vue'
+import PieChartCard, { type PieSlice } from '@/components/reports/PieChartCard.vue'
 import DrilldownDialog from '@/components/admin/DrilldownDialog.vue'
-import { useReports, BUCKET_LABELS, STATUS_BUCKET, type AgingRow } from '@/composables/useReports'
+import { useReports, BUCKET_LABELS, BUCKET_ORDER, STATUS_BUCKET, type AgingRow, type ReportFilters } from '@/composables/useReports'
+import { downloadCsv, csvDateStamp } from '@/utils/csv'
 import type { ProjectReportRow } from '@/types/reports'
 import type { DrilldownRow } from '@/types/admin'
 
+const filters = ref<ReportFilters>({ programmes: [], statuses: [], cycles: [], search: '' })
+
 const {
+  allRows,
   detailRows,
   loading,
   error,
@@ -33,50 +38,27 @@ const {
   mentorWorkload,
   primaryReviewerWorkload,
   secondaryReviewerWorkload,
-} = useReports()
-
-const programmeFilter = ref('')
-const statusFilter = ref('')
-const cycleFilter = ref('')
-const search = ref('')
+} = useReports(filters)
 
 onMounted(() => refresh())
 
-// Programme is the one filter the underlying report API actually accepts
-// as a parameter, so changing it re-runs the report server-side rather
-// than just re-filtering what's already loaded.
-async function onProgrammeChange() {
-  await refresh(programmeFilter.value || undefined)
-}
+const toOptions = (values: string[]) => values.map((v) => ({ label: v, value: v }))
+const programmeSelectOptions = computed(() => toOptions(programmeOptions.value))
+const statusSelectOptions = computed(() => toOptions(statusOptions.value))
+const cycleSelectOptions = computed(() => toOptions(cycleOptions.value))
+
+const hasActiveFilters = computed(() => {
+  const f = filters.value
+  return !!(f.programmes.length || f.statuses.length || f.cycles.length || f.search.trim())
+})
 
 function clearFilters() {
-  programmeFilter.value = ''
-  statusFilter.value = ''
-  cycleFilter.value = ''
-  search.value = ''
-  refresh()
+  filters.value = { programmes: [], statuses: [], cycles: [], search: '' }
 }
 
 const lastRefreshedLabel = computed(() =>
   lastRefreshed.value ? lastRefreshed.value.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : null,
 )
-
-// Status + cycle + search filter the already-fetched rows client-side —
-// no extra request, since the one report call already returned everything.
-const filteredDetailRows = computed(() => {
-  let rows = detailRows.value
-  if (statusFilter.value) rows = rows.filter((r) => r.project_status === statusFilter.value)
-  if (cycleFilter.value) rows = rows.filter((r) => r.irb_cycle === cycleFilter.value)
-  const term = search.value.trim().toLowerCase()
-  if (term) {
-    rows = rows.filter((r) =>
-      [r.project_title, r.irb_unit, r.mentor_name, r.primary_reviewer_name, r.secondary_reviewer_name, ...r.students.map((s) => s.name)]
-        .filter(Boolean)
-        .some((v) => v!.toLowerCase().includes(term)),
-    )
-  }
-  return rows
-})
 
 function toDrilldownRows(rows: ProjectReportRow[]): DrilldownRow[] {
   return rows.map((r) => ({
@@ -114,7 +96,7 @@ function openAgingDrilldown(bucket: AgingRow['bucket']) {
 }
 
 function openProgrammeDrilldown(programme: string, bucketKey?: string) {
-  let rows = detailRows.value.filter((r) => r.irb_unit === programme)
+  let rows = detailRows.value.filter((r) => (r.irb_unit || 'Unassigned') === programme)
   if (bucketKey) rows = rows.filter((r) => STATUS_BUCKET[r.project_status] === bucketKey)
   openDrilldown(bucketKey ? `${programme} — ${BUCKET_LABELS[bucketKey]}` : programme, rows)
 }
@@ -138,6 +120,63 @@ const pipelineStages = computed<PipelineStage[]>(() => [
   { key: 'approved', label: 'Approved', count: bucketCounts.value.approved, icon: 'check-circle' },
 ])
 
+// ── Pie charts ────────────────────────────────────────────────────────
+// Like every other chart on this page, these read the filtered
+// `detailRows`, so a slice's count always matches the drill-down it opens.
+const stageSlices = computed<PieSlice[]>(() =>
+  Object.keys(BUCKET_LABELS).map((k) => ({ key: k, label: BUCKET_LABELS[k], value: bucketCounts.value[k] })),
+)
+
+// Largest 7 programmes get their own slice; the rest fold into "Other" so
+// the pie never needs more than the 8 fixed palette colours.
+const OTHER_KEY = '__other__'
+const MAX_PROGRAMME_SLICES = 7
+const programmeSlices = computed<PieSlice[]>(() => {
+  const counts = new Map<string, number>()
+  for (const r of detailRows.value) {
+    const key = r.irb_unit || 'Unassigned'
+    counts.set(key, (counts.get(key) || 0) + 1)
+  }
+  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  const top = sorted.slice(0, MAX_PROGRAMME_SLICES).map(([p, n]) => ({ key: p, label: p, value: n }))
+  const rest = sorted.slice(MAX_PROGRAMME_SLICES)
+  if (rest.length) top.push({ key: OTHER_KEY, label: `Other (${rest.length})`, value: rest.reduce((a, [, n]) => a + n, 0) })
+  return top
+})
+const topProgrammes = computed(() => new Set(programmeSlices.value.filter((s) => s.key !== OTHER_KEY).map((s) => s.key)))
+
+function openProgrammeSliceDrilldown(key: string) {
+  if (key !== OTHER_KEY) return openDrilldown(key, detailRows.value.filter((r) => (r.irb_unit || 'Unassigned') === key))
+  openDrilldown('Other programmes', detailRows.value.filter((r) => !topProgrammes.value.has(r.irb_unit || 'Unassigned')))
+}
+
+const AGING_KEYS = ['0-2', '3-5', '6-10', '10+'] as const
+const agingSlices = computed<PieSlice[]>(() =>
+  AGING_KEYS.map((k) => ({ key: k, label: `${k} days`, value: agingCounts.value[k] })),
+)
+
+type AssignmentKey = 'both' | 'primary_only' | 'secondary_only' | 'none'
+const ASSIGNMENT_LABELS: Record<AssignmentKey, string> = {
+  both: 'Both reviewers',
+  primary_only: 'Primary only',
+  secondary_only: 'Secondary only',
+  none: 'Not yet assigned',
+}
+function assignmentOf(r: ProjectReportRow): AssignmentKey {
+  if (r.primary_reviewer && r.secondary_reviewer) return 'both'
+  if (r.primary_reviewer) return 'primary_only'
+  if (r.secondary_reviewer) return 'secondary_only'
+  return 'none'
+}
+const assignmentSlices = computed<PieSlice[]>(() => {
+  const counts: Record<AssignmentKey, number> = { both: 0, primary_only: 0, secondary_only: 0, none: 0 }
+  for (const r of detailRows.value) counts[assignmentOf(r)] += 1
+  return (Object.keys(ASSIGNMENT_LABELS) as AssignmentKey[]).map((k) => ({ key: k, label: ASSIGNMENT_LABELS[k], value: counts[k] }))
+})
+function openAssignmentDrilldown(key: string) {
+  openDrilldown(ASSIGNMENT_LABELS[key as AssignmentKey], detailRows.value.filter((r) => assignmentOf(r) === key))
+}
+
 const detailColumns: DataTableColumn[] = [
   { key: 'project_id', label: 'Project ID', path: 'project_name', sortable: true },
   { key: 'title', label: 'Project Title', path: 'project_title', sortable: true },
@@ -154,22 +193,38 @@ const detailColumns: DataTableColumn[] = [
 ]
 
 function exportDetailCsv() {
-  const header = ['Project ID', 'Title', 'Students', 'Programme', 'Cycle', 'Status', 'Days in Stage', 'Mentor', 'Primary Reviewer', 'Secondary Reviewer', 'Last Updated']
-  const lines = [header.join(',')]
-  for (const r of filteredDetailRows.value) {
-    lines.push(
-      [r.project_name, r.project_title, r.students.map((s) => s.name).join('; '), r.irb_unit, r.irb_cycle || '', r.project_status, r.days_in_state, r.mentor_name || '', r.primary_reviewer_name || '', r.secondary_reviewer_name || '', r.last_updated]
-        .map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`)
-        .join(','),
-    )
-  }
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'project-report.csv'
-  a.click()
-  URL.revokeObjectURL(url)
+  downloadCsv(
+    `project-report-${csvDateStamp()}.csv`,
+    ['Project ID', 'Title', 'Students', 'Programme', 'Cycle', 'Status', 'Days in Stage', 'Mentor', 'Primary Reviewer', 'Secondary Reviewer', 'Last Updated'],
+    detailRows.value.map((r) => [
+      r.project_name,
+      r.project_title,
+      r.students.map((s) => s.name).join('; '),
+      r.irb_unit,
+      r.irb_cycle,
+      r.project_status,
+      r.days_in_state,
+      r.mentor_name,
+      r.primary_reviewer_name,
+      r.secondary_reviewer_name,
+      r.last_updated,
+    ]),
+  )
+}
+
+// Same rows and columns as the Programme Analytics table (so it respects
+// the current filters), plus a closing total row.
+function exportProgrammeCsv() {
+  const rows = programmeMatrix.value
+  const totals = BUCKET_ORDER.map((k) => rows.reduce((a, r) => a + (r as unknown as Record<string, number>)[k], 0))
+  downloadCsv(
+    `programme-analytics-${csvDateStamp()}.csv`,
+    ['Programme', 'Total', ...BUCKET_ORDER.map((k) => BUCKET_LABELS[k])],
+    [
+      ...rows.map((r) => [r.programme, r.total, ...BUCKET_ORDER.map((k) => (r as unknown as Record<string, number>)[k])]),
+      ['All programmes', rows.reduce((a, r) => a + r.total, 0), ...totals],
+    ],
+  )
 }
 
 const workloadTab = ref<'mentor' | 'primary_reviewer' | 'secondary_reviewer'>('mentor')
@@ -196,60 +251,57 @@ const workloadColumns: DataTableColumn[] = [
         <p v-if="lastRefreshedLabel" class="mt-1 text-xs text-muted">Last refreshed: {{ lastRefreshedLabel }}</p>
       </div>
       <div class="flex shrink-0 items-center gap-2">
-        <Button variant="outline" icon-left="refresh-cw" :loading="loading" @click="refresh(programmeFilter || undefined)">
+        <Button variant="outline" icon-left="refresh-cw" :loading="loading" @click="refresh()">
           Refresh
         </Button>
-        <Button variant="outline" icon-left="download" :disabled="!filteredDetailRows.length" @click="exportDetailCsv">
+        <Button variant="outline" icon-left="download" :disabled="!detailRows.length" @click="exportDetailCsv">
           Export CSV
         </Button>
       </div>
     </div>
 
-    <LoadingState v-if="loading && !detailRows.length" label="Loading reports…" />
-    <ErrorState v-else-if="error" :error="error" @retry="() => refresh(programmeFilter || undefined)" />
+    <LoadingState v-if="loading && !allRows.length" label="Loading reports…" />
+    <ErrorState v-else-if="error" :error="error" @retry="refresh" />
     <template v-else>
       <!-- Global filters -->
       <div class="mb-5 flex flex-wrap items-center gap-2 rounded-xl border border-line bg-paper p-4 shadow-card">
-        <select
-          v-model="programmeFilter"
-          class="rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm text-charcoal focus:border-primary focus:outline-none"
-          @change="onProgrammeChange"
-        >
-          <option value="">All programmes</option>
-          <option v-for="p in programmeOptions" :key="p" :value="p">{{ p }}</option>
-        </select>
-        <select
-          v-model="statusFilter"
-          class="rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm text-charcoal focus:border-primary focus:outline-none"
-        >
-          <option value="">All statuses</option>
-          <option v-for="s in statusOptions" :key="s" :value="s">{{ s }}</option>
-        </select>
-        <select
-          v-if="cycleOptions.length"
-          v-model="cycleFilter"
-          class="rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm text-charcoal focus:border-primary focus:outline-none"
-        >
-          <option value="">All cycles</option>
-          <option v-for="c in cycleOptions" :key="c" :value="c">{{ c }}</option>
-        </select>
+        <MultiSelect
+          v-model="filters.programmes"
+          :options="programmeSelectOptions"
+          placeholder="All programmes"
+          variant="outline"
+          class="min-w-44"
+        />
+        <MultiSelect
+          v-model="filters.statuses"
+          :options="statusSelectOptions"
+          placeholder="All statuses"
+          variant="outline"
+          class="min-w-44 max-w-80"
+        />
+        <MultiSelect
+          v-if="cycleSelectOptions.length"
+          v-model="filters.cycles"
+          :options="cycleSelectOptions"
+          placeholder="All cycles"
+          variant="outline"
+          class="min-w-36"
+        />
         <div class="relative">
           <FeatherIcon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <input
-            v-model="search"
+            v-model="filters.search"
             type="text"
             placeholder="Search projects, students, reviewers…"
-            class="w-64 rounded-md border border-line bg-canvas py-1.5 pl-8 pr-2 text-sm text-charcoal placeholder:text-muted focus:border-primary focus:outline-none"
+            class="w-72 rounded-md border border-line bg-canvas py-1.5 pl-8 pr-2 text-sm text-charcoal placeholder:text-muted focus:border-primary focus:outline-none"
           />
         </div>
-        <Button
-          v-if="programmeFilter || statusFilter || cycleFilter || search"
-          variant="ghost"
-          size="sm"
-          @click="clearFilters"
-        >
-          Clear
+        <Button v-if="hasActiveFilters" variant="ghost" size="sm" icon-left="x" @click="clearFilters">
+          Clear filters
         </Button>
+        <span v-if="hasActiveFilters" class="ml-auto text-sm text-muted">
+          Showing {{ totalProjects }} of {{ allRows.length }} projects
+        </span>
       </div>
 
       <EmptyState
@@ -285,6 +337,34 @@ const workloadColumns: DataTableColumn[] = [
         <!-- Workflow pipeline -->
         <div class="mb-5">
           <PipelineFlow :stages="pipelineStages" @select="openBucketDrilldown" />
+        </div>
+
+        <!-- Pie chart overview -->
+        <div class="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <PieChartCard
+            title="Project Status Distribution"
+            subtitle="Share of projects at each review stage."
+            :slices="stageSlices"
+            @select="openBucketDrilldown"
+          />
+          <PieChartCard
+            title="Projects by Programme"
+            subtitle="How projects are spread across programmes."
+            :slices="programmeSlices"
+            @select="openProgrammeSliceDrilldown"
+          />
+          <PieChartCard
+            title="Project Aging"
+            subtitle="Days active projects have spent in their current stage."
+            :slices="agingSlices"
+            @select="(k) => openAgingDrilldown(k as AgingRow['bucket'])"
+          />
+          <PieChartCard
+            title="Reviewer Assignment"
+            subtitle="Whether primary and secondary reviewers are assigned."
+            :slices="assignmentSlices"
+            @select="openAssignmentDrilldown"
+          />
         </div>
 
         <!-- Status distribution -->
@@ -329,8 +409,15 @@ const workloadColumns: DataTableColumn[] = [
 
         <!-- Programme analytics -->
         <div class="mb-5 rounded-xl border border-line bg-paper p-6 shadow-card">
-          <h3 class="text-base font-semibold text-charcoal">Programme Analytics</h3>
-          <p class="mb-4 text-sm text-muted">Where each programme's projects stand right now.</p>
+          <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 class="text-base font-semibold text-charcoal">Programme Analytics</h3>
+              <p class="text-sm text-muted">Where each programme's projects stand right now.</p>
+            </div>
+            <Button variant="outline" size="sm" icon-left="download" :disabled="!programmeMatrix.length" @click="exportProgrammeCsv">
+              Export CSV
+            </Button>
+          </div>
           <BucketBarChart
             :labels="programmeMatrix.map((r) => r.programme)"
             :values="programmeMatrix.map((r) => r.total)"
@@ -426,8 +513,8 @@ const workloadColumns: DataTableColumn[] = [
         <!-- Detailed project report -->
         <div class="rounded-xl border border-line bg-paper p-6 shadow-card">
           <h3 class="mb-1 text-base font-semibold text-charcoal">Detailed Project Report</h3>
-          <p class="mb-4 text-sm text-muted">{{ filteredDetailRows.length }} of {{ totalProjects }} projects match the current filters.</p>
-          <DataTable :columns="detailColumns" :rows="filteredDetailRows as unknown as Record<string, unknown>[]" row-key="project_name" empty-title="No matching projects">
+          <p class="mb-4 text-sm text-muted">{{ totalProjects }} of {{ allRows.length }} projects match the current filters.</p>
+          <DataTable :columns="detailColumns" :rows="detailRows as unknown as Record<string, unknown>[]" row-key="project_name" empty-title="No matching projects">
             <template #cell-title="{ value }">
               <span class="line-clamp-2 max-w-xs">{{ value }}</span>
             </template>

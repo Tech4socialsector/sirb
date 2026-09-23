@@ -157,12 +157,14 @@ def get_project_summary_by_irb_unit(irb_unit=None):
 
 	Same active-or-approved condition as get_projects_by_irb_unit — see
 	its docstring for why a plain `sp.status = 'active'` filter would
-	drop every approved project from this summary.
+	drop every approved project from this summary. Counts distinct projects:
+	the join is per Student Project Mapping, so `count(*)` counted a group
+	project once per student.
 	"""
 	_check_permission()
 
 	params = {}
-	query = """select iu.ao_name as irb_unit, count(*) as project_count, p.status as project_status
+	query = """select iu.ao_name as irb_unit, count(distinct p.name) as project_count, p.status as project_status
 		from `tabStudent Project Mapping` as sp
 		join `tabIRB Project` as p on sp.irb_project = p.name
 		join `tabIRB Unit` as iu on p.irb_unit = iu.name

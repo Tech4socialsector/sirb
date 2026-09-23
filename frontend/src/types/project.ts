@@ -65,6 +65,8 @@ export interface ProjectDetailPayload {
   roles: ProjectRoles
   students: ProjectStudent[]
   meta: { can_write: boolean }
+  /** Status changes the server will accept from this user right now (sirb/workflow.py). */
+  allowed_statuses?: string[]
 }
 
 export interface StatusChangeEntry {

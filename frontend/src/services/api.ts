@@ -14,7 +14,23 @@ export class ApiError extends Error {
   }
 }
 
+// Frappe's own permission-engine wording ("Not allowed via controller
+// permission check", "does not have doctype access via role permission
+// for document …") is meaningless to users — show a plain sentence instead.
+const INTERNAL_PERMISSION_TEXT =
+  /controller permission|role permission|does not have access to this document|Insufficient Permission|Not permitted|No permission for/i
+
+/** Server messages may carry HTML (<strong>, <br>, links); toasts and error
+ * states render plain text, so strip tags and decode entities. */
+function toPlainText(message: string): string {
+  const withBreaks = message.replace(/<br\s*\/?>/gi, ' ').replace(/<\/(p|li|div)>/gi, ' ')
+  const doc = new DOMParser().parseFromString(withBreaks, 'text/html')
+  return (doc.body.textContent || '').replace(/\s+/g, ' ').trim()
+}
+
 function friendlyMessage(status: number, serverMessage?: string): { message: string; kind: ApiError['kind'] } {
+  serverMessage = serverMessage ? toPlainText(serverMessage) : undefined
+  if (status === 403 && serverMessage && INTERNAL_PERMISSION_TEXT.test(serverMessage)) serverMessage = undefined
   if (status === 401) {
     return { message: 'Your session has expired. Please log in again.', kind: 'session_expired' }
   }

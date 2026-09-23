@@ -1,20 +1,39 @@
-import { ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { ApiError } from '@/services/api'
 import type { ProjectListRow } from '@/types/project'
 import type { WorklistBucket } from '@/services/projects'
 
+const BUCKETS: WorklistBucket[] = ['pending', 'unapproved', 'approved']
+
+/**
+ * Loads all three worklist buckets (pending/in-progress/approved) once, in
+ * parallel, instead of re-fetching every time the active tab changes —
+ * this is what makes it possible to show a real count on every tab
+ * up front, and switching tabs afterwards is instant/local.
+ */
 export function useProjects(fetcher: (bucket: WorklistBucket) => Promise<ProjectListRow[]>) {
-  const rows = ref<ProjectListRow[]>([])
+  const buckets = reactive<Record<WorklistBucket, ProjectListRow[]>>({
+    pending: [],
+    unapproved: [],
+    approved: [],
+  })
   const loading = ref(false)
   const error = ref<ApiError | null>(null)
   const bucket = ref<WorklistBucket>('pending')
 
-  async function load(newBucket?: WorklistBucket) {
-    if (newBucket) bucket.value = newBucket
+  const rows = computed(() => buckets[bucket.value])
+  const counts = computed(() => ({
+    pending: buckets.pending.length,
+    unapproved: buckets.unapproved.length,
+    approved: buckets.approved.length,
+  }))
+
+  async function load() {
     loading.value = true
     error.value = null
     try {
-      rows.value = await fetcher(bucket.value)
+      const results = await Promise.all(BUCKETS.map((b) => fetcher(b)))
+      BUCKETS.forEach((b, i) => (buckets[b] = results[i]))
     } catch (e) {
       error.value = e instanceof ApiError ? e : new ApiError('Failed to load projects.', 'server')
     } finally {
@@ -22,5 +41,5 @@ export function useProjects(fetcher: (bucket: WorklistBucket) => Promise<Project
     }
   }
 
-  return { rows, loading, error, bucket, load }
+  return { rows, loading, error, bucket, counts, load }
 }

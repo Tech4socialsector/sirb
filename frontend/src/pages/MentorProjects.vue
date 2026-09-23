@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted } from 'vue'
 import AppShell from '@/components/layout/AppShell.vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
@@ -9,21 +9,20 @@ import WorklistTabs from '@/components/projects/WorklistTabs.vue'
 import { useProjects } from '@/composables/useProjects'
 import { fetchMentorProjects } from '@/services/projects'
 
-const { rows, loading, error, bucket, load } = useProjects(fetchMentorProjects)
+const { rows, loading, error, bucket, counts, load } = useProjects(fetchMentorProjects)
 
 onMounted(() => load())
-watch(bucket, () => load())
 </script>
 
 <template>
   <AppShell>
-    <PageHeader title="Mentor Worklist" description="Projects where you are the assigned faculty mentor.">
-      <template #actions>
-        <WorklistTabs v-model="bucket" />
-      </template>
-    </PageHeader>
+    <PageHeader title="Mentor Worklist" description="Projects where you are the assigned faculty mentor." />
     <LoadingState v-if="loading" />
     <ErrorState v-else-if="error" :error="error" @retry="() => load()" />
-    <ProjectListTable v-else :rows="rows" empty-title="No projects in this bucket" />
+    <ProjectListTable v-else :rows="rows" empty-title="No projects in this bucket">
+      <template #tabs>
+        <WorklistTabs v-model="bucket" :counts="counts" />
+      </template>
+    </ProjectListTable>
   </AppShell>
 </template>

@@ -56,6 +56,7 @@ export interface IrbProjectDoc {
 
 export interface ProjectDetailPayload {
   doc: IrbProjectDoc
+  link_titles: Record<string, string>
   roles: ProjectRoles
   students: ProjectStudent[]
   meta: { can_write: boolean }

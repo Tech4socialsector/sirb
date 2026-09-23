@@ -28,10 +28,10 @@ const kind = props.error && 'kind' in props.error ? props.error.kind : undefined
 
 <template>
   <div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
-    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
+    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-danger/10 text-danger">
       <FeatherIcon :name="iconFor(kind)" class="h-6 w-6" />
     </div>
-    <p class="max-w-sm text-sm text-gray-600">{{ error?.message || 'Something went wrong.' }}</p>
+    <p class="max-w-sm text-sm text-muted">{{ error?.message || 'Something went wrong.' }}</p>
     <Button v-if="kind !== 'permission' && kind !== 'not_found'" variant="outline" @click="$emit('retry')">
       Try again
     </Button>

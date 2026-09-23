@@ -57,11 +57,11 @@ defineExpose({ reset })
 <template>
   <Dialog
     :model-value="modelValue"
-    :options="{ title }"
+    :options="{ title, size: 'xl' }"
     @update:model-value="(v: boolean) => emit('update:modelValue', v)"
   >
     <template #body-content>
-      <div class="space-y-4">
+      <div class="space-y-5">
         <template v-for="field in fields" :key="field.fieldname">
           <LinkField
             v-if="field.type === 'link'"
@@ -81,19 +81,19 @@ defineExpose({ reset })
           />
         </template>
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-gray-700">CSV File</label>
+          <label class="mb-1.5 block text-sm font-medium text-charcoal">CSV File</label>
           <input
             ref="fileInput"
             type="file"
             accept=".csv"
-            class="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-gray-200"
+            class="block w-full rounded-md border border-line bg-canvas p-2.5 text-sm text-charcoal file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-primary-hover"
             @change="onFileChange"
           />
         </div>
       </div>
     </template>
     <template #actions>
-      <Button variant="solid" class="w-full" :disabled="!canSubmit()" @click="submit">Submit</Button>
+      <Button variant="solid" size="lg" class="w-full" :disabled="!canSubmit()" @click="submit">Submit</Button>
     </template>
   </Dialog>
 </template>

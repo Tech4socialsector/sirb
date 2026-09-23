@@ -70,6 +70,15 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/sirb/admin/students',
+    name: 'student-project-management',
+    component: () => import('@/pages/StudentProjectManagement.vue'),
+    meta: {
+      title: 'Student & Project Management',
+      requiresRole: (s) => s.isAdmin,
+    },
+  },
+  {
     path: '/sirb/admin/reports',
     name: 'anchor-reports',
     component: () => import('@/pages/AnchorReports.vue'),
@@ -95,6 +104,12 @@ const routes: RouteRecordRaw[] = [
       title: 'Upload Faculty',
       requiresRole: (s) => s.isAnchor,
     },
+  },
+  {
+    path: '/sirb/profile',
+    name: 'profile',
+    component: () => import('@/pages/Profile.vue'),
+    meta: { title: 'Profile' },
   },
   {
     path: '/sirb/unauthorized',

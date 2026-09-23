@@ -11,6 +11,11 @@ class IRBUnit(Document):
 		#self.revoke_roles_if_not_needed(None)
 
 	def update_reviewer_roles(self):
+		# Same fix as sirb.utils.set_mentor_and_reviewer_roles: this syncs
+		# OTHER users' roles system-wide based on committee membership, not
+		# just the acting user's own data, so it needs ignore_permissions
+		# regardless of who saved this IRB Unit — otherwise a non-admin
+		# save throws PermissionError here and the save looks like it failed.
 		current_reviewer_faculty = [row.faculty_member for row in self.irb_committee_faculty_members]
 		current_reviewer_faculty_users = []
 		if current_reviewer_faculty:
@@ -18,6 +23,7 @@ class IRBUnit(Document):
 				faou_doc = frappe.get_doc("Faculty Academic Organizational Unit", crf)
 				faculty_doc = frappe.get_doc("Faculty", faou_doc.faculty_member)
 				crfu = frappe.get_doc("User", faculty_doc.system_user)
+				crfu.flags.ignore_permissions = True
 				crfu.add_roles("IRB Reviewer")
 				current_reviewer_faculty_users.append(crfu)
 		self.revoke_roles_if_not_needed()
@@ -39,5 +45,6 @@ class IRBUnit(Document):
 			if u not in all_valid_reviewer_users:
 				print("Removing role for ", u)
 				udoc = frappe.get_doc("User", u)
+				udoc.flags.ignore_permissions = True
 				udoc.remove_roles("IRB Reviewer")
 

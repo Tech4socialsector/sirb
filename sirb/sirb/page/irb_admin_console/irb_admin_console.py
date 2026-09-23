@@ -195,14 +195,82 @@ def get_dashboard_data(filters=None):
 			status_counts[KEY_BY_STATUS[s]] for s in statuses if KEY_BY_STATUS.get(s)
 		)
 
+	# ---- Distinct project counts (total_students counts one row per
+	# student, so a group project with 3 students counts 3x there — this
+	# is the actual project count the "Total Projects" KPI needs) --------
+	total_projects = frappe.db.sql(
+		f"""select count(distinct p.name) as cnt {BASE_JOIN}{where_extra}""",
+		params,
+	)[0][0]
+
+	new_projects_last_30_days = frappe.db.sql(
+		f"""
+		select count(distinct p.name) as cnt {BASE_JOIN}{where_extra}
+		and p.creation >= date_sub(now(), interval 30 day)
+		""",
+		params,
+	)[0][0]
+
+	# Proxy for "approved in the last 30 days": IRB Project has no
+	# dedicated approved-on field, and Approved projects stop being
+	# touched afterwards (on_change marks their Student Project Mapping
+	# inactive), so `modified` closely tracks when approval happened.
+	approved_last_30_days = frappe.db.sql(
+		f"""
+		select count(distinct p.name) as cnt {BASE_JOIN}{where_extra}
+		and p.status = "Approved" and p.modified >= date_sub(now(), interval 30 day)
+		""",
+		params,
+	)[0][0]
+
 	return {
 		"total_students": total_students,
+		"total_projects": total_projects,
+		"new_projects_last_30_days": new_projects_last_30_days,
+		"approved_last_30_days": approved_last_30_days,
 		"status_counts": status_counts,
 		"pending_actions": pending_actions,
 		"programme_matrix": programme_matrix,
 		"status_list": STATUS_LIST,
 		"status_key_map": STATUS_KEY_MAP,
 	}
+
+
+@frappe.whitelist()
+def get_project_trend(filters=None, months=6):
+	"""Distinct project count per calendar month (by creation date) for
+	the last `months` months — real data from IRB Project.creation, not a
+	simulated/estimated series. Powers the "Project Trends" chart.
+	"""
+	_check_permission()
+	if isinstance(filters, str):
+		filters = json.loads(filters) if filters else {}
+	months = int(months or 6)
+	where_extra, params = _build_filters_clause(filters)
+
+	rows = frappe.db.sql(
+		f"""
+		select date_format(p.creation, '%%Y-%%m') as month, count(distinct p.name) as cnt
+		{BASE_JOIN}{where_extra}
+		and p.creation >= date_sub(now(), interval {months} month)
+		group by month
+		order by month
+		""",
+		params,
+		as_dict=True,
+	)
+	counts_by_month = {r["month"]: r["cnt"] for r in rows}
+
+	# Fill in every month in the window (including zero-count ones) so the
+	# chart's x-axis is a continuous timeline, not just the months that
+	# happened to have data.
+	today = frappe.utils.now_datetime()
+	series = []
+	for i in range(months - 1, -1, -1):
+		d = frappe.utils.add_months(today, -i)
+		key = d.strftime("%Y-%m")
+		series.append({"month": d.strftime("%b %Y"), "count": counts_by_month.get(key, 0)})
+	return series
 
 
 @frappe.whitelist()

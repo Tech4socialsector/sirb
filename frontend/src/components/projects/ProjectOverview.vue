@@ -15,8 +15,8 @@ const domainOptions = [
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 bg-white p-5">
-    <h3 class="mb-4 text-sm font-semibold text-gray-900">Basic Project Details</h3>
+  <div class="rounded-lg border border-line bg-paper p-5">
+    <h3 class="mb-4 text-sm font-semibold text-charcoal">Basic Project Details</h3>
     <div class="grid gap-4 md:grid-cols-2">
       <FormControl
         type="select"

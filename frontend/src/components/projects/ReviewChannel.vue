@@ -37,7 +37,7 @@ const channels = computed(() => {
 </script>
 
 <template>
-  <div v-if="channels.length" class="mt-2 space-y-3 rounded-md border border-gray-100 bg-gray-50 p-3">
+  <div v-if="channels.length" class="mt-2 space-y-3 rounded-md border border-line bg-canvas p-3">
     <div v-for="channel in channels" :key="channel.fieldname">
       <FormControl
         type="textarea"

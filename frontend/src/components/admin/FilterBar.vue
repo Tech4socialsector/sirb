@@ -40,58 +40,61 @@ watch(local, apply, { deep: false })
 </script>
 
 <template>
-  <div class="mb-5 flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4">
-    <div class="w-48">
-      <Autocomplete
-        placeholder="Programme / Course"
-        :options="toOptions(options.programmes.map((p) => ({ name: p.name, ao_name: p.ao_name })))"
-        :model-value="local.irb_unit?.[0]"
-        @update:model-value="(v: { value: string } | undefined) => (local.irb_unit = v ? [v.value] : undefined)"
-      />
+  <div class="mb-5 rounded-lg border border-line bg-paper p-4 shadow-card">
+    <div class="flex flex-wrap items-end gap-3">
+      <div class="w-48">
+        <label class="mb-1.5 block text-xs font-medium text-muted">Programme / Course</label>
+        <Autocomplete
+          placeholder="All programmes"
+          :options="toOptions(options.programmes.map((p) => ({ name: p.name, ao_name: p.ao_name })))"
+          :model-value="local.irb_unit?.[0]"
+          @update:model-value="(v: { value: string } | undefined) => (local.irb_unit = v ? [v.value] : undefined)"
+        />
+      </div>
+      <div class="w-36">
+        <label class="mb-1.5 block text-xs font-medium text-muted">Academic Year</label>
+        <FormControl
+          type="select"
+          :options="[{ label: 'All years', value: '' }, ...options.academic_years.map((y) => ({ label: y, value: y }))]"
+          :model-value="local.academic_year?.[0] || ''"
+          @update:model-value="(v: string) => (local.academic_year = v ? [v] : undefined)"
+        />
+      </div>
+      <div class="w-36">
+        <label class="mb-1.5 block text-xs font-medium text-muted">Batch / Cycle</label>
+        <FormControl
+          type="select"
+          :options="[{ label: 'All cycles', value: '' }, ...options.cycles.map((c) => ({ label: c, value: c }))]"
+          :model-value="local.irb_cycle?.[0] || ''"
+          @update:model-value="(v: string) => (local.irb_cycle = v ? [v] : undefined)"
+        />
+      </div>
+      <div class="w-52">
+        <label class="mb-1.5 block text-xs font-medium text-muted">Status</label>
+        <FormControl
+          type="select"
+          :options="statusOptions()"
+          :model-value="local.status || ''"
+          @update:model-value="(v: string) => (local.status = v || undefined)"
+        />
+      </div>
+      <div class="w-36">
+        <label class="mb-1.5 block text-xs font-medium text-muted">From</label>
+        <FormControl
+          type="date"
+          :model-value="local.from_date"
+          @update:model-value="(v: string) => (local.from_date = v || undefined)"
+        />
+      </div>
+      <div class="w-36">
+        <label class="mb-1.5 block text-xs font-medium text-muted">To</label>
+        <FormControl
+          type="date"
+          :model-value="local.to_date"
+          @update:model-value="(v: string) => (local.to_date = v || undefined)"
+        />
+      </div>
+      <Button variant="outline" @click="clear">Clear filters</Button>
     </div>
-    <div class="w-40">
-      <FormControl
-        type="select"
-        placeholder="Academic Year"
-        :options="[{ label: 'All years', value: '' }, ...options.academic_years.map((y) => ({ label: y, value: y }))]"
-        :model-value="local.academic_year?.[0] || ''"
-        @update:model-value="(v: string) => (local.academic_year = v ? [v] : undefined)"
-      />
-    </div>
-    <div class="w-40">
-      <FormControl
-        type="select"
-        placeholder="Batch / Cycle"
-        :options="[{ label: 'All cycles', value: '' }, ...options.cycles.map((c) => ({ label: c, value: c }))]"
-        :model-value="local.irb_cycle?.[0] || ''"
-        @update:model-value="(v: string) => (local.irb_cycle = v ? [v] : undefined)"
-      />
-    </div>
-    <div class="w-56">
-      <FormControl
-        type="select"
-        placeholder="Status"
-        :options="statusOptions()"
-        :model-value="local.status || ''"
-        @update:model-value="(v: string) => (local.status = v || undefined)"
-      />
-    </div>
-    <div class="w-40">
-      <FormControl
-        type="date"
-        placeholder="From"
-        :model-value="local.from_date"
-        @update:model-value="(v: string) => (local.from_date = v || undefined)"
-      />
-    </div>
-    <div class="w-40">
-      <FormControl
-        type="date"
-        placeholder="To"
-        :model-value="local.to_date"
-        @update:model-value="(v: string) => (local.to_date = v || undefined)"
-      />
-    </div>
-    <Button variant="outline" @click="clear">Clear filters</Button>
   </div>
 </template>

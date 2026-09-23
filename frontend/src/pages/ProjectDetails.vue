@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Button, toast } from 'frappe-ui'
 import AppShell from '@/components/layout/AppShell.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
@@ -9,15 +9,16 @@ import ProjectOverview from '@/components/projects/ProjectOverview.vue'
 import StudentInformation from '@/components/projects/StudentInformation.vue'
 import PersonCard from '@/components/projects/PersonCard.vue'
 import ProjectActions from '@/components/projects/ProjectActions.vue'
-import ApprovalTimeline from '@/components/projects/ApprovalTimeline.vue'
 import EthicsQuestionnaire from '@/components/projects/EthicsQuestionnaire.vue'
 import { useProject } from '@/composables/useProject'
 import { useProjectActions } from '@/composables/useProjectActions'
+import { useTimelineDrawer } from '@/composables/useTimelineDrawer'
 import type { IrbProjectDoc } from '@/types/project'
 
 const props = defineProps<{ name: string }>()
 
 const { detail, history, loading, error, transitioning, load, transitionTo } = useProject(props.name)
+const { setContext, clearContext } = useTimelineDrawer()
 
 // Local editable copy of the doc so field edits don't mutate the loaded
 // snapshot until explicitly saved — mirrors Frappe's dirty-doc model.
@@ -29,6 +30,26 @@ onMounted(async () => {
   await load()
   if (detail.value) localDoc.value = { ...detail.value.doc }
 })
+
+// Keep the global header's Timeline drawer in sync with this page's
+// already-loaded data — the drawer never fetches on its own, so it stays
+// current across saves/transitions for free.
+watch(
+  [detail, history, loading],
+  ([d, h, isLoading]) => {
+    setContext({
+      projectName: props.name,
+      projectTitle: d?.doc.title ?? null,
+      studentName: d?.students.map((s) => s.full_name).join(', ') || null,
+      currentStatus: d?.doc.status ?? null,
+      history: h,
+      loading: isLoading && !d,
+    })
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => clearContext())
 
 const roles = computed(() => detail.value?.roles ?? null)
 const hasSecondaryReviewer = computed(() => Boolean(localDoc.value?.secondary_reviewer))
@@ -97,8 +118,18 @@ const correctionNoticeStatuses = [
 
       <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <StudentInformation :students="detail.students" />
-        <PersonCard label="Faculty Mentor" :name="localDoc.faculty_mentor" :can-edit-link="false" />
-        <PersonCard label="Primary Reviewer" :name="localDoc.primary_reviewer" :can-edit-link="false" />
+        <PersonCard
+          label="Faculty Mentor"
+          :name="localDoc.faculty_mentor"
+          :display-name="detail.link_titles?.faculty_mentor"
+          :can-edit-link="false"
+        />
+        <PersonCard
+          label="Primary Reviewer"
+          :name="localDoc.primary_reviewer"
+          :display-name="detail.link_titles?.primary_reviewer"
+          :can-edit-link="false"
+        />
       </div>
 
       <div class="mb-4">
@@ -106,15 +137,18 @@ const correctionNoticeStatuses = [
       </div>
 
       <div class="mb-4">
-        <EthicsQuestionnaire :doc="localDoc" :disabled="!canEdit" @update="updateField" />
+        <EthicsQuestionnaire
+          :doc="localDoc"
+          :link-titles="detail.link_titles"
+          :disabled="!canEdit"
+          @update="updateField"
+        />
       </div>
 
       <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <ProjectActions :actions="actions" :busy="transitioning || saving" @action="onAction" />
         <Button v-if="canEdit && dirty" variant="solid" :loading="saving" @click="saveChanges">Save</Button>
       </div>
-
-      <ApprovalTimeline :history="history" />
     </template>
   </AppShell>
 </template>

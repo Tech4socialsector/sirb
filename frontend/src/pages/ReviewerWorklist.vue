@@ -16,10 +16,9 @@ const fetcher = computed(() =>
 )
 const title = computed(() => (props.role === 'primary' ? 'Primary Reviewer Worklist' : 'Secondary Reviewer Worklist'))
 
-const { rows, loading, error, bucket, load } = useProjects((b) => fetcher.value(b))
+const { rows, loading, error, bucket, counts, load } = useProjects((b) => fetcher.value(b))
 
 onMounted(() => load())
-watch(bucket, () => load())
 watch(
   () => props.role,
   () => load(),
@@ -28,13 +27,13 @@ watch(
 
 <template>
   <AppShell>
-    <PageHeader :title="title" description="Projects assigned to you for review.">
-      <template #actions>
-        <WorklistTabs v-model="bucket" />
-      </template>
-    </PageHeader>
+    <PageHeader :title="title" description="Projects assigned to you for review." />
     <LoadingState v-if="loading" />
     <ErrorState v-else-if="error" :error="error" @retry="() => load()" />
-    <ProjectListTable v-else :rows="rows" empty-title="No projects in this bucket" />
+    <ProjectListTable v-else :rows="rows" empty-title="No projects in this bucket">
+      <template #tabs>
+        <WorklistTabs v-model="bucket" :counts="counts" />
+      </template>
+    </ProjectListTable>
   </AppShell>
 </template>

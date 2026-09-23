@@ -42,15 +42,25 @@ def _days_since_field_set_to_current_value(doctype: str, docname: str, fieldname
 
 @frappe.whitelist()
 def get_projects_by_irb_unit(irb_unit=None, status=None, campus=None):
-	"""Row-level detail: one row per active project, with student names,
-	mentor/reviewer names+emails, and days-in-current-status.
+	"""Row-level detail: one row per active-or-approved project, with
+	student names, mentor/reviewer names+emails, and days-in-current-status.
+
+	Approved projects have their Student Project Mapping flipped to
+	"inactive" (see IRBProject.on_change), so a plain `status = 'active'`
+	filter here would silently drop every approved project from a
+	*reports* page whose whole point is historical/complete analysis —
+	matches the same `(sp.status = 'active' or p.status = 'Approved')`
+	condition already used by the admin dashboard's BASE_JOIN.
 	"""
 	_check_permission()
 
 	sp_data_list = frappe.db.sql(
-		"""select GROUP_CONCAT(student order by student separator ',') as student_ids,
-		irb_project as project_id from `tabStudent Project Mapping`
-		where status = 'active' group by irb_project""",
+		"""select GROUP_CONCAT(sp.student order by sp.student separator ',') as student_ids,
+		sp.irb_project as project_id
+		from `tabStudent Project Mapping` as sp
+		join `tabIRB Project` as p on sp.irb_project = p.name
+		where (sp.status = 'active' or p.status = 'Approved')
+		group by sp.irb_project""",
 		as_dict=True,
 	)
 
@@ -67,7 +77,7 @@ def get_projects_by_irb_unit(irb_unit=None, status=None, campus=None):
 		student_info = [f"{s['full_name']} ({s['email']})" for s in student_data]
 
 		params = {"project_id": sp_data["project_id"]}
-		query = """select p.status, COALESCE(f1.full_name, '') as mentor_name,
+		query = """select p.status, p.title, p.irb_cycle, p.modified, COALESCE(f1.full_name, '') as mentor_name,
 			COALESCE(f1.system_user, '') as mentor_email, COALESCE(f2.full_name, '') as pr_name,
 			COALESCE(f2.system_user, '') as pr_email, COALESCE(f3.full_name, '') as sr_name,
 			COALESCE(f3.system_user, '') as sr_email, p.name, p.irb_unit
@@ -115,11 +125,25 @@ def get_projects_by_irb_unit(irb_unit=None, status=None, campus=None):
 			{
 				"irb_unit": irb_unit_name,
 				"project_status": p["status"],
+				"project_title": p["title"],
+				"irb_cycle": p["irb_cycle"],
+				"last_updated": p["modified"],
 				"days_in_state": _days_since_field_set_to_current_value("IRB Project", p["name"], "status"),
 				"student_info": student_info,
+				# Structured alongside the combined display strings above
+				# (kept as-is for anything already reading them) so the
+				# frontend can render "Name" with the email as secondary
+				# text/tooltip instead of one long "Name (email)" string.
+				"students": [{"name": s["full_name"], "email": s["email"]} for s in student_data],
 				"mentor": f"{p['mentor_name']} ({p['mentor_email']})" if p["mentor_email"] else None,
+				"mentor_name": p["mentor_name"] or None,
+				"mentor_email": p["mentor_email"] or None,
 				"primary_reviewer": f"{p['pr_name']} ({p['pr_email']})" if p["pr_email"] else None,
+				"primary_reviewer_name": p["pr_name"] or None,
+				"primary_reviewer_email": p["pr_email"] or None,
 				"secondary_reviewer": f"{p['sr_name']} ({p['sr_email']})" if p["sr_email"] else None,
+				"secondary_reviewer_name": p["sr_name"] or None,
+				"secondary_reviewer_email": p["sr_email"] or None,
 				"project_name": p["name"],
 			}
 		)
@@ -129,7 +153,12 @@ def get_projects_by_irb_unit(irb_unit=None, status=None, campus=None):
 
 @frappe.whitelist()
 def get_project_summary_by_irb_unit(irb_unit=None):
-	"""Grouped project count by Programme x Status, with chart-ready data."""
+	"""Grouped project count by Programme x Status, with chart-ready data.
+
+	Same active-or-approved condition as get_projects_by_irb_unit — see
+	its docstring for why a plain `sp.status = 'active'` filter would
+	drop every approved project from this summary.
+	"""
 	_check_permission()
 
 	params = {}
@@ -137,7 +166,7 @@ def get_project_summary_by_irb_unit(irb_unit=None):
 		from `tabStudent Project Mapping` as sp
 		join `tabIRB Project` as p on sp.irb_project = p.name
 		join `tabIRB Unit` as iu on p.irb_unit = iu.name
-		where sp.status = 'active'"""
+		where (sp.status = 'active' or p.status = 'Approved')"""
 	if irb_unit:
 		query += " and p.irb_unit = %(irb_unit)s"
 		params["irb_unit"] = irb_unit

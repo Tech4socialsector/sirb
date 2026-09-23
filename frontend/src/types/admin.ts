@@ -28,11 +28,19 @@ export interface ProgrammeMatrixRow {
 
 export interface DashboardData {
   total_students: number
+  total_projects: number
+  new_projects_last_30_days: number
+  approved_last_30_days: number
   status_counts: Record<string, number>
   pending_actions: Record<string, number>
   programme_matrix: ProgrammeMatrixRow[]
   status_list: string[]
   status_key_map: Record<string, string>
+}
+
+export interface TrendPoint {
+  month: string
+  count: number
 }
 
 export interface RoleWorkloadRow {

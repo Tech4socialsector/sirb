@@ -7,6 +7,7 @@ import type { IrbProjectDoc } from '@/types/project'
 
 const props = defineProps<{
   doc: IrbProjectDoc
+  linkTitles?: Record<string, string>
   disabled: boolean
 }>()
 
@@ -40,6 +41,7 @@ watch(visibleTabs, (val) => {
             :section="section"
             :all-fields="tabs.flatMap((t) => t.sections.flatMap((s) => s.columns.flat()))"
             :doc="doc"
+            :link-titles="linkTitles"
             :disabled="disabled"
             :is-field-visible="isFieldVisible"
             :is-field-mandatory="isFieldMandatory"

@@ -32,8 +32,11 @@ const config = computed<ChartConfig>(() => ({
   })),
   title: '',
   xAxis: { key: 'status', type: 'category' },
-  yAxis: {},
-  series: [{ name: 'count', type: 'bar', color: '#5e64ff' }],
+  // `title` must be a real string, not omitted — frappe-ui's chart options
+  // build the axis label as `↑ ${yAxis.title}` with no fallback, so an
+  // empty {} here rendered the literal text "↑ undefined" on the chart.
+  yAxis: { title: '' },
+  series: [{ name: 'count', type: 'bar', color: '#0f172a' }],
 }))
 </script>
 

@@ -1,17 +1,35 @@
-import { io, type Socket } from 'socket.io-client'
+import { initSocket, toast } from 'frappe-ui'
+import type { Socket } from 'socket.io-client'
 import { onUnmounted } from 'vue'
 
 let socket: Socket | null = null
+let connectionIssueShown = false
 
 function getSocket(): Socket {
   if (socket) return socket
-  const host = window.location.hostname
-  const siteName = (window as unknown as { sitename?: string }).sitename || host
-  socket = io(`${window.location.protocol}//${host}/${siteName}`, {
-    withCredentials: true,
-    reconnection: true,
-    path: '/socket.io',
+  // Frappe's realtime (socket.io) server runs on its own port — separate
+  // from the webserver this page was served from — configured per-site
+  // as `socketio_port` (see sites/common_site_config.json) and exposed to
+  // the browser as a top-level `window.socketio_port` boot global. The
+  // previous hand-rolled connection here ignored that entirely and
+  // pointed socket.io at the page's own origin with no port at all, so it
+  // never actually reached the realtime server — upload progress events
+  // were being published by the backend but never received here.
+  const port = (window as unknown as { socketio_port?: number }).socketio_port
+  socket = initSocket(port ? { port } : {}) as Socket
+
+  // A silent failure here previously looked identical to "nothing to
+  // report yet" from the caller's point of view — surface it instead of
+  // leaving the uploader/progress UI looking stuck with no explanation.
+  socket.on('connect_error', () => {
+    if (connectionIssueShown) return
+    connectionIssueShown = true
+    toast.error('Live progress updates are unavailable right now (realtime connection failed). The upload itself is still running in the background.')
   })
+  socket.on('connect', () => {
+    connectionIssueShown = false
+  })
+
   return socket
 }
 

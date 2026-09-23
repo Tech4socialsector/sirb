@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AppShell from '@/components/layout/AppShell.vue'
-import PageHeader from '@/components/common/PageHeader.vue'
-import SummaryCard from '@/components/dashboard/SummaryCard.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import DashboardGreeting from '@/components/dashboard/DashboardGreeting.vue'
+import KpiCard from '@/components/dashboard/KpiCard.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRoles } from '@/composables/useRoles'
 import { fetchMyPendingCounts } from '@/services/projects'
 
+const router = useRouter()
 const { currentUser } = useAuth()
 const { isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isAdmin, isAnchor } = useRoles()
 
 const counts = ref<Record<string, number>>({})
 const loading = ref(true)
+
+const hasAnyWork = computed(
+  () => isStudent.value || isFacultyMentor.value || isPrimaryReviewer.value || isSecondaryReviewer.value || isAdmin.value || isAnchor.value,
+)
 
 onMounted(async () => {
   try {
@@ -25,59 +31,59 @@ onMounted(async () => {
 
 <template>
   <AppShell>
-    <PageHeader
-      :title="`Welcome${currentUser ? ', ' + currentUser.full_name.split(' ')[0] : ''}`"
-      description="Here's an overview of what needs your attention."
+    <DashboardGreeting
+      :name="currentUser?.full_name.split(' ')[0] || 'there'"
+      subtitle="Here's an overview of what needs your attention."
     />
 
-    <LoadingState v-if="loading" />
+    <LoadingState v-if="loading" label="Loading your dashboard…" />
     <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <SummaryCard
+      <KpiCard
         v-if="isStudent"
         label="My Projects"
         :value="counts.student_projects ?? 0"
-        icon="file-text"
-        to="/sirb/my-projects"
+        icon="folder"
+        action-label="View Projects"
+        clickable
+        @click="router.push('/sirb/my-projects')"
       />
-      <SummaryCard
-        v-if="isFacultyMentor || isAdmin"
-        label="Awaiting My Mentor Approval"
+      <KpiCard
+        v-if="isFacultyMentor"
+        label="Awaiting Mentor Approval"
         :value="counts.mentor_pending ?? 0"
         icon="user-check"
         tone="warning"
-        to="/sirb/review/mentor"
+        action-label="View All"
+        clickable
+        @click="router.push('/sirb/review/mentor')"
       />
-      <SummaryCard
-        v-if="isPrimaryReviewer || isAdmin"
-        label="Awaiting My Primary Review"
+      <KpiCard
+        v-if="isPrimaryReviewer"
+        label="Awaiting Primary Review"
         :value="counts.primary_reviewer_pending ?? 0"
-        icon="check-square"
-        tone="warning"
-        to="/sirb/review/primary"
+        icon="eye"
+        tone="info"
+        action-label="View All"
+        clickable
+        @click="router.push('/sirb/review/primary')"
       />
-      <SummaryCard
-        v-if="isSecondaryReviewer || isAdmin"
-        label="Awaiting My Secondary Review"
+      <KpiCard
+        v-if="isSecondaryReviewer"
+        label="Awaiting Secondary Review"
         :value="counts.secondary_reviewer_pending ?? 0"
-        icon="check-square"
-        tone="warning"
-        to="/sirb/review/secondary"
+        icon="eye"
+        tone="info"
+        action-label="View All"
+        clickable
+        @click="router.push('/sirb/review/secondary')"
       />
-      <SummaryCard v-if="isAdmin" label="Admin Console" value="Open" icon="grid" to="/sirb/admin" />
-      <SummaryCard v-if="isAnchor" label="Anchor Reports" value="Open" icon="bar-chart-2" to="/sirb/admin/reports" />
+      <KpiCard v-if="isAdmin" label="Admin Console" value="Open" icon="grid" clickable @click="router.push('/sirb/admin')" />
+      <KpiCard v-if="isAnchor" label="Reports" value="Open" icon="bar-chart-2" clickable @click="router.push('/sirb/admin/reports')" />
     </div>
 
     <div
-      v-if="
-        !loading &&
-        !isStudent &&
-        !isFacultyMentor &&
-        !isPrimaryReviewer &&
-        !isSecondaryReviewer &&
-        !isAdmin &&
-        !isAnchor
-      "
-      class="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500"
+      v-if="!loading && !hasAnyWork"
+      class="rounded-lg border border-line bg-paper p-8 text-center text-sm text-muted"
     >
       No SIRB workflows are currently assigned to your account.
     </div>

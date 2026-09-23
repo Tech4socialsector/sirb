@@ -6,13 +6,55 @@
 
 :root {
   color-scheme: light;
+
+  /* Design tokens — restrained academic/enterprise palette. Used via the
+     tailwind.config.js semantic color extension (bg-canvas, text-charcoal,
+     etc). Existing literal Tailwind gray/emerald/amber/red/blue classes
+     elsewhere stay as-is; this is the source of truth for new/restyled UI.
+
+     Stored as space-separated RGB channels (not hex) so Tailwind's opacity
+     modifiers (e.g. bg-charcoal/30) actually work — a flat hex/var value
+     can't be composed with an alpha channel.
+
+     NOT named `ink` / `surface`: frappe-ui's own Tailwind preset already
+     reserves those two as nested color families (ink-gray-*, ink-blue-*,
+     surface-*, ...). Extending `theme.colors` with a plain string at the
+     same key collides with that nested object and silently drops the
+     bare utility (.text-ink / .bg-surface compiled to nothing — that's
+     why text and card backgrounds were going missing/see-through
+     app-wide). `charcoal` / `paper` avoid the collision entirely. */
+  --color-canvas: 248 250 252;
+  --color-paper: 255 255 255;
+  --color-border: 226 232 240;
+  --color-charcoal: 15 23 42;
+  --color-muted: 100 116 139;
+  --color-primary: 15 23 42;
+  --color-primary-hover: 30 41 59;
+  --color-success: 22 163 74;
+  --color-warning: 217 119 6;
+  --color-danger: 220 38 38;
+  --color-info: 37 99 235;
+
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  overflow: hidden;
 }
 
 body {
-  margin: 0;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: theme('colors.gray.50');
+    'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: rgb(var(--color-canvas));
 }
 
 .sirb-scrollbar {

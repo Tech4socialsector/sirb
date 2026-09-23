@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Autocomplete, FormLabel } from 'frappe-ui'
 import { searchLink, type LinkOption } from '@/services/links'
 
@@ -17,6 +17,12 @@ const options = ref<LinkOption[]>([])
 async function onQuery(txt: string) {
   options.value = await searchLink(props.doctype, txt)
 }
+
+// frappe-ui's Autocomplete only emits `update:query` when the typed text
+// changes, never on initial mount — so without this, `options` stays
+// empty (showing "No results found") until the user types at least one
+// character, even though matching records exist.
+onMounted(() => onQuery(''))
 
 function onChange(option: LinkOption | undefined) {
   emit('update:modelValue', option?.value)

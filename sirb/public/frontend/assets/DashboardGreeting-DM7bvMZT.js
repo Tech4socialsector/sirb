@@ -1,0 +1,2 @@
+import{$ as e,B as t,Rt as n,V as r,W as i,ir as a}from"./runtime-dom.esm-bundler-BJ-qJ23c.js";var o={class:`mb-6`},s={class:`text-2xl font-semibold text-charcoal`},c={class:`mt-1 text-base text-muted`},l=e({__name:`DashboardGreeting`,props:{name:{},subtitle:{}},setup(e){let l=e,u=t(()=>{let e=new Date().getHours();return e<12?`Good morning`:e<17?`Good afternoon`:`Good evening`});return(e,t)=>(n(),i(`div`,o,[r(`h1`,s,a(u.value)+`, `+a(l.name),1),r(`p`,c,a(l.subtitle),1)]))}});export{l as t};
+//# sourceMappingURL=DashboardGreeting-DM7bvMZT.js.map

@@ -377,23 +377,72 @@ def enque_student_upload(file_url, irb_unit, irb_cycle):
     )
     return "Upload Started"
 
+def _normalize_header(col):
+    # Collapses "Faculty name", "faculty  Name", "Faculty_Name" etc down to
+    # the same key so a header only has to loosely match, not equal an
+    # exact literal string byte-for-byte.
+    return re.sub(r'[^a-z0-9]', '', col.strip().lower())
+
+
+def _resolve_faculty_columns(fieldnames):
+    """
+    Maps the CSV's actual header row to the two columns the importer
+    needs, tolerating case/punctuation/whitespace differences (the
+    previous version required the header to equal the exact literal
+    strings "Faculty name" / "Faculty's email ID", so a header that
+    differed by even a capital letter or a stray space failed the whole
+    upload with a raw KeyError instead of a usable message).
+
+    Returns: (name_field, email_field, error) — error is a user-facing
+    string (or None) naming which expected columns weren't found.
+    """
+    name_aliases = {'facultyname', 'name'}
+    email_aliases = {'facultysemailid', 'facultyemailid', 'facultyemail', 'email', 'emailid'}
+
+    name_field = None
+    email_field = None
+    for col in fieldnames or []:
+        normalized = _normalize_header(col)
+        if name_field is None and normalized in name_aliases:
+            name_field = col
+        if email_field is None and normalized in email_aliases:
+            email_field = col
+
+    missing = []
+    if not name_field:
+        missing.append('Faculty name')
+    if not email_field:
+        missing.append('Faculty\'s email ID')
+    if missing:
+        return None, None, f"The following columns are missing in the uploaded file: {', '.join(missing)}"
+    return name_field, email_field, None
+
+
 def import_faculty_list(logged_in_user, file_url, ao_unit):
-    faculty_name_field = "Faculty name"
-    faculty_email_field = "Faculty's email ID"
     file_path = get_file_path(file_url.split('/')[-1])
     #limit_faculty_count = 5
     encoding = detect_csv_encoding(file_path)
     with open(file_path, 'r', newline='', encoding=encoding) as f:
-        rows = list(csv.DictReader(f))
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        faculty_name_field, faculty_email_field, header_err = _resolve_faculty_columns(reader.fieldnames)
+        if header_err:
+            frappe.log_error(title="Faculty upload failure", message=header_err)
+            frappe.publish_realtime(
+                event = "sirb_faculty_import_progress",
+                user = logged_in_user,
+                message = {"progress": 100, "status": header_err, "error": 1}
+            )
+            return
         total_rows = len(rows)
         successful_faculty_count = 0
-        
+
         ao_unit_doc = frappe.get_doc("Academic Organizational Unit", ao_unit)
         if not ao_unit_doc:
             message = {"progress": 100,
                     "status" : "Specified Academic Organizational Unit does not exist"}
             message["error"] =  1
-            print("Sending realtime to ", logged_in_user)                    
+            print("Sending realtime to ", logged_in_user)
             frappe.publish_realtime(
                 event = "sirb_faculty_import_progress",
                 user = logged_in_user,

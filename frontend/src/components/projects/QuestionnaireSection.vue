@@ -12,6 +12,7 @@ const props = defineProps<{
   section: SchemaSection
   allFields: SchemaField[]
   doc: IrbProjectDoc
+  linkTitles?: Record<string, string>
   disabled: boolean
   isFieldVisible: (field: SchemaField) => boolean
   isFieldMandatory: (field: SchemaField) => boolean
@@ -34,9 +35,9 @@ function hasReviewContentAnywhere() {
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 bg-white p-5">
+  <div class="rounded-lg border border-line bg-paper p-5">
     <div class="mb-4 flex items-center justify-between">
-      <h3 v-if="section.label" class="text-sm font-semibold text-gray-900">{{ section.label }}</h3>
+      <h3 v-if="section.label" class="text-sm font-semibold text-charcoal">{{ section.label }}</h3>
       <Button v-if="hasReviewContentAnywhere()" variant="ghost" size="sm" @click="showReview = !showReview">
         {{ showReview ? 'Hide review notes' : 'Show review notes' }}
       </Button>
@@ -49,6 +50,7 @@ function hasReviewContentAnywhere() {
             <SchemaFieldInput
               :field="field"
               :model-value="doc[field.fieldname]"
+              :display-value="linkTitles?.[field.fieldname]"
               :disabled="disabled || Boolean(field.read_only)"
               :required="isFieldMandatory(field)"
               @update:model-value="(v) => emit('update', field.fieldname, v)"

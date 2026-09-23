@@ -16,8 +16,8 @@ function introRole() {
   <div class="mb-6">
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 class="text-xl font-semibold text-gray-900">{{ doc.title || 'Untitled Project' }}</h1>
-        <p class="mt-0.5 text-sm text-gray-500">{{ doc.name }} · Cycle {{ doc.irb_cycle || '—' }}</p>
+        <h1 class="text-xl font-semibold text-charcoal">{{ doc.title || 'Untitled Project' }}</h1>
+        <p class="mt-0.5 text-sm text-muted">{{ doc.name }} · Cycle {{ doc.irb_cycle || '—' }}</p>
       </div>
       <StatusBadge :status="doc.status" />
     </div>

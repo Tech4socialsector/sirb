@@ -11,7 +11,7 @@ const emit = defineEmits<{ action: [status: string] }>()
 </script>
 
 <template>
-  <div v-if="actions.length" class="flex flex-wrap gap-2 rounded-lg border border-gray-200 bg-white p-4">
+  <div v-if="actions.length" class="flex flex-wrap gap-2 rounded-lg border border-line bg-paper p-4">
     <Button
       v-for="action in actions"
       :key="action.targetStatus"

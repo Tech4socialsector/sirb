@@ -6,6 +6,7 @@ import type {
   DrilldownRow,
   FilterOptions,
   RoleWorkload,
+  TrendPoint,
 } from '@/types/admin'
 
 const NS = 'sirb.sirb.page.irb_admin_console.irb_admin_console'
@@ -20,6 +21,10 @@ export function fetchDashboardData(filters: DashboardFilters) {
 
 export function fetchRoleWorkload(filters: DashboardFilters) {
   return call<RoleWorkload>(`${NS}.get_role_workload`, { filters })
+}
+
+export function fetchProjectTrend(filters: DashboardFilters, months = 6) {
+  return call<TrendPoint[]>(`${NS}.get_project_trend`, { filters, months })
 }
 
 export function fetchRecentActivity(filters: DashboardFilters, limit = 25) {

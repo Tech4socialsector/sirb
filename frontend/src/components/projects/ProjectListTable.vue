@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { FeatherIcon } from 'frappe-ui'
+import DataTable, { type DataTableColumn } from '@/components/common/DataTable.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
-import EmptyState from '@/components/common/EmptyState.vue'
+import { fetchStatusChangeHistory } from '@/services/projects'
+import { useTimelineDrawer } from '@/composables/useTimelineDrawer'
 import type { ProjectListRow } from '@/types/project'
 
 const props = defineProps<{
@@ -11,65 +15,103 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
+const { setContext, open: openTimelineDrawer } = useTimelineDrawer()
 
-function openProject(row: ProjectListRow) {
-  const name = row.project_id || row.project_name
+function projectName(row: ProjectListRow) {
+  return row.project_id || row.project_name || ''
+}
+
+function openProject(row: Record<string, unknown>) {
+  const name = projectName(row as unknown as ProjectListRow)
   if (name) router.push({ name: 'project-details', params: { name } })
 }
+
+// "Edit" isn't a separate destination — the project details page already
+// lets you edit any field you have permission to (see ProjectDetails.vue /
+// canEdit), so a distinct Edit button would just point at the same place
+// under a different label. One clear "View" action, plus Timeline since
+// that's genuinely a second, different thing you can do from a row.
+async function viewTimeline(row: ProjectListRow) {
+  const name = projectName(row)
+  if (!name) return
+  setContext({
+    projectName: name,
+    projectTitle: row.project_title,
+    studentName: row.student_name || null,
+    currentStatus: row.project_status,
+    history: [],
+    loading: true,
+  })
+  openTimelineDrawer()
+  try {
+    const history = await fetchStatusChangeHistory(name)
+    setContext({ history, loading: false })
+  } catch {
+    setContext({ loading: false })
+  }
+}
+
+// Student worklists (Mentor/Primary/Secondary Reviewer) always carry
+// student_name; a student's own "My Projects" list never does (it's
+// already scoped to them) — show the column only when it's actually there.
+const hasStudentColumn = computed(() => props.rows.some((r) => r.student_name))
+
+// The worklist endpoints alias the project id as either `project_id` or
+// `project_name` depending on the query — normalize to one stable key so
+// DataTable always has something unique to key rows on.
+const normalizedRows = computed(() => props.rows.map((r) => ({ ...r, _key: r.project_id || r.project_name })))
+
+const columns = computed<DataTableColumn[]>(() => [
+  ...(hasStudentColumn.value ? [{ key: 'student', label: 'Student', path: 'student_name', sortable: true }] : []),
+  { key: 'project', label: 'Project', path: 'project_title', sortable: true },
+  { key: 'cycle', label: 'Cycle', path: 'irb_cycle', sortable: true },
+  { key: 'status', label: 'Status', path: 'project_status', sortable: true },
+  { key: 'updated', label: 'Updated', path: 'last_updated', sortable: true },
+  { key: 'actions', label: '', align: 'right' },
+])
 </script>
 
 <template>
-  <EmptyState
-    v-if="!rows.length"
-    icon="inbox"
-    :title="emptyTitle || 'No projects found'"
-    :description="emptyDescription"
-  />
-  <div v-else class="overflow-hidden rounded-lg border border-gray-200 bg-white">
-    <!-- Desktop table -->
-    <table class="hidden w-full text-left text-sm md:table">
-      <thead class="border-b border-gray-200 bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-        <tr>
-          <th v-if="rows[0]?.student_name" class="px-4 py-2.5 font-medium">Student</th>
-          <th class="px-4 py-2.5 font-medium">Project</th>
-          <th class="px-4 py-2.5 font-medium">Cycle</th>
-          <th class="px-4 py-2.5 font-medium">Status</th>
-          <th class="px-4 py-2.5 font-medium">Updated</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-100">
-        <tr
-          v-for="row in props.rows"
-          :key="row.project_id || row.project_name"
-          class="cursor-pointer hover:bg-gray-50"
-          @click="openProject(row)"
-        >
-          <td v-if="row.student_name" class="px-4 py-3 text-gray-700">{{ row.student_name }}</td>
-          <td class="px-4 py-3 font-medium text-gray-900">{{ row.project_title || '(Untitled)' }}</td>
-          <td class="px-4 py-3 text-gray-500">{{ row.irb_cycle || '—' }}</td>
-          <td class="px-4 py-3"><StatusBadge :status="row.project_status" /></td>
-          <td class="px-4 py-3 text-gray-500">
-            {{ row.last_updated ? new Date(row.last_updated).toLocaleDateString() : '—' }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Mobile cards -->
-    <div class="divide-y divide-gray-100 md:hidden">
-      <button
-        v-for="row in props.rows"
-        :key="row.project_id || row.project_name"
-        class="flex w-full flex-col gap-1.5 p-4 text-left"
-        @click="openProject(row)"
-      >
-        <span v-if="row.student_name" class="text-xs text-gray-500">{{ row.student_name }}</span>
-        <span class="font-medium text-gray-900">{{ row.project_title || '(Untitled)' }}</span>
-        <div class="flex items-center justify-between">
-          <StatusBadge :status="row.project_status" />
-          <span class="text-xs text-gray-400">{{ row.irb_cycle }}</span>
-        </div>
-      </button>
+  <div class="rounded-xl border border-line bg-paper p-6 shadow-card">
+    <div v-if="$slots.tabs" class="-mx-6 -mt-6 mb-5">
+      <slot name="tabs" />
     </div>
+    <DataTable
+      :columns="columns"
+      :rows="normalizedRows as unknown as Record<string, unknown>[]"
+      row-key="_key"
+      clickable-rows
+      :empty-title="emptyTitle || 'No projects found'"
+      :empty-description="emptyDescription"
+      @row-click="openProject"
+    >
+      <template #cell-project="{ value }">
+        <span class="font-medium text-charcoal">{{ value || '(Untitled)' }}</span>
+      </template>
+      <template #cell-cycle="{ value }">{{ value || '—' }}</template>
+      <template #cell-status="{ value }">
+        <StatusBadge :status="value as string" />
+      </template>
+      <template #cell-updated="{ value }">
+        {{ value ? new Date(value as string).toLocaleDateString() : '—' }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-end gap-1">
+          <button
+            class="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-primary transition-colors hover:bg-canvas"
+            @click.stop="openProject(row)"
+          >
+            View
+          </button>
+          <button
+            class="rounded-md p-1.5 text-muted transition-colors hover:bg-canvas hover:text-primary"
+            title="View timeline"
+            @click.stop="viewTimeline(row as unknown as ProjectListRow)"
+          >
+            <FeatherIcon name="clock" class="h-4 w-4" />
+          </button>
+        </div>
+      </template>
+    </DataTable>
   </div>
 </template>

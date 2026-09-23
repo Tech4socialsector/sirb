@@ -103,9 +103,26 @@ def get_reviewers(irb_unit, exclude_faculty_id = None):
     else:
         return min_pr, None
 
+def _get_user_ignoring_perms(name):
+    doc = frappe.get_doc("User", name)
+    doc.flags.ignore_permissions = True
+    return doc
+
+
 def set_mentor_and_reviewer_roles():
     # Make sure that all current mentors and reviewers have the right roles set and
     # those that are not do not have this role.
+    #
+    # This runs from IRBProject.on_change() — i.e. under whichever user
+    # (student/mentor/reviewer) just saved a project — but it syncs role
+    # assignments for OTHER users system-wide based on global project
+    # state, which a non-admin has no doctype permission to do. Without
+    # ignore_permissions, add_roles()/remove_roles() below throws
+    # PermissionError for any non-admin save, which aborts the rest of
+    # on_change() (notifications) and, from the API caller's point of
+    # view, makes the whole save() call look like it failed even though
+    # the status field itself was already committed — the frontend never
+    # gets a clean response to refresh from.
 
     # Get all current primary reviewers
     query = '''
@@ -116,7 +133,7 @@ def set_mentor_and_reviewer_roles():
     if result:
         prs = [pr[0] for pr in result]
         print("Primary reviewers - ", prs)
-        pr_docs = {p: frappe.get_doc("User", p) for p in prs}
+        pr_docs = {p: _get_user_ignoring_perms(p) for p in prs}
 
         print(pr_docs)
         for _,p in pr_docs.items():
@@ -131,7 +148,7 @@ def set_mentor_and_reviewer_roles():
             },
             pluck="name"
         )        
-        all_prs_docs = {p: frappe.get_doc("User", p) for p in all_prs}
+        all_prs_docs = {p: _get_user_ignoring_perms(p) for p in all_prs}
         print(pr_docs, all_prs_docs)
         for id, user in all_prs_docs.items():
             if id not in pr_docs:
@@ -147,7 +164,7 @@ def set_mentor_and_reviewer_roles():
     if result:
         srs = [sr[0] for sr in result]
         print("Secondary reviewers - ", srs)
-        secondary_reviewers = {s: frappe.get_doc("User", s) for s in srs}
+        secondary_reviewers = {s: _get_user_ignoring_perms(s) for s in srs}
         for _, s in secondary_reviewers.items():
             s.add_roles("Secondary IRB Reviewer")
                                 
@@ -159,7 +176,7 @@ def set_mentor_and_reviewer_roles():
             },
             pluck="name"
         )
-        all_srs_docs = {s: frappe.get_doc("User", s) for s in all_srs}
+        all_srs_docs = {s: _get_user_ignoring_perms(s) for s in all_srs}
         for _, user in all_srs_docs.items():
             if user not in secondary_reviewers:
                 user.remove_roles("Secondary IRB Reviewer")
@@ -174,7 +191,7 @@ def set_mentor_and_reviewer_roles():
     if result:
         current_mentor_ids = [m[0] for m in result]
         #print("Faculty mentors - ", current_mentor_ids)
-        current_mentors = {cm: frappe.get_doc("User", cm) for cm in current_mentor_ids}
+        current_mentors = {cm: _get_user_ignoring_perms(cm) for cm in current_mentor_ids}
         #print("Faculty mentors - ", current_mentors)
         for _, m in current_mentors.items():
             m.add_roles("Faculty Mentor")
@@ -188,7 +205,7 @@ def set_mentor_and_reviewer_roles():
             pluck="name"
         )        
         #print(all_mentors)
-        all_mentor_docs = {m: frappe.get_doc("User", m) for m in all_mentors}
+        all_mentor_docs = {m: _get_user_ignoring_perms(m) for m in all_mentors}
         #print(all_mentor_docs)
         for _, user in all_mentor_docs.items():
             if user not in current_mentors:

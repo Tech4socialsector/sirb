@@ -13,6 +13,26 @@ import frappe
 from sirb.api import get_irb_project_roles, get_project_students
 
 
+def _link_titles(doc):
+	"""Maps each populated Link fieldname on `doc` to the linked doc's
+	display title (its title_field, e.g. Faculty.full_name), so the
+	frontend never has to show raw autoincrement IDs like "8" for
+	fields such as faculty_mentor/primary_reviewer/secondary_reviewer.
+	"""
+	titles = {}
+	for df in doc.meta.fields:
+		if df.fieldtype != "Link" or not doc.get(df.fieldname):
+			continue
+		value = doc.get(df.fieldname)
+		try:
+			target_meta = frappe.get_meta(df.options)
+			title_field = target_meta.get_title_field()
+			titles[df.fieldname] = frappe.db.get_value(df.options, value, title_field) or value
+		except Exception:
+			titles[df.fieldname] = value
+	return titles
+
+
 @frappe.whitelist()
 def get_project_detail(project_name):
 	"""Single aggregated payload for the Project Details page: the doc
@@ -29,6 +49,7 @@ def get_project_detail(project_name):
 
 	return {
 		"doc": doc.as_dict(),
+		"link_titles": _link_titles(doc),
 		"roles": roles,
 		"students": students,
 		"meta": {

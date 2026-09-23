@@ -63,7 +63,7 @@ export function useAdminDashboard() {
         fetchRoleWorkload(filters),
         fetchRecentActivity(filters),
         fetchProjectTrend(filters),
-        fetchDrilldownStudents({ filters }),
+        fetchDrilldownStudents({ filters, per_project: true }),
       ])
       dashboard.value = dashboardData
       workload.value = workloadData
@@ -77,8 +77,10 @@ export function useAdminDashboard() {
     }
   }
 
+  // Per project, so a drill-down lists as many rows as the count clicked
+  // (group projects used to appear once per student).
   async function drilldown(args: DrilldownArgs) {
-    return fetchDrilldownStudents(args)
+    return fetchDrilldownStudents({ ...args, per_project: true })
   }
 
   return {

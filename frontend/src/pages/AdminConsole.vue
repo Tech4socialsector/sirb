@@ -63,7 +63,8 @@ async function onApplyFilters(newFilters: DashboardFilters) {
 // Maps a drill-down context to an existing worklist route, where one
 // exists — never invents a new "all projects" page. Left undefined (no
 // "Open Projects" button) when nothing in the app already shows that slice.
-function routeFor(args: { pending_group?: string; status_key?: string }): string | undefined {
+function routeFor(args: { pending_group?: string; status_key?: string; status_keys?: string[] }): string | undefined {
+  if (args.status_keys?.includes('primary_reviewer')) return '/sirb/review/primary'
   if (args.pending_group === 'mentor_action_required') return '/sirb/review/mentor'
   if (args.pending_group === 'reviewer_action_required') return '/sirb/review/primary'
   if (args.status_key === 'primary_reviewer') return '/sirb/review/primary'
@@ -75,6 +76,9 @@ function routeFor(args: { pending_group?: string; status_key?: string }): string
 async function openDrilldown(args: {
   irb_unit?: string
   status_key?: string
+  /** Several statuses at once; `label` names them in the dialog title. */
+  status_keys?: string[]
+  label?: string
   pending_group?: string
   role?: string
   faculty?: string
@@ -91,7 +95,10 @@ async function openDrilldown(args: {
     drillArgs.irb_unit = args.irb_unit
     titleParts.push(p?.programme || args.irb_unit)
   }
-  if (args.status_key) {
+  if (args.status_keys?.length) {
+    drillArgs.status_keys = args.status_keys
+    titleParts.push(args.label || args.status_keys.join(', ').replace(/_/g, ' '))
+  } else if (args.status_key) {
     drillArgs.status = dashboard.value?.status_key_map[args.status_key]
     titleParts.push(args.status_key.replace(/_/g, ' '))
   } else if (args.pending_group) {
@@ -134,9 +141,11 @@ const pipelineStages = computed<PipelineStage[]>(() => {
   ]
 })
 
+// Each stage opens exactly the statuses its count sums (see pipelineStages).
 function onPipelineSelect(key: string) {
-  if (key === 'primary_review') openDrilldown({ status_key: 'primary_reviewer' })
+  if (key === 'primary_review') openDrilldown({ status_keys: ['primary_reviewer', 'reviewer_feedback'], label: 'Primary Review' })
   else if (key === 'secondary_review') openDrilldown({ status_key: 'secondary_reviewer' })
+  else if (key === 'final_approval_required') openDrilldown({ status_keys: ['final_approval', 'provisional'], label: 'Final Approval' })
   else openDrilldown({ pending_group: key })
 }
 
@@ -274,6 +283,10 @@ async function loadRecordCounts() {
         <PipelineFlow :stages="pipelineStages" @select="onPipelineSelect" />
       </div>
 
+      <div class="mb-5">
+        <ProgrammeAnalyticsTable :rows="dashboard.programme_matrix" @drill="openDrilldown" />
+      </div>
+
       <div class="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <TrendChart :points="trend" />
         <div class="rounded-xl border border-line bg-paper p-6 shadow-card">
@@ -285,10 +298,6 @@ async function loadRecordCounts() {
 
       <div class="mb-5">
         <AttentionList :rows="attentionRows" />
-      </div>
-
-      <div class="mb-5">
-        <ProgrammeAnalyticsTable :rows="dashboard.programme_matrix" @drill="openDrilldown" />
       </div>
 
       <div class="mb-5">

@@ -5,6 +5,8 @@ import json
 
 import frappe
 
+from sirb.sirb_api import worklists
+
 # Canonical status list — must match the "status" Select field options on
 # IRB Project exactly. This is the single source of truth for workflow
 # stage; the dashboard never invents or duplicates status values.
@@ -55,12 +57,12 @@ PENDING_ACTION_GROUPS = {
 
 # Statuses that represent "pending" work for each named role, used for the
 # per-person mentor/reviewer workload cards.
-MENTOR_PENDING_STATUSES = ["Awaiting Faculty mentor approval"]
-PRIMARY_REVIEWER_PENDING_STATUSES = [
-	"Awaiting primary reviewer comments to secondary reviewer",
-	"Awaiting reviewer feedback to student",
-]
-SECONDARY_REVIEWER_PENDING_STATUSES = ["Awaiting secondary reviewer comments to primary reviewer"]
+# Same lists the reviewers' own worklists use, so the workload panel's
+# counts match what each person sees in their Pending tab (this file's own
+# copy had drifted: it left "Awaiting final approval" out for primaries).
+MENTOR_PENDING_STATUSES = [worklists.MENTOR_PENDING_STATUS]
+PRIMARY_REVIEWER_PENDING_STATUSES = worklists.PRIMARY_REVIEWER_PENDING_STATUSES
+SECONDARY_REVIEWER_PENDING_STATUSES = [worklists.SECONDARY_REVIEWER_PENDING_STATUS]
 
 ALLOWED_ROLES = {"System Manager", "Administrator"}
 
@@ -151,10 +153,13 @@ def get_dashboard_data(filters=None):
 	where_extra, params = _build_filters_clause(filters)
 
 	# ---- Programme x status matrix -------------------------------------------------
+	# Distinct projects: BASE_JOIN has one row per Student Project Mapping, so
+	# count(*) counted a group project once per student. A project has one
+	# unit and one status, so these per-group counts still sum exactly.
 	rows = frappe.db.sql(
 		f"""
 		select iu.name as irb_unit, iu.ao_name as programme, p.status as status,
-			count(*) as cnt
+			count(distinct p.name) as cnt
 		{BASE_JOIN}{where_extra}
 		group by iu.name, p.status
 		""",
@@ -181,12 +186,13 @@ def get_dashboard_data(filters=None):
 
 	# ---- Overall status counts (for cards + chart) ----------------------------------
 	status_counts = {k: 0 for k in STATUS_KEY_MAP}
-	total_students = 0
 	for r in rows:
 		status_key = KEY_BY_STATUS.get(r["status"])
 		if status_key:
 			status_counts[status_key] += r["cnt"]
-		total_students += r["cnt"]
+
+	# Student-project memberships (a student on two projects counts twice).
+	total_students = frappe.db.sql(f"""select count(*) {BASE_JOIN}{where_extra}""", params)[0][0]
 
 	# ---- Pending action groups -------------------------------------------------------
 	pending_actions = {}
@@ -195,9 +201,7 @@ def get_dashboard_data(filters=None):
 			status_counts[KEY_BY_STATUS[s]] for s in statuses if KEY_BY_STATUS.get(s)
 		)
 
-	# ---- Distinct project counts (total_students counts one row per
-	# student, so a group project with 3 students counts 3x there — this
-	# is the actual project count the "Total Projects" KPI needs) --------
+	# ---- Distinct project counts ---------------------------------------------------
 	total_projects = frappe.db.sql(
 		f"""select count(distinct p.name) as cnt {BASE_JOIN}{where_extra}""",
 		params,
@@ -352,7 +356,7 @@ def get_role_workload(filters=None):
 
 		rows = frappe.db.sql(
 			f"""
-			select f.name as faculty_id, f.full_name as faculty_name, count(*) as pending_count
+			select f.name as faculty_id, f.full_name as faculty_name, count(distinct p.name) as pending_count
 			from `tabStudent Project Mapping` as sp
 			join `tabIRB Project` as p on sp.irb_project = p.name
 			join `tabStudent` as s on sp.student = s.name
@@ -377,18 +381,36 @@ def get_role_workload(filters=None):
 
 
 @frappe.whitelist()
-def get_drilldown_students(filters=None, status=None, irb_unit=None, pending_group=None, role_person=None):
+def get_drilldown_students(
+	filters=None,
+	status=None,
+	irb_unit=None,
+	pending_group=None,
+	role_person=None,
+	status_keys=None,
+	per_project=False,
+):
 	"""Row-level drill-down for the modal table. Accepts an explicit status,
 	an irb_unit, a pending_group key (mapped to its underlying statuses), or
 	a role_person filter (mentor/primary_reviewer/secondary_reviewer + Faculty
 	id, mapped to that role's pending statuses) — combined with the active
-	dashboard filters. With none of these, returns every active student.
+	dashboard filters. `status_keys` (STATUS_KEY_MAP keys) selects several
+	statuses at once, for cards that sum more than one status. With none of
+	these, returns every active student.
+
+	One row per student-project membership by default (Student & Project
+	Management and the Desk page list students). `per_project` returns one
+	row per project with its members aggregated, so the row count matches
+	the project counts the Admin Console drills from.
 	"""
+	per_project = frappe.utils.cint(per_project)
 	_check_permission()
 	if isinstance(filters, str):
 		filters = json.loads(filters) if filters else {}
 	if isinstance(role_person, str) and role_person.startswith("{"):
 		role_person = json.loads(role_person)
+	if isinstance(status_keys, str):
+		status_keys = json.loads(status_keys) if status_keys else None
 	filters = dict(filters or {})
 
 	if irb_unit:
@@ -399,7 +421,15 @@ def get_drilldown_students(filters=None, status=None, irb_unit=None, pending_gro
 	where_extra, params = _build_filters_clause(filters)
 
 	extra_clause = ""
-	if pending_group and pending_group in PENDING_ACTION_GROUPS:
+	multi_statuses = [STATUS_KEY_MAP[k] for k in (status_keys or []) if k in STATUS_KEY_MAP]
+	if multi_statuses:
+		placeholders = []
+		for i, st in enumerate(multi_statuses):
+			pkey = f"sk_status_{i}"
+			params[pkey] = st
+			placeholders.append(f"%({pkey})s")
+		extra_clause = f" and p.status in ({','.join(placeholders)})"
+	elif pending_group and pending_group in PENDING_ACTION_GROUPS:
 		statuses = PENDING_ACTION_GROUPS[pending_group]
 		placeholders = []
 		for i, st in enumerate(statuses):
@@ -424,11 +454,19 @@ def get_drilldown_students(filters=None, status=None, irb_unit=None, pending_gro
 			params["role_person_id"] = role_person["faculty"]
 			extra_clause = f" and p.{field} = %(role_person_id)s and p.status in ({','.join(placeholders)})"
 
+	if per_project:
+		student_fields = """min(s.name) as student_id,
+			group_concat(distinct s.full_name order by s.full_name separator ', ') as student_name,
+			count(distinct s.name) as student_count"""
+		group_by = "group by p.name"
+	else:
+		student_fields = "s.name as student_id, s.full_name as student_name, 1 as student_count"
+		group_by = ""
+
 	rows = frappe.db.sql(
 		f"""
 		select
-			s.name as student_id,
-			s.full_name as student_name,
+			{student_fields},
 			iu.ao_name as programme,
 			p.name as project_id,
 			p.title as project_title,
@@ -446,6 +484,7 @@ def get_drilldown_students(filters=None, status=None, irb_unit=None, pending_gro
 		left join `tabFaculty` as sr on p.secondary_reviewer = sr.name
 		where (sp.status = "active" or p.status = "Approved")
 		{where_extra}{extra_clause}
+		{group_by}
 		order by p.modified desc
 		limit 1000
 		""",

@@ -37,6 +37,10 @@ export interface DrilldownArgs {
   irb_unit?: string
   pending_group?: string
   role_person?: { role: string; faculty: string }
+  /** Several STATUS_KEY_MAP keys at once, for cards that sum statuses. */
+  status_keys?: string[]
+  /** One row per project (members aggregated) instead of per student. */
+  per_project?: boolean
 }
 
 export function fetchDrilldownStudents(args: DrilldownArgs) {

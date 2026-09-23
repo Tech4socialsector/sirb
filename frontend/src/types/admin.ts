@@ -68,7 +68,9 @@ export interface ActivityRow {
 
 export interface DrilldownRow {
   student_id: string
+  /** Comma-separated members when fetched with `per_project`. */
   student_name: string
+  student_count?: number
   programme: string
   project_id: string
   project_title: string

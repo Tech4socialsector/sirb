@@ -163,6 +163,7 @@ class IRBAdminConsole {
 		$f.html(`
 			<div class="awd-filter-bar">
 				<div class="awd-filter-field" data-field="irb_unit"><label>Programme / Course</label></div>
+				<div class="awd-filter-field" data-field="campus"><label>Campus</label></div>
 				<div class="awd-filter-field" data-field="academic_year"><label>Academic Year</label></div>
 				<div class="awd-filter-field" data-field="irb_cycle"><label>Batch / Cycle</label></div>
 				<div class="awd-filter-field" data-field="status">
@@ -223,6 +224,11 @@ class IRBAdminConsole {
 			"irb_unit",
 			"Programme / Course",
 			opts.programmes.map((p) => ({ value: p.name, label: p.ao_name || p.name }))
+		);
+		make_multiselect(
+			"campus",
+			"Campus",
+			opts.campuses.map((c) => ({ value: c.name, label: c.ao_name || c.name }))
 		);
 		make_multiselect(
 			"academic_year",

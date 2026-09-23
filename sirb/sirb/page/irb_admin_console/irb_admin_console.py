@@ -110,6 +110,7 @@ def _build_filters_clause(filters):
 	add_multi("faculty_mentor", "p.faculty_mentor")
 	add_multi("primary_reviewer", "p.primary_reviewer")
 	add_multi("secondary_reviewer", "p.secondary_reviewer")
+	add_multi("campus", "campus_ao.name")
 
 	if filters.get("status"):
 		clauses.append("p.status = %(status)s")
@@ -134,6 +135,11 @@ BASE_JOIN = """
 	join `tabIRB Project` as p on sp.irb_project = p.name
 	join `tabStudent` as s on sp.student = s.name
 	join `tabIRB Unit` as iu on p.irb_unit = iu.name
+	join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+	left join `tabAcademic Organizational Unit` as campus_ao
+		on campus_ao.ao_type = "Campus"
+		and campus_ao.lft <= ao_unit.lft
+		and campus_ao.rgt >= ao_unit.rgt
 	where (sp.status = "active" or p.status = "Approved")
 """
 
@@ -220,6 +226,19 @@ def get_filter_options():
 		as_dict=True,
 	)
 
+	campuses = frappe.db.sql(
+		"""select distinct campus_ao.name, campus_ao.ao_name
+		from `tabIRB Unit` as iu
+		join `tabIRB Project` as p on p.irb_unit = iu.name
+		join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+		join `tabAcademic Organizational Unit` as campus_ao
+			on campus_ao.ao_type = "Campus"
+			and campus_ao.lft <= ao_unit.lft
+			and campus_ao.rgt >= ao_unit.rgt
+		order by campus_ao.ao_name""",
+		as_dict=True,
+	)
+
 	academic_years = frappe.db.sql(
 		"""select distinct academic_year from `tabStudent`
 		where academic_year is not null and academic_year != ''
@@ -255,6 +274,7 @@ def get_filter_options():
 
 	return {
 		"programmes": programmes,
+		"campuses": campuses,
 		"academic_years": [d["academic_year"] for d in academic_years],
 		"cycles": [d["irb_cycle"] for d in cycles],
 		"mentors": mentors,
@@ -289,6 +309,11 @@ def get_role_workload(filters=None):
 			join `tabIRB Project` as p on sp.irb_project = p.name
 			join `tabStudent` as s on sp.student = s.name
 			join `tabIRB Unit` as iu on p.irb_unit = iu.name
+			join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+			left join `tabAcademic Organizational Unit` as campus_ao
+				on campus_ao.ao_type = "Campus"
+				and campus_ao.lft <= ao_unit.lft
+				and campus_ao.rgt >= ao_unit.rgt
 			join `tabFaculty` as f on p.{role_field} = f.name
 			where sp.status = "active"
 			and p.status in ({','.join(placeholders)})
@@ -373,6 +398,11 @@ def get_drilldown_students(filters=None, status=None, irb_unit=None, pending_gro
 		join `tabIRB Project` as p on sp.irb_project = p.name
 		join `tabStudent` as s on sp.student = s.name
 		join `tabIRB Unit` as iu on p.irb_unit = iu.name
+		join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+		left join `tabAcademic Organizational Unit` as campus_ao
+			on campus_ao.ao_type = "Campus"
+			and campus_ao.lft <= ao_unit.lft
+			and campus_ao.rgt >= ao_unit.rgt
 		left join `tabFaculty` as fm on p.faculty_mentor = fm.name
 		left join `tabFaculty` as pr on p.primary_reviewer = pr.name
 		left join `tabFaculty` as sr on p.secondary_reviewer = sr.name

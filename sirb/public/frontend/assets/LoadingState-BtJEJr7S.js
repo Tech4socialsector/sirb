@@ -1,0 +1,2 @@
+import{$ as e,Qn as t,Rt as n,V as r,W as i,Z as a,ir as o}from"./runtime-dom.esm-bundler-BJ-qJ23c.js";import{d as s}from"./index-uwtqbP6P.js";var c={class:`flex flex-col items-center justify-center gap-3 py-16 text-center text-muted`},l={class:`text-sm`},u=e({__name:`LoadingState`,props:{label:{default:`Loading…`}},setup(e){return(u,d)=>(n(),i(`div`,c,[a(t(s),{class:`h-6 w-6`}),r(`p`,l,o(e.label),1)]))}});export{u as t};
+//# sourceMappingURL=LoadingState-BtJEJr7S.js.map

@@ -24,7 +24,7 @@ const { isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isAn
 // introduce new pages per role (see architecture note: one shared
 // ProjectDetails.vue + role-scoped worklists, not five separate apps).
 const groups = computed<NavGroup[]>(() => {
-  const list: NavGroup[] = [{ label: null, items: [{ label: 'Dashboard', to: '/sirb', icon: 'home' }] }]
+  const list: NavGroup[] = [{ label: null, items: [{ label: 'Home', to: '/sirb', icon: 'home' }] }]
 
   const myWork: NavItem[] = []
   if (isStudent.value) myWork.push({ label: 'My Projects', to: '/sirb/my-projects', icon: 'file-text' })

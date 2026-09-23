@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
     path: '/sirb',
     name: 'dashboard',
     component: () => import('@/pages/Dashboard.vue'),
-    meta: { title: 'Dashboard' },
+    meta: { title: 'Home' },
   },
   {
     path: '/sirb/my-projects',

@@ -107,8 +107,15 @@ const columns = computed<DataTableColumn[]>(() => [
         </div>
       </template>
       <template #cell-cycle="{ value }">{{ value || '—' }}</template>
-      <template #cell-status="{ value }">
-        <StatusBadge :status="value as string" />
+      <template #cell-status="{ row, value }">
+        <div class="flex flex-col items-start gap-1">
+          <StatusBadge :status="value as string" />
+          <!-- Only the Dashboard's rows carry `needs_action`. -->
+          <span v-if="row.needs_action" class="inline-flex items-center gap-1 text-xs font-medium text-warning">
+            <FeatherIcon name="alert-circle" class="h-3.5 w-3.5" />
+            Needs your action
+          </span>
+        </div>
       </template>
       <template #cell-updated="{ value }">
         {{ value ? new Date(value as string).toLocaleDateString() : '—' }}

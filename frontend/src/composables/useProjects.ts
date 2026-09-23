@@ -1,4 +1,5 @@
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ApiError } from '@/services/api'
 import type { ProjectListRow } from '@/types/project'
 import type { WorklistBucket } from '@/services/projects'
@@ -19,7 +20,23 @@ export function useProjects(fetcher: (bucket: WorklistBucket) => Promise<Project
   })
   const loading = ref(false)
   const error = ref<ApiError | null>(null)
-  const bucket = ref<WorklistBucket>('pending')
+  // The active tab lives in `?tab=` so dashboard cards can deep-link to a
+  // tab, and Back/Forward and reloads keep it.
+  const route = useRoute()
+  const router = useRouter()
+  const tabFromQuery = (): WorklistBucket => {
+    const t = route.query.tab
+    return typeof t === 'string' && (BUCKETS as string[]).includes(t) ? (t as WorklistBucket) : 'pending'
+  }
+  const bucket = ref<WorklistBucket>(tabFromQuery())
+  watch(() => route.query.tab, () => (bucket.value = tabFromQuery()))
+  watch(bucket, (b) => {
+    if (tabFromQuery() === b) return
+    const query = { ...route.query }
+    if (b === 'pending') delete query.tab
+    else query.tab = b
+    router.replace({ query })
+  })
 
   const rows = computed(() => buckets[bucket.value])
   const counts = computed(() => ({

@@ -25,6 +25,12 @@ PRIMARY_REVIEWER_PENDING_STATUSES = [
 SECONDARY_REVIEWER_PENDING_STATUS = "Awaiting secondary reviewer comments to primary reviewer"
 MENTOR_PENDING_STATUS = "Awaiting Faculty mentor approval"
 
+# Approving a project flips its Student Project Mapping rows to "inactive"
+# (see IRBProject.on_change), so a plain `sp.status = 'active'` filter made
+# every "Approved" worklist tab permanently empty. Same condition as the
+# student list and the Anchor reports.
+ACTIVE_OR_APPROVED = "(sp.status = 'active' or p.status = 'Approved')"
+
 # One row per project: a group project has several Student Project Mapping
 # rows, so members are aggregated rather than returned as duplicate rows.
 PROJECT_ROW_FIELDS = """
@@ -49,7 +55,7 @@ def _role_scoped_projects(role_field, doc, status_clause, status_params=None):
 		params.update(status_params)
 	query = (
 		PROJECT_ROW_FIELDS.format(role_join=f"p.{role_field} = f.name")
-		+ " where f.system_user = %(system_user)s and sp.status = 'active' " + status_clause
+		+ " where f.system_user = %(system_user)s and " + ACTIVE_OR_APPROVED + " " + status_clause
 		+ " group by p.name order by p.modified desc"
 	)
 	return frappe.db.sql(query, params, as_dict=True)
@@ -173,3 +179,87 @@ def get_my_pending_counts():
 		counts["student_group_projects"] = sum(1 for p in student_projects if p.student_count > 1)
 
 	return counts
+
+
+# (dashboard key, Frappe role that grants it, get_logged_in_doc key,
+#  IRB Project field, pending statuses, worklist route). The Frappe role and
+# the get_logged_in_doc key differ for reviewers ("Primary IRB Reviewer" vs
+# "Primary Reviewer"), so both are listed.
+DASHBOARD_ROLES = [
+	("mentor", "Faculty Mentor", "Faculty Mentor", "faculty_mentor", [MENTOR_PENDING_STATUS], "/sirb/review/mentor"),
+	(
+		"primary_reviewer",
+		"Primary IRB Reviewer",
+		"Primary Reviewer",
+		"primary_reviewer",
+		PRIMARY_REVIEWER_PENDING_STATUSES,
+		"/sirb/review/primary",
+	),
+	(
+		"secondary_reviewer",
+		"Secondary IRB Reviewer",
+		"Secondary Reviewer",
+		"secondary_reviewer",
+		[SECONDARY_REVIEWER_PENDING_STATUS],
+		"/sirb/review/secondary",
+	),
+]
+
+
+def _role_bucket_counts(role_field, doc, pending_statuses):
+	"""Pending / in-progress / approved counts in one query. Same joins and
+	scoping as _role_scoped_projects, so each number equals the length of
+	the matching worklist tab."""
+	placeholders = {f"status{i}": s for i, s in enumerate(pending_statuses)}
+	pending_in = ", ".join(f"%({k})s" for k in placeholders)
+	row = frappe.db.sql(
+		f"""select
+			count(distinct case when p.status in ({pending_in}) then p.name end) as pending,
+			count(distinct case when p.status != 'Approved' then p.name end) as in_progress,
+			count(distinct case when p.status = 'Approved' then p.name end) as approved
+		from tabStudent as s
+		join `tabStudent Project Mapping` as sp on sp.student = s.name
+		join `tabIRB Project` as p on sp.irb_project = p.name
+		join tabFaculty as f on p.{role_field} = f.name
+		where f.system_user = %(system_user)s and {ACTIVE_OR_APPROVED}""",
+		{"system_user": doc.system_user, **placeholders},
+		as_dict=True,
+	)[0]
+	return {k: int(row[k] or 0) for k in ("pending", "in_progress", "approved")}
+
+
+@frappe.whitelist()
+def get_my_dashboard(recent_limit=5):
+	"""Everything the Dashboard shows, in one request: for each mentor /
+	reviewer role the user holds, the three worklist-tab counts plus their
+	most recently updated in-progress projects (each flagged with whether
+	it is waiting on *this* user), and the student's own project counts.
+	"""
+	recent_limit = max(1, min(int(recent_limit or 5), 20))
+	user_roles = set(frappe.get_roles())
+	roles = []
+
+	for key, role, doc_key, field, pending_statuses, route in DASHBOARD_ROLES:
+		if role not in user_roles:
+			continue
+		doc = get_logged_in_doc(doc_key)
+		if not doc:
+			continue
+		recent = _role_scoped_projects(field, doc, "and p.status != 'Approved'")
+		for row in recent:
+			row["needs_action"] = row.project_status in pending_statuses
+		# Projects waiting on this user first; the stable sort keeps the
+		# query's most-recently-updated order within each group.
+		recent = sorted(recent, key=lambda r: not r["needs_action"])[:recent_limit]
+		roles.append({"key": key, "route": route, "counts": _role_bucket_counts(field, doc, pending_statuses), "recent": recent})
+
+	student = None
+	if get_logged_in_doc("Student"):
+		projects = get_student_projects()
+		student = {
+			"total": len(projects),
+			"group": sum(1 for p in projects if (p.student_count or 0) > 1),
+			"approved": sum(1 for p in projects if p.project_status == "Approved"),
+		}
+
+	return {"roles": roles, "student": student}

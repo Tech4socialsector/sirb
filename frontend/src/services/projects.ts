@@ -25,8 +25,20 @@ export function fetchSecondaryReviewerProjects(bucket: WorklistBucket = 'pending
   return call<ProjectListRow[]>('sirb.sirb_api.worklists.get_secondary_reviewer_projects', { bucket })
 }
 
-export function fetchMyPendingCounts() {
-  return call<Record<string, number>>('sirb.sirb_api.worklists.get_my_pending_counts')
+export interface DashboardRoleSummary {
+  key: 'mentor' | 'primary_reviewer' | 'secondary_reviewer'
+  route: string
+  counts: { pending: number; in_progress: number; approved: number }
+  recent: (ProjectListRow & { needs_action: boolean })[]
+}
+
+export interface DashboardPayload {
+  roles: DashboardRoleSummary[]
+  student: { total: number; group: number; approved: number } | null
+}
+
+export function fetchMyDashboard() {
+  return call<DashboardPayload>('sirb.sirb_api.worklists.get_my_dashboard')
 }
 
 export function fetchProjectDetail(projectName: string) {

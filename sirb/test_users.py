@@ -19,6 +19,8 @@ TEST_USERS = [
 	# Teammates for the group projects below.
 	("sirb.student2@example.com", "Test Student Two", ["Student"], "Student"),
 	("sirb.student3@example.com", "Test Student Three", ["Student"], "Student"),
+	("sirb.student4@example.com", "Test Student Four", ["Student"], "Student"),
+	("sirb.student5@example.com", "Test Student Five", ["Student"], "Student"),
 	("sirb.mentor@example.com", "Test Mentor", ["Faculty Member", "Faculty Mentor"], "Faculty"),
 	(
 		"sirb.primary@example.com",
@@ -38,22 +40,25 @@ TEST_USERS = [
 COMMITTEE_USERS = ["sirb.primary@example.com", "sirb.secondary@example.com"]
 
 PROJECT_PREFIX = "[TEST] "
-# title, status, member emails, has primary reviewer
+S1, S2, S3, S4, S5 = (f"sirb.student{n}@example.com" for n in ("", "2", "3", "4", "5"))
+# title, status, member emails, reviewers assigned: None | "primary" | "both"
 TEST_PROJECTS = [
-	("Solo: Reading habits survey", "Awaiting proposal completion by student", ["sirb.student@example.com"], False),
-	("Solo: Campus water audit", "Awaiting Faculty mentor approval", ["sirb.student@example.com"], False),
-	(
-		"Group: Street vendor livelihoods",
-		"Awaiting reviewer feedback to student",
-		["sirb.student@example.com", "sirb.student2@example.com", "sirb.student3@example.com"],
-		True,
-	),
-	(
-		"Group: Bird census of Sarjapur lake",
-		"Approved",
-		["sirb.student@example.com", "sirb.student2@example.com"],
-		True,
-	),
+	("Solo: Reading habits survey", "Awaiting proposal completion by student", [S1], None),
+	("Solo: Campus water audit", "Awaiting Faculty mentor approval", [S1], None),
+	("Group: Street vendor livelihoods", "Awaiting reviewer feedback to student", [S1, S2, S3], "primary"),
+	("Group: Bird census of Sarjapur lake", "Approved", [S1, S2], "primary"),
+	# Solo projects, one per workflow stage.
+	("Solo: Mobile phone use among teenagers", "Awaiting primary reviewer comments to secondary reviewer", [S2], "both"),
+	("Solo: Library footfall study", "Awaiting final approval", [S3], "primary"),
+	("Solo: Mid-day meal nutrition", "Awaiting secondary reviewer comments to primary reviewer", [S4], "both"),
+	("Solo: Commute time and wellbeing", "Awaiting student correction for mentor feedback", [S5], None),
+	("Solo: Household waste segregation", "Approved", [S4], "primary"),
+	# Group projects, one per workflow stage.
+	("Group: Urban heat islands in Bengaluru", "Awaiting reviewer feedback to student", [S2, S4], "primary"),
+	("Group: Local language newspapers", "Awaiting Faculty mentor approval", [S3, S5], None),
+	("Group: Tribal health practices", "Awaiting secondary reviewer comments to primary reviewer", [S1, S4, S5], "both"),
+	("Group: Informal credit networks", "Provisionally approved", [S2, S3, S5], "both"),
+	("Group: Rainwater harvesting adoption", "Approved", [S3, S4], "both"),
 ]
 
 
@@ -129,7 +134,8 @@ def _ensure_projects():
 		return
 	mentor = frappe.db.get_value("Faculty", {"system_user": "sirb.mentor@example.com"})
 	primary = frappe.db.get_value("Faculty", {"system_user": "sirb.primary@example.com"})
-	for title, status, members, has_reviewer in TEST_PROJECTS:
+	secondary = frappe.db.get_value("Faculty", {"system_user": "sirb.secondary@example.com"})
+	for title, status, members, reviewers in TEST_PROJECTS:
 		title = PROJECT_PREFIX + title
 		if frappe.db.exists("IRB Project", {"title": title}):
 			continue
@@ -143,8 +149,9 @@ def _ensure_projects():
 				"irb_unit": irb_unit,
 				"irb_cycle": "August 2026",
 				"faculty_mentor": mentor,
-				"primary_reviewer": primary if has_reviewer else None,
-				"num_reviewers": "1",
+				"primary_reviewer": primary if reviewers else None,
+				"secondary_reviewer": secondary if reviewers == "both" else None,
+				"num_reviewers": "2" if reviewers == "both" else "1",
 				"project_domain": "Humans",
 				"i_hereby_confirm_the_above": 1,
 			}

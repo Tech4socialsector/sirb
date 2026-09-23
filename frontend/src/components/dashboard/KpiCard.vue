@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { FeatherIcon } from 'frappe-ui'
+import type { RouteLocationRaw } from 'vue-router'
 
 const props = withDefaults(
   defineProps<{
@@ -11,7 +12,7 @@ const props = withDefaults(
      * "+8 this month" or "6 need action". Omit rather than invent one. */
     support?: string
     tone?: 'default' | 'warning' | 'success' | 'info'
-    to?: string
+    to?: RouteLocationRaw
     /** Set when the card is clickable via @click rather than `to` — adds
      * the same hover affordance so it doesn't look inert. */
     clickable?: boolean

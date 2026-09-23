@@ -1,99 +1,155 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { FeatherIcon } from 'frappe-ui'
 import AppShell from '@/components/layout/AppShell.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
 import DashboardGreeting from '@/components/dashboard/DashboardGreeting.vue'
 import KpiCard from '@/components/dashboard/KpiCard.vue'
+import ProjectListTable from '@/components/projects/ProjectListTable.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRoles } from '@/composables/useRoles'
-import { fetchMyPendingCounts } from '@/services/projects'
+import { ApiError } from '@/services/api'
+import { fetchMyDashboard, type DashboardPayload, type DashboardRoleSummary } from '@/services/projects'
 
-const router = useRouter()
 const { currentUser } = useAuth()
 const { isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isAdmin, isAnchor } = useRoles()
 
-const counts = ref<Record<string, number>>({})
+const data = ref<DashboardPayload | null>(null)
 const loading = ref(true)
+const error = ref<ApiError | null>(null)
 
-const hasAnyWork = computed(
-  () => isStudent.value || isFacultyMentor.value || isPrimaryReviewer.value || isSecondaryReviewer.value || isAdmin.value || isAnchor.value,
-)
-
-const studentProjectsSupport = computed(() => {
-  const total = counts.value.student_projects ?? 0
-  if (!total) return undefined
-  const group = counts.value.student_group_projects ?? 0
-  return `${total - group} individual · ${group} group`
-})
-
-onMounted(async () => {
+async function load() {
+  loading.value = true
+  error.value = null
   try {
-    counts.value = await fetchMyPendingCounts()
+    data.value = await fetchMyDashboard()
+  } catch (e) {
+    error.value = e instanceof ApiError ? e : new ApiError('Failed to load your dashboard.', 'server')
   } finally {
     loading.value = false
   }
+}
+
+onMounted(load)
+
+const ROLE_COPY: Record<DashboardRoleSummary['key'], { title: string; pending: string; icon: string }> = {
+  mentor: { title: 'Mentor Review', pending: 'Awaiting Your Approval', icon: 'user-check' },
+  primary_reviewer: { title: 'Primary Review', pending: 'Awaiting Your Review', icon: 'eye' },
+  secondary_reviewer: { title: 'Secondary Review', pending: 'Awaiting Your Review', icon: 'eye' },
+}
+
+// The server only returns roles whose faculty record exists; the role
+// flags additionally keep the UI in line with the sidebar's own gating.
+const roleVisible: Record<DashboardRoleSummary['key'], () => boolean> = {
+  mentor: () => isFacultyMentor.value,
+  primary_reviewer: () => isPrimaryReviewer.value,
+  secondary_reviewer: () => isSecondaryReviewer.value,
+}
+const roles = computed(() => (data.value?.roles ?? []).filter((r) => roleVisible[r.key]?.()))
+const student = computed(() => (isStudent.value ? data.value?.student ?? null : null))
+
+const totalNeedsAction = computed(() => roles.value.reduce((a, r) => a + r.counts.pending, 0))
+const subtitle = computed(() => {
+  if (loading.value || error.value || !roles.value.length) return "Here's an overview of your SIRB work."
+  if (!totalNeedsAction.value) return "You're all caught up. Nothing is waiting on you right now."
+  const n = totalNeedsAction.value
+  return `${n} project${n === 1 ? ' is' : 's are'} waiting on you.`
 })
+
+const hasAnything = computed(() => roles.value.length > 0 || !!student.value || isAdmin.value || isAnchor.value)
+
+function tabLink(route: string, tab: 'pending' | 'unapproved' | 'approved') {
+  return tab === 'pending' ? route : { path: route, query: { tab } }
+}
 </script>
 
 <template>
   <AppShell>
-    <DashboardGreeting
-      :name="currentUser?.full_name.split(' ')[0] || 'there'"
-      subtitle="Here's an overview of what needs your attention."
-    />
+    <DashboardGreeting :name="currentUser?.full_name?.split(' ')[0] || 'there'" :subtitle="subtitle" />
 
     <LoadingState v-if="loading" label="Loading your dashboard…" />
-    <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <KpiCard
-        v-if="isStudent"
-        label="My Projects"
-        :value="counts.student_projects ?? 0"
-        :support="studentProjectsSupport"
-        icon="folder"
-        action-label="View Projects"
-        clickable
-        @click="router.push('/sirb/my-projects')"
-      />
-      <KpiCard
-        v-if="isFacultyMentor"
-        label="Awaiting Mentor Approval"
-        :value="counts.mentor_pending ?? 0"
-        icon="user-check"
-        tone="warning"
-        action-label="View All"
-        clickable
-        @click="router.push('/sirb/review/mentor')"
-      />
-      <KpiCard
-        v-if="isPrimaryReviewer"
-        label="Awaiting Primary Review"
-        :value="counts.primary_reviewer_pending ?? 0"
-        icon="eye"
-        tone="info"
-        action-label="View All"
-        clickable
-        @click="router.push('/sirb/review/primary')"
-      />
-      <KpiCard
-        v-if="isSecondaryReviewer"
-        label="Awaiting Secondary Review"
-        :value="counts.secondary_reviewer_pending ?? 0"
-        icon="eye"
-        tone="info"
-        action-label="View All"
-        clickable
-        @click="router.push('/sirb/review/secondary')"
-      />
-      <KpiCard v-if="isAdmin" label="Admin Console" value="Open" icon="grid" clickable @click="router.push('/sirb/admin')" />
-      <KpiCard v-if="isAnchor" label="Reports" value="Open" icon="bar-chart-2" clickable @click="router.push('/sirb/admin/reports')" />
-    </div>
+    <ErrorState v-else-if="error" :error="error" @retry="load" />
+    <div v-else class="space-y-8">
+      <!-- Admin / Anchor shortcuts -->
+      <div v-if="isAdmin || isAnchor" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard v-if="isAdmin" label="Admin Console" value="Open" icon="grid" action-label="Go to console" to="/sirb/admin" />
+        <KpiCard v-if="isAnchor" label="Reports" value="Open" icon="bar-chart-2" action-label="View reports" to="/sirb/admin/reports" />
+      </div>
 
-    <div
-      v-if="!loading && !hasAnyWork"
-      class="rounded-lg border border-line bg-paper p-8 text-center text-sm text-muted"
-    >
-      No SIRB workflows are currently assigned to your account.
+      <!-- Student -->
+      <section v-if="student">
+        <h2 class="mb-3 text-lg font-semibold text-charcoal">My Projects</h2>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <KpiCard
+            label="My Projects"
+            :value="student.total"
+            :support="student.total ? `${student.total - student.group} individual · ${student.group} group` : 'No projects yet'"
+            icon="folder"
+            action-label="View Projects"
+            to="/sirb/my-projects"
+          />
+          <KpiCard
+            label="In Progress"
+            :value="student.total - student.approved"
+            icon="clock"
+            tone="info"
+            action-label="View Projects"
+            to="/sirb/my-projects"
+          />
+          <KpiCard label="Approved" :value="student.approved" icon="check-circle" tone="success" action-label="View Projects" to="/sirb/my-projects" />
+        </div>
+      </section>
+
+      <!-- One section per mentor / reviewer role -->
+      <section v-for="role in roles" :key="role.key">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg font-semibold text-charcoal">{{ ROLE_COPY[role.key].title }}</h2>
+          <RouterLink :to="role.route" class="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+            Open worklist
+            <FeatherIcon name="arrow-right" class="h-3.5 w-3.5" />
+          </RouterLink>
+        </div>
+        <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <KpiCard
+            :label="ROLE_COPY[role.key].pending"
+            :value="role.counts.pending"
+            :icon="ROLE_COPY[role.key].icon"
+            :tone="role.counts.pending ? 'warning' : 'default'"
+            :support="role.counts.pending ? 'Waiting on you' : 'All caught up'"
+            action-label="View Pending"
+            :to="tabLink(role.route, 'pending')"
+          />
+          <KpiCard
+            label="In Progress"
+            :value="role.counts.in_progress"
+            icon="clock"
+            tone="info"
+            support="Assigned to you, not yet approved"
+            action-label="View In Progress"
+            :to="tabLink(role.route, 'unapproved')"
+          />
+          <KpiCard
+            label="Approved"
+            :value="role.counts.approved"
+            icon="check-circle"
+            tone="success"
+            support="Fully approved projects"
+            action-label="View Approved"
+            :to="tabLink(role.route, 'approved')"
+          />
+        </div>
+        <h3 class="mb-2 text-sm font-semibold text-muted">Recently updated</h3>
+        <ProjectListTable
+          :rows="role.recent"
+          empty-title="No active projects"
+          empty-description="Projects assigned to you will appear here."
+        />
+      </section>
+
+      <div v-if="!hasAnything" class="rounded-lg border border-line bg-paper p-8 text-center text-sm text-muted">
+        No SIRB workflows are currently assigned to your account.
+      </div>
     </div>
   </AppShell>
 </template>

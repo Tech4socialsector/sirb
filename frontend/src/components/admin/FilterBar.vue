@@ -1,100 +1,113 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
-import { Autocomplete, Button, FormControl } from 'frappe-ui'
+import { computed, reactive, watch } from 'vue'
+import { Button, FormControl, MultiSelect } from 'frappe-ui'
 import type { DashboardFilters, FilterOptions } from '@/types/admin'
 
 const props = defineProps<{ options: FilterOptions }>()
 const emit = defineEmits<{ apply: [DashboardFilters] }>()
 
-const local = reactive<DashboardFilters>({})
+type MultiKey = 'campus' | 'irb_unit' | 'academic_year' | 'irb_cycle' | 'status'
+const MULTI_KEYS: MultiKey[] = ['campus', 'irb_unit', 'academic_year', 'irb_cycle', 'status']
 
-function toOptions(items: { name: string; full_name?: string; ao_name?: string }[]) {
-  return items.map((i) => ({ label: i.full_name || i.ao_name || i.name, value: i.name }))
-}
+const emptyState = () => ({
+  campus: [] as string[],
+  irb_unit: [] as string[],
+  academic_year: [] as string[],
+  irb_cycle: [] as string[],
+  status: [] as string[],
+  from_date: '',
+  to_date: '',
+})
+const local = reactive(emptyState())
 
-const statusOptions = () => [
-  { label: 'All statuses', value: '' },
-  ...props.options.statuses.map((s) => ({ label: s, value: s })),
-]
+const campusOptions = computed(() => (props.options.campuses ?? []).map((c) => ({ label: c.ao_name || c.name, value: c.name })))
 
-function apply() {
-  const filters: DashboardFilters = {}
-  if (local.irb_unit?.length) filters.irb_unit = local.irb_unit
-  if (local.academic_year?.length) filters.academic_year = local.academic_year
-  if (local.irb_cycle?.length) filters.irb_cycle = local.irb_cycle
-  if (local.faculty_mentor?.length) filters.faculty_mentor = local.faculty_mentor
-  if (local.primary_reviewer?.length) filters.primary_reviewer = local.primary_reviewer
-  if (local.secondary_reviewer?.length) filters.secondary_reviewer = local.secondary_reviewer
-  if (local.status) filters.status = local.status
-  if (local.from_date) filters.from_date = local.from_date
-  if (local.to_date) filters.to_date = local.to_date
-  emit('apply', filters)
-}
+// With campuses selected, only offer the programmes inside them.
+const programmeOptions = computed(() =>
+  props.options.programmes
+    .filter((p) => !local.campus.length || (p.campus && local.campus.includes(p.campus)))
+    .map((p) => ({ label: p.ao_name || p.name, value: p.name })),
+)
+const yearOptions = computed(() => props.options.academic_years.map((y) => ({ label: y, value: y })))
+const cycleOptions = computed(() => props.options.cycles.map((c) => ({ label: c, value: c })))
+const statusOptions = computed(() => props.options.statuses.map((s) => ({ label: s, value: s })))
+
+// Picking a campus drops selected programmes outside it, which would
+// otherwise silently AND the result down to nothing.
+watch(
+  () => [...local.campus],
+  () => {
+    const allowed = new Set(programmeOptions.value.map((o) => o.value))
+    const kept = local.irb_unit.filter((p) => allowed.has(p))
+    if (kept.length !== local.irb_unit.length) local.irb_unit = kept
+  },
+)
+
+const hasActiveFilters = computed(() => MULTI_KEYS.some((k) => local[k].length) || !!local.from_date || !!local.to_date)
+const dateRangeInvalid = computed(() => !!local.from_date && !!local.to_date && local.from_date > local.to_date)
+
+const filters = computed<DashboardFilters>(() => {
+  const f: DashboardFilters = {}
+  for (const k of MULTI_KEYS) if (local[k].length) f[k] = [...local[k]]
+  if (!dateRangeInvalid.value) {
+    if (local.from_date) f.from_date = local.from_date
+    if (local.to_date) f.to_date = local.to_date
+  }
+  return f
+})
+
+// Emit only when the effective filters change (e.g. not on a campus change
+// that leaves the same programmes), so the dashboard doesn't refetch for nothing.
+watch(
+  () => JSON.stringify(filters.value),
+  () => emit('apply', filters.value),
+)
 
 function clear() {
-  Object.keys(local).forEach((k) => delete (local as Record<string, unknown>)[k])
-  emit('apply', {})
+  Object.assign(local, emptyState())
 }
-
-watch(local, apply, { deep: false })
 </script>
 
 <template>
   <div class="mb-5 rounded-lg border border-line bg-paper p-4 shadow-card">
-    <div class="flex flex-wrap items-end gap-3">
-      <div class="w-48">
+    <!-- Even grid: fields keep equal widths and wrap into tidy rows. -->
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] items-end gap-3">
+      <div v-if="campusOptions.length" class="min-w-0">
+        <label class="mb-1.5 block text-xs font-medium text-muted">Campus</label>
+        <MultiSelect v-model="local.campus" :options="campusOptions" placeholder="All campuses" class="w-full" />
+      </div>
+      <div class="min-w-0">
         <label class="mb-1.5 block text-xs font-medium text-muted">Programme / Course</label>
-        <Autocomplete
+        <MultiSelect
+          v-model="local.irb_unit"
+          :options="programmeOptions"
           placeholder="All programmes"
-          :options="toOptions(options.programmes.map((p) => ({ name: p.name, ao_name: p.ao_name })))"
-          :model-value="local.irb_unit?.[0]"
-          @update:model-value="(v: { value: string } | undefined) => (local.irb_unit = v ? [v.value] : undefined)"
+          empty-text="No programmes in the selected campus"
+          class="w-full"
         />
       </div>
-      <div class="w-36">
+      <div class="min-w-0">
         <label class="mb-1.5 block text-xs font-medium text-muted">Academic Year</label>
-        <FormControl
-          type="select"
-          :options="[{ label: 'All years', value: '' }, ...options.academic_years.map((y) => ({ label: y, value: y }))]"
-          :model-value="local.academic_year?.[0] || ''"
-          @update:model-value="(v: string) => (local.academic_year = v ? [v] : undefined)"
-        />
+        <MultiSelect v-model="local.academic_year" :options="yearOptions" placeholder="All years" empty-text="No academic years" class="w-full" />
       </div>
-      <div class="w-36">
+      <div class="min-w-0">
         <label class="mb-1.5 block text-xs font-medium text-muted">Batch / Cycle</label>
-        <FormControl
-          type="select"
-          :options="[{ label: 'All cycles', value: '' }, ...options.cycles.map((c) => ({ label: c, value: c }))]"
-          :model-value="local.irb_cycle?.[0] || ''"
-          @update:model-value="(v: string) => (local.irb_cycle = v ? [v] : undefined)"
-        />
+        <MultiSelect v-model="local.irb_cycle" :options="cycleOptions" placeholder="All cycles" class="w-full" />
       </div>
-      <div class="w-52">
+      <div class="min-w-0">
         <label class="mb-1.5 block text-xs font-medium text-muted">Status</label>
-        <FormControl
-          type="select"
-          :options="statusOptions()"
-          :model-value="local.status || ''"
-          @update:model-value="(v: string) => (local.status = v || undefined)"
-        />
+        <MultiSelect v-model="local.status" :options="statusOptions" placeholder="All statuses" class="w-full" />
       </div>
-      <div class="w-36">
+      <div class="min-w-0">
         <label class="mb-1.5 block text-xs font-medium text-muted">From</label>
-        <FormControl
-          type="date"
-          :model-value="local.from_date"
-          @update:model-value="(v: string) => (local.from_date = v || undefined)"
-        />
+        <FormControl type="date" class="w-full" :model-value="local.from_date" @update:model-value="(v: string) => (local.from_date = v || '')" />
       </div>
-      <div class="w-36">
+      <div class="min-w-0">
         <label class="mb-1.5 block text-xs font-medium text-muted">To</label>
-        <FormControl
-          type="date"
-          :model-value="local.to_date"
-          @update:model-value="(v: string) => (local.to_date = v || undefined)"
-        />
+        <FormControl type="date" class="w-full" :model-value="local.to_date" @update:model-value="(v: string) => (local.to_date = v || '')" />
       </div>
-      <Button variant="outline" @click="clear">Clear filters</Button>
+      <div><Button variant="outline" :disabled="!hasActiveFilters" @click="clear">Clear filters</Button></div>
     </div>
+    <p v-if="dateRangeInvalid" class="mt-2 text-xs text-danger">"From" is after "To" — the date range is ignored until it's fixed.</p>
   </div>
 </template>

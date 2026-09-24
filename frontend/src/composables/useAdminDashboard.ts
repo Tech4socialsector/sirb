@@ -54,7 +54,12 @@ export function useAdminDashboard() {
     filterOptions.value = await fetchFilterOptions()
   }
 
+  // Each filter click starts a refresh; only the latest one may write its
+  // results, so a slow earlier response can't overwrite newer numbers.
+  let refreshSeq = 0
+
   async function refresh(filters: DashboardFilters) {
+    const seq = ++refreshSeq
     loading.value = true
     error.value = null
     try {
@@ -65,15 +70,17 @@ export function useAdminDashboard() {
         fetchProjectTrend(filters),
         fetchDrilldownStudents({ filters, per_project: true }),
       ])
+      if (seq !== refreshSeq) return
       dashboard.value = dashboardData
       workload.value = workloadData
       activity.value = activityData
       trend.value = trendData
       pendingRows.value = allPendingRows
     } catch (e) {
+      if (seq !== refreshSeq) return
       error.value = e instanceof ApiError ? e : new ApiError('Failed to load the dashboard.', 'server')
     } finally {
-      loading.value = false
+      if (seq === refreshSeq) loading.value = false
     }
   }
 

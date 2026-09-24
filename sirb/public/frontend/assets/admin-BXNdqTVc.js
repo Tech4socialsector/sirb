@@ -1,0 +1,2 @@
+import{i as e}from"./index-Be08i6cK.js";var t=`sirb.sirb.page.irb_admin_console.irb_admin_console`;function n(){return e(`${t}.get_filter_options`)}function r(n){return e(`${t}.get_dashboard_data`,{filters:n})}function i(n){return e(`${t}.get_role_workload`,{filters:n})}function a(n,r=6){return e(`${t}.get_project_trend`,{filters:n,months:r})}function o(n,r=25){return e(`${t}.get_recent_activity`,{filters:n,limit:r})}function s(n){return e(`${t}.get_drilldown_students`,n)}export{o as a,a as i,s as n,i as o,n as r,r as t};
+//# sourceMappingURL=admin-BXNdqTVc.js.map

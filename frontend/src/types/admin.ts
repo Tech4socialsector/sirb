@@ -1,5 +1,7 @@
 export interface FilterOptions {
-  programmes: { name: string; ao_name: string }[]
+  campuses: { name: string; ao_name: string }[]
+  /** `campus` is the Campus org unit the programme sits under, if any. */
+  programmes: { name: string; ao_name: string; campus?: string | null }[]
   academic_years: string[]
   cycles: string[]
   mentors: { name: string; full_name: string }[]
@@ -8,13 +10,14 @@ export interface FilterOptions {
 }
 
 export interface DashboardFilters {
+  campus?: string[]
   irb_unit?: string[]
   academic_year?: string[]
   irb_cycle?: string[]
   faculty_mentor?: string[]
   primary_reviewer?: string[]
   secondary_reviewer?: string[]
-  status?: string
+  status?: string[]
   from_date?: string
   to_date?: string
 }

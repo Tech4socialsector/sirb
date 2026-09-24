@@ -112,10 +112,29 @@ def _build_filters_clause(filters):
 	add_multi("faculty_mentor", "p.faculty_mentor")
 	add_multi("primary_reviewer", "p.primary_reviewer")
 	add_multi("secondary_reviewer", "p.secondary_reviewer")
+	add_multi("status", "p.status")
 
-	if filters.get("status"):
-		clauses.append("p.status = %(status)s")
-		params["status"] = filters["status"]
+	# Campus: every project whose IRB Unit's org unit sits anywhere under one
+	# of the selected Campus units in the org tree (nested set) — the same
+	# rule as the "Projects by IRB Unit" report's Campus filter.
+	campuses = filters.get("campus")
+	if campuses and not isinstance(campuses, (list, tuple)):
+		campuses = [campuses]
+	campuses = [c for c in (campuses or []) if c]
+	if campuses:
+		placeholders = []
+		for i, c in enumerate(campuses):
+			pkey = f"campus_{i}"
+			params[pkey] = c
+			placeholders.append(f"%({pkey})s")
+		clauses.append(
+			f"""p.irb_unit in (
+				select ciu.name from `tabIRB Unit` as ciu
+				join `tabAcademic Organizational Unit` as ca on ciu.ao_unit = ca.name
+				join `tabAcademic Organizational Unit` as cc on ca.lft >= cc.lft and ca.rgt <= cc.rgt
+				where cc.name in ({','.join(placeholders)})
+			)"""
+		)
 
 	if filters.get("from_date"):
 		clauses.append("p.modified >= %(from_date)s")
@@ -284,12 +303,31 @@ def get_filter_options():
 	"""
 	_check_permission()
 
+	# Each programme carries the Campus it sits under (if any), so the filter
+	# bar can narrow the programme list to the selected campuses.
 	programmes = frappe.db.sql(
-		"""select distinct iu.name, iu.ao_name
+		"""select distinct iu.name, iu.ao_name,
+			(select c.name from `tabAcademic Organizational Unit` as c
+				where c.ao_type = 'Campus' and a.lft >= c.lft and a.rgt <= c.rgt
+				order by c.lft desc limit 1) as campus
 		from `tabIRB Unit` as iu
 		join `tabIRB Project` as p on p.irb_unit = iu.name
+		left join `tabAcademic Organizational Unit` as a on iu.ao_unit = a.name
 		order by iu.ao_name""",
 		as_dict=True,
+	)
+
+	# Only campuses that contain at least one programme with projects.
+	campus_names = sorted({p.campus for p in programmes if p.campus})
+	campuses = (
+		frappe.get_all(
+			"Academic Organizational Unit",
+			filters={"name": ["in", campus_names]},
+			fields=["name", "ao_name"],
+			order_by="ao_name asc",
+		)
+		if campus_names
+		else []
 	)
 
 	academic_years = frappe.db.sql(
@@ -326,6 +364,7 @@ def get_filter_options():
 	)
 
 	return {
+		"campuses": campuses,
 		"programmes": programmes,
 		"academic_years": [d["academic_year"] for d in academic_years],
 		"cycles": [d["irb_cycle"] for d in cycles],
@@ -415,10 +454,15 @@ def get_drilldown_students(
 
 	if irb_unit:
 		filters["irb_unit"] = irb_unit
-	if status:
-		filters["status"] = status
 
 	where_extra, params = _build_filters_clause(filters)
+
+	# The drilled status is ANDed with the dashboard's Status filter rather
+	# than replacing it, so a drill-down never shows projects the filtered
+	# cards didn't count.
+	if status:
+		where_extra += " and p.status = %(drill_status)s"
+		params["drill_status"] = status
 
 	extra_clause = ""
 	multi_statuses = [STATUS_KEY_MAP[k] for k in (status_keys or []) if k in STATUS_KEY_MAP]

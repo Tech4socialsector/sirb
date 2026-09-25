@@ -90,3 +90,25 @@ body {
   color: rgb(var(--color-primary));
   text-decoration: underline;
 }
+
+/* Select triggers that must stay within their box (long option labels). */
+.sirb-truncate-select [data-slot='trigger'],
+.sirb-truncate-select button {
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+.sirb-truncate-select [data-slot='trigger'] span,
+.sirb-truncate-select button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Horizontally scrollable strips (tabs) without a visible scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

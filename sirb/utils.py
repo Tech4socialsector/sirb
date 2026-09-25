@@ -221,6 +221,14 @@ def send_email_if_configured(email_template, params, recipient_list):
 
 	# Check if an account exists
 	if default_email_account:
+		# Callers run inside a document save (e.g. IRBProject.on_change); a
+		# missing template must skip the e-mail, not fail the save.
+		if not frappe.db.exists("Email Template", email_template):
+			frappe.log_error(
+				title=f"Email Template '{email_template}' not found",
+				message=f"E-mail not sent to {recipient_list} with params {params}",
+			)
+			return
 		email_template_doc = frappe.get_doc("Email Template", email_template)
 		rendered_content = frappe.render_template(email_template_doc.response_, params)
 		rendered_subject = frappe.render_template(email_template_doc.subject, params)

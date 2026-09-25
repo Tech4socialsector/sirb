@@ -3,6 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe.utils import get_url
 from sirb.utils import send_email_if_configured
 
 class StudentProjectMapping(Document):
@@ -29,13 +30,14 @@ class StudentProjectMapping(Document):
 			for n in notification_info:
 				student_name_list.append(n["student_name"])
 				student_email_list.append(n["student_email"])
-			student_names = ",".join(student_name_list)
-			if student_names[-1] == ',':
-				student_names = student_names[:-1]
+			# full_name is optional on Student; a blank one must not break the insert.
+			student_names = ",".join(n for n in student_name_list if n)
+			project_url = get_url(f"/sirb/projects/{self.irb_project}")
 			params = {
 				"project_status": notification_info[0]["status"],
 				"project_name": notification_info[0]["title"],
-				"student_names": student_names
+				"student_names": student_names,
+				"project_url": project_url,
 			}
 			print("SENDING EMAIL!!")
 			print(params)

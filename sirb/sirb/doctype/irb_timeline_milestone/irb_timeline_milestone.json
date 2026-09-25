@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "creation": "2026-09-26 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "activity",
+  "start_date",
+  "end_date",
+  "time_note",
+  "remind_statuses"
+ ],
+ "fields": [
+  {
+   "fieldname": "activity",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Activity",
+   "reqd": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date / From",
+   "reqd": 1
+  },
+  {
+   "description": "For a date range; the deadline is this date.",
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To"
+  },
+  {
+   "description": "e.g. 6:00 PM, 2-4 pm, or earlier as per completion",
+   "fieldname": "time_note",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Time / Note"
+  },
+  {
+   "description": "JSON list of project statuses that Remind targets. Edited from the SIRB portal.",
+   "fieldname": "remind_statuses",
+   "fieldtype": "Small Text",
+   "label": "Remind Statuses"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-09-26 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "IRB Timeline Milestone",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

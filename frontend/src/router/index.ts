@@ -79,6 +79,15 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/sirb/admin/alerts',
+    name: 'timeline-alerts',
+    component: () => import('@/pages/TimelineAlerts.vue'),
+    meta: {
+      title: 'Timeline Alerts',
+      requiresRole: (s) => s.isAdmin,
+    },
+  },
+  {
     path: '/sirb/admin/students',
     name: 'student-project-management',
     component: () => import('@/pages/StudentProjectManagement.vue'),

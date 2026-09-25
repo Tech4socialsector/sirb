@@ -47,6 +47,8 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+# Timeline Alert variables + "Preview as Timeline Alert" on the Email Template form.
+doctype_js = {"Email Template": "public/js/email_template.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -95,7 +97,7 @@ website_route_rules = [
 # ------------
 
 # before_install = "sirb.install.before_install"
-# after_install = "sirb.install.after_install"
+after_install = "sirb.install.after_install"
 
 # Uninstallation
 # ------------
@@ -179,6 +181,13 @@ has_permission = {
 # 		"sirb.tasks.monthly"
 # 	],
 # }
+
+scheduler_events = {
+	"cron": {
+		# Timeline Alerts: fire scheduled alerts whose next run has passed.
+		"*/5 * * * *": ["sirb.sirb_api.timeline_alerts.run_due_alerts"],
+	},
+}
 
 # Testing
 # -------

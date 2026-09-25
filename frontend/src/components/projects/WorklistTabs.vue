@@ -18,11 +18,11 @@ const active = computed(() => props.modelValue)
 </script>
 
 <template>
-  <div class="flex gap-1 border-b border-line px-6">
+  <div class="no-scrollbar flex gap-1 overflow-x-auto border-b border-line px-2 sm:px-6">
     <button
       v-for="tab in tabs"
       :key="tab.value"
-      class="relative flex items-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors"
+      class="relative flex shrink-0 items-center gap-2 whitespace-nowrap px-3 py-2.5 text-sm font-medium transition-colors"
       :class="active === tab.value ? 'text-charcoal' : 'text-muted hover:text-charcoal'"
       @click="emit('update:modelValue', tab.value)"
     >
@@ -35,7 +35,7 @@ const active = computed(() => props.modelValue)
       </span>
       <span
         v-if="active === tab.value"
-        class="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary"
+        class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary"
       />
     </button>
   </div>

@@ -1,0 +1,147 @@
+{
+ "actions": [],
+ "autoname": "format:TA-{#####}",
+ "creation": "2026-09-26 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "alert_name",
+  "enabled",
+  "email_template",
+  "filters",
+  "timeline",
+  "milestone",
+  "schedule_section",
+  "frequency",
+  "start_at",
+  "end_date",
+  "column_break_sched",
+  "next_run_at",
+  "last_run_at",
+  "last_run"
+ ],
+ "fields": [
+  {
+   "fieldname": "alert_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Alert Name",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "email_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Email Template",
+   "options": "Email Template",
+   "reqd": 1
+  },
+  {
+   "description": "Which students receive the alert. Edit from the SIRB portal (Timeline Alerts page).",
+   "fieldname": "filters",
+   "fieldtype": "Code",
+   "label": "Recipient Filters",
+   "options": "JSON"
+  },
+  {
+   "description": "Optional: the deadline this alert reminds about (fills the deadline variables).",
+   "fieldname": "timeline",
+   "fieldtype": "Link",
+   "label": "Timeline",
+   "options": "IRB Timeline",
+   "search_index": 1
+  },
+  {
+   "fieldname": "milestone",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Deadline Row"
+  },
+  {
+   "fieldname": "schedule_section",
+   "fieldtype": "Section Break",
+   "label": "Schedule"
+  },
+  {
+   "default": "Once",
+   "fieldname": "frequency",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Frequency",
+   "options": "Once\nDaily\nWeekly\nMonthly",
+   "reqd": 1
+  },
+  {
+   "fieldname": "start_at",
+   "fieldtype": "Datetime",
+   "label": "First Run At",
+   "reqd": 1
+  },
+  {
+   "description": "Recurring alerts stop after this date.",
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "Stop After"
+  },
+  {
+   "fieldname": "column_break_sched",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "next_run_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Next Run At",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "last_run_at",
+   "fieldtype": "Datetime",
+   "label": "Last Run At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_run",
+   "fieldtype": "Link",
+   "label": "Last Run",
+   "options": "IRB Alert Run",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-26 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "IRB Timeline Alert",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "alert_name",
+ "track_changes": 1
+}

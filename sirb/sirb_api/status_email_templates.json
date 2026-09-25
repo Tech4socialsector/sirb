@@ -1,0 +1,44 @@
+[
+ {
+  "name": "Status Change Email Template",
+  "subject": "IRB Project \"{{project_name}}\" requires your action",
+  "use_html": 1,
+  "response_html": "<p>\nThe status of IRB Project proposal named <strong>\"{{ project_name }}\"</strong>\nhas changed to <strong>\"{{ project_status }}\"</strong> and requires your action.\n</p>\n\n<p>\nKindly review the project and questionnaire and act on it as soon as possible\nif it has not been granted its final approval.\n</p>\n\n<p>\n<a href=\"https://student-irb.m.frappe.cloud/app/\" target=\"_blank\">\nPlease click here to review\n</a>\n</p>\n\n<p>\nThank you.<br>\nIRB Team\n</p>"
+ },
+ {
+  "name": "New IRB Project Template",
+  "subject": "Welcome to IRB application for Student Research Projects",
+  "use_html": 0,
+  "response": "<div class=\"ql-editor read-mode\"><p>Dear {{student_names}},</p><p><br></p><p>Welcome to the Institutional Review Board (IRB) Application portal for Student Research Projects.</p><p><br></p><p>Please follow the steps below to complete your application</p><p><br></p><p><strong>Setting up your portal account</strong></p><p class=\"ql-indent-1\">Please visit <a href=\"https://student-irb.m.frappe.cloud\" rel=\"noopener noreferrer\">https://student-irb.m.frappe.cloud/</a> and sign in with your apu.edu.in email id.</p><p class=\"ql-indent-1\"><br></p><p class=\"ql-indent-1\">Please bookmark the link to access the portal for all future requirements.</p><p class=\"ql-indent-1\">Tutorials for portal - <a href=\"https://drive.google.com/file/d/1C5zb796-K7o6Q8N0Q8AbzegJJKRoFI4y/view?usp=drive_link\" rel=\"noopener noreferrer\">https://drive.google.com/file/d/1C5zb796-K7o6Q8N0Q8AbzegJJKRoFI4y/view?usp=drive_link</a></p><p class=\"ql-indent-1\"><br></p><p><strong>Filling your application and submission to Faculty Mentor</strong></p><p class=\"ql-indent-1\">Once you log in, you will be directed to the ‘Students' IRB Projects’ page, where you can Click on the project and open the application. You will also be asked to upload your field project proposal, any sample consent forms and survey tools etc. as a single pdf file. All these documents complete your IRB application which you will then need to submit to your Faculty Mentor for approval.</p><p class=\"ql-indent-1\"><br></p><p class=\"ql-indent-1\">Once your mentor approves the application, this will move to the IRB for review automatically. However, if your mentor asks for a revision, you must revise and resubmit before the deadline.</p><p class=\"ql-indent-1\"><br></p><p><strong> IRB Review</strong></p><p class=\"ql-indent-1\">After your Faculty Mentor approves, the IRB will review your application and will communicate the status to you and your Faculty Mentor. If the IRB asks the student to revise and resubmit their application, you will need to revise your application in light of the feedback and take this forward through your Faculty Mentor to the IRB.</p><p class=\"ql-indent-1\"><br></p><p>Contact us at <u style=\"color: rgb(0, 71, 178);\">research@apu.edu.in</u>/<a href=\"mailto:student.irbhelpdesk@apu.edu.in\" rel=\"noopener noreferrer\">student.irbhelpdesk@apu.edu.in</a> for any assistance you may require for the portal. Kindly include student ID, student name, faculty mentor name, title of project/proposal in your email to us.</p><p><br></p><p>IRB Team</p></div>"
+ },
+ {
+  "name": "Student Correction For Mentor Feedback Template",
+  "subject": "IRB Application - Request for revision and re-submition by Faculty mentor",
+  "use_html": 0,
+  "response": "<div class=\"ql-editor read-mode\"><p>Dear {{student_names}},</p><p><br></p><p>Your application has been reviewed and feedback shared on the portal. </p><p><br></p><p>We request you to revise and resubmit the application within 5 days after incorporating the revisions.</p><p><br></p><p>Regards,</p><p>IRB team</p></div>"
+ },
+ {
+  "name": "Awaiting Mentor Approval Template",
+  "subject": "IRB Application - Submitted to faculty mentor",
+  "use_html": 0,
+  "response": "<div class=\"ql-editor read-mode\"><p>Dear {{student_names}},</p><p><br></p><p>Your IRB application has been submitted to your faculty mentor for verification. </p><p><br></p><p>Regards,</p><p>IRB Team</p></div>"
+ },
+ {
+  "name": "Student Correction For Reviewer Feedback Template",
+  "subject": "IRB Review - Revise and resubmit",
+  "use_html": 0,
+  "response": "<div class=\"ql-editor read-mode\"><p>Dear {{student_names}},</p><p><br></p><p>The IRB has reviewed your application and feedback has been provided by your reviewer. </p><p><br></p><p>We request you to login to the IRB portal, review the feedback provided by your reviewer, revise and resubmit the application &nbsp;within 5 days.</p><p><br></p><p>You are expected to discuss the feedback provided by the IRB with your faculty mentor. Once you submit the revised form, &nbsp;the application will automatically move to IRB.</p><p><br></p><p>Regards,</p><p>IRB Team</p></div>"
+ },
+ {
+  "name": "Project Provisionally Approved Template",
+  "subject": "IRB Review Decision - Provisionally Approved",
+  "use_html": 0,
+  "response": "<div class=\"ql-editor read-mode\"><p>Dear {{student_names}},</p><p><br></p><p>Your application has been reviewed and provisionally approved by the IRB pending submission of some documents. </p><p><br></p><p>Please login to the IRB portal to view your reviewer's comments and submit the required documents to get the final approval.</p><p><br></p><p>Regards,</p><p>IRB Team</p></div>"
+ },
+ {
+  "name": "Project Approved Template",
+  "subject": "IRB Review Decision - Approved",
+  "use_html": 0,
+  "response": "<div class=\"ql-editor read-mode\"><p>Dear {{student_names}},</p><p><br></p><p>Your application has been reviewed and approved by IRB. You can check the portal to view the feedback from the IRB reviewer, if any.</p><p><br></p><p>We thank you for your commitment to follow the necessary procedures and ethical protocols for the safety of your respondents and wish you all the best for your project.</p><p><br></p><p>Regards,</p><p>IRB Team &nbsp;</p></div>"
+ }
+]

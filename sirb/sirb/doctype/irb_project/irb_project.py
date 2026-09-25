@@ -3,6 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe.utils import get_url
 from sirb.proposal_checks import format_issues, get_proposal_issues
 from sirb.workflow import validate_status_change
 from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
@@ -161,9 +162,8 @@ class IRBProject(Document):
 					for n in notification_info:
 						student_name_list.append(n["student_name"])
 						student_email_list.append(n["student_email"])
-					student_names = ",".join(student_name_list)
-					if student_names[-1] == ',':
-						student_names = student_names[:-1]
+					# full_name is optional on Student; a blank one must not break the save.
+					student_names = ",".join(n for n in student_name_list if n)
 					mentor_email = notification_info[0]["mentor_email"]
 					faculty_recipient_list = []
 					to_students = to_faculty = False
@@ -203,10 +203,12 @@ class IRBProject(Document):
 						to_students = True
 					# print("Recipient list ", recipient_list)
 					# Create a system notification
+					project_url = get_url(f"/sirb/projects/{self.name}")
 					params = {
 						"project_status": self.status,
 						"project_name": self.title,
-						"student_names": student_names
+						"student_names": student_names,
+						"project_url": project_url,
 					}
 					if to_faculty:
 						send_email_if_configured("Status Change Email Template", params, faculty_recipient_list)

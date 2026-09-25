@@ -1,0 +1,342 @@
+{
+ "charts": [
+  {
+   "chart_name": "Timeline Alert Runs",
+   "label": "Timeline Alert Runs"
+  },
+  {
+   "chart_name": "Timeline Alert E-mails Queued",
+   "label": "Timeline Alert E-mails Queued"
+  },
+  {
+   "chart_name": "Timeline Alert Runs by Status",
+   "label": "Timeline Alert Runs by Status"
+  },
+  {
+   "chart_name": "Timeline Alert E-mail Delivery",
+   "label": "Timeline Alert E-mail Delivery"
+  }
+ ],
+ "content": "[{\"id\":\"tla_title\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Timeline Alerts</b></span>\",\"col\":12}},{\"id\":\"tla_intro\",\"type\":\"paragraph\",\"data\":{\"col\":12,\"text\":\"E-mail students picked by programme, status or inactivity, now or on a schedule. Compose and schedule alerts in the <a href=\\\"/sirb/admin/alerts\\\">SIRB portal</a>; this page tracks what was sent.\"}},{\"id\":\"tla_card_0\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Timeline Alerts\",\"col\":4}},{\"id\":\"tla_card_1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Alert Runs (Last 30 Days)\",\"col\":4}},{\"id\":\"tla_card_2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Alert E-mails Queued (Last 30 Days)\",\"col\":4}},{\"id\":\"tla_card_3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Alert Runs With Problems (Last 30 Days)\",\"col\":4}},{\"id\":\"tla_card_4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Alert E-mails Awaiting Delivery\",\"col\":4}},{\"id\":\"tla_card_5\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Alert E-mail Delivery Errors (Last 30 Days)\",\"col\":4}},{\"id\":\"tla_sp1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"tla_sc_hdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Shortcuts</b></span>\",\"col\":12}},{\"id\":\"tla_sc_0\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Open Timeline Alerts\",\"col\":4}},{\"id\":\"tla_sc_1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Scheduled Alerts\",\"col\":4}},{\"id\":\"tla_sc_2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Alert Runs\",\"col\":4}},{\"id\":\"tla_sc_3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Runs Needing Attention\",\"col\":4}},{\"id\":\"tla_sc_4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Alert E-mail Queue\",\"col\":4}},{\"id\":\"tla_sc_5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Email Templates\",\"col\":4}},{\"id\":\"tla_sp2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"tla_ch_hdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Activity</b></span>\",\"col\":12}},{\"id\":\"tla_chart_0\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Timeline Alert Runs\",\"col\":6}},{\"id\":\"tla_chart_1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Timeline Alert E-mails Queued\",\"col\":6}},{\"id\":\"tla_chart_2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Timeline Alert Runs by Status\",\"col\":6}},{\"id\":\"tla_chart_3\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Timeline Alert E-mail Delivery\",\"col\":6}},{\"id\":\"tla_sp3\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"tla_lk_hdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Records &amp; Setup</b></span>\",\"col\":12}},{\"id\":\"tla_links_0\",\"type\":\"card\",\"data\":{\"card_name\":\"Timeline Alerts\",\"col\":4}},{\"id\":\"tla_links_1\",\"type\":\"card\",\"data\":{\"card_name\":\"E-mail Setup\",\"col\":4}},{\"id\":\"tla_links_2\",\"type\":\"card\",\"data\":{\"card_name\":\"Recipient Data\",\"col\":4}}]",
+ "creation": "2026-09-26 11:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "notification",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Timeline Alerts",
+ "links": [
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Timeline Alerts",
+   "link_count": 3,
+   "link_to": null,
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Timeline",
+   "link_count": 0,
+   "link_to": "IRB Timeline",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Timeline Alert",
+   "link_count": 0,
+   "link_to": "IRB Timeline Alert",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Alert Run",
+   "link_count": 0,
+   "link_to": "IRB Alert Run",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "E-mail Setup",
+   "link_count": 3,
+   "link_to": null,
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Email Template",
+   "link_count": 0,
+   "link_to": "Email Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Email Account",
+   "link_count": 0,
+   "link_to": "Email Account",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Email Queue",
+   "link_count": 0,
+   "link_to": "Email Queue",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Recipient Data",
+   "link_count": 3,
+   "link_to": null,
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "Student",
+   "link_count": 0,
+   "link_to": "Student",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "IRB Project",
+   "link_count": 0,
+   "link_to": "IRB Project",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "description": null,
+   "hidden": 0,
+   "icon": "",
+   "is_query_report": 0,
+   "label": "User",
+   "link_count": 0,
+   "link_to": "User",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "report_ref_doctype": "",
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-09-26 11:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "Timeline Alerts",
+ "number_cards": [
+  {
+   "label": "Active Timeline Alerts",
+   "number_card_name": "Active Timeline Alerts"
+  },
+  {
+   "label": "Alert Runs (Last 30 Days)",
+   "number_card_name": "Alert Runs (Last 30 Days)"
+  },
+  {
+   "label": "Alert E-mails Queued (Last 30 Days)",
+   "number_card_name": "Alert E-mails Queued (Last 30 Days)"
+  },
+  {
+   "label": "Alert Runs With Problems (Last 30 Days)",
+   "number_card_name": "Alert Runs With Problems (Last 30 Days)"
+  },
+  {
+   "label": "Alert E-mails Awaiting Delivery",
+   "number_card_name": "Alert E-mails Awaiting Delivery"
+  },
+  {
+   "label": "Alert E-mail Delivery Errors (Last 30 Days)",
+   "number_card_name": "Alert E-mail Delivery Errors (Last 30 Days)"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 1.5,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "",
+   "format": "",
+   "icon": "",
+   "kanban_board": "",
+   "label": "Open Timeline Alerts",
+   "link_to": "",
+   "report_ref_doctype": "",
+   "restrict_to_domain": "",
+   "stats_filter": "",
+   "type": "URL",
+   "url": "/sirb/admin/alerts"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Active",
+   "icon": "",
+   "kanban_board": "",
+   "label": "Scheduled Alerts",
+   "link_to": "IRB Timeline Alert",
+   "report_ref_doctype": "",
+   "restrict_to_domain": "",
+   "stats_filter": "[[\"IRB Timeline Alert\", \"enabled\", \"=\", 1, false]]",
+   "type": "DocType",
+   "url": ""
+  },
+  {
+   "color": "Gray",
+   "doc_view": "List",
+   "format": "",
+   "icon": "",
+   "kanban_board": "",
+   "label": "Alert Runs",
+   "link_to": "IRB Alert Run",
+   "report_ref_doctype": "",
+   "restrict_to_domain": "",
+   "stats_filter": "",
+   "type": "DocType",
+   "url": ""
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} to review",
+   "icon": "",
+   "kanban_board": "",
+   "label": "Runs Needing Attention",
+   "link_to": "IRB Alert Run",
+   "report_ref_doctype": "",
+   "restrict_to_domain": "",
+   "stats_filter": "[[\"IRB Alert Run\", \"status\", \"in\", [\"Failed\", \"Completed with errors\"], false]]",
+   "type": "DocType",
+   "url": ""
+  },
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "format": "{} e-mails",
+   "icon": "",
+   "kanban_board": "",
+   "label": "Alert E-mail Queue",
+   "link_to": "Email Queue",
+   "report_ref_doctype": "",
+   "restrict_to_domain": "",
+   "stats_filter": "[[\"Email Queue\", \"reference_doctype\", \"=\", \"IRB Alert Run\", false]]",
+   "type": "DocType",
+   "url": ""
+  },
+  {
+   "color": "Gray",
+   "doc_view": "List",
+   "format": "",
+   "icon": "",
+   "kanban_board": "",
+   "label": "Email Templates",
+   "link_to": "Email Template",
+   "report_ref_doctype": "",
+   "restrict_to_domain": "",
+   "stats_filter": "",
+   "type": "DocType",
+   "url": ""
+  }
+ ],
+ "title": "Timeline Alerts"
+}

@@ -76,8 +76,8 @@ const columns = computed<DataTableColumn[]>(() => [
 </script>
 
 <template>
-  <div class="rounded-xl border border-line bg-paper p-6 shadow-card">
-    <div v-if="$slots.tabs" class="-mx-6 -mt-6 mb-5">
+  <div class="rounded-xl border border-line bg-paper p-4 shadow-card sm:p-6">
+    <div v-if="$slots.tabs" class="-mx-4 -mt-4 mb-4 sm:-mx-6 sm:-mt-6 sm:mb-5">
       <slot name="tabs" />
     </div>
     <DataTable
@@ -91,7 +91,7 @@ const columns = computed<DataTableColumn[]>(() => [
     >
       <template #cell-student="{ row, value }">
         <div class="flex min-w-0 flex-col gap-1">
-          <span class="block w-32 whitespace-normal text-charcoal">{{ value }}</span>
+          <span class="block whitespace-normal text-charcoal sm:w-32">{{ value }}</span>
           <Badge v-if="isGroup(row)" theme="blue" variant="subtle" size="sm" class="self-start">
             Group · {{ row.student_count }}
           </Badge>

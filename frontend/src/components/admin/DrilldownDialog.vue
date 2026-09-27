@@ -62,7 +62,7 @@ const filteredRows = computed(() => {
   const term = search.value.trim().toLowerCase()
   if (term) {
     out = out.filter((r) =>
-      [r.student_name, r.project_title, r.programme, r.faculty_mentor, r.primary_reviewer, r.secondary_reviewer]
+      [String(r.project_id), r.student_name, r.project_title, r.programme, r.faculty_mentor, r.primary_reviewer, r.secondary_reviewer]
         .filter(Boolean)
         .some((v) => v!.toLowerCase().includes(term)),
     )
@@ -86,6 +86,7 @@ const canOpenProjects = computed(() =>
 )
 
 const allColumns: DataTableColumn[] = [
+  { key: 'project_id', label: 'Project ID', sortable: true },
   { key: 'student', label: 'Student', path: 'student_name', sortable: true },
   { key: 'project', label: 'Project', path: 'project_title', sortable: true },
   { key: 'programme', label: 'Programme', sortable: true },
@@ -129,6 +130,8 @@ function openProjects() {
 
 function exportCsv() {
   const header = [
+    'Project ID',
+    'Project',
     'Student Name',
     'Student ID',
     'Programme',
@@ -142,6 +145,8 @@ function exportCsv() {
   for (const r of filteredRows.value) {
     lines.push(
       [
+        r.project_id,
+        r.project_title,
         r.student_name,
         r.student_id,
         r.programme,
@@ -206,7 +211,7 @@ function exportCsv() {
               <input
                 v-model="search"
                 type="text"
-                placeholder="Search students, projects, mentors…"
+                placeholder="Search ID, students, projects, mentors…"
                 class="w-64 rounded-md border border-line bg-canvas py-1.5 pl-8 pr-2 text-sm text-charcoal placeholder:text-muted focus:border-primary focus:outline-none"
               />
             </div>
@@ -240,11 +245,16 @@ function exportCsv() {
               :columns="columns"
               :rows="filteredRows as unknown as Record<string, unknown>[]"
               row-key="project_id"
+              :clickable-rows="canOpenProjects"
               :loading="loading"
               empty-title="No matching projects"
               empty-description="Try a different search term or clear the filters."
               :page-size="10"
+              @row-click="(r) => canOpenProjects && viewProject(r as unknown as DrilldownRow)"
             >
+              <template #cell-project_id="{ value }">
+                <span class="font-semibold text-primary">#{{ value }}</span>
+              </template>
               <template #cell-status="{ value }">
                 <StatusBadge :status="value as string" />
               </template>

@@ -66,7 +66,7 @@ export function useAdminDashboard() {
       const [dashboardData, workloadData, activityData, trendData, allPendingRows] = await Promise.all([
         fetchDashboardData(filters),
         fetchRoleWorkload(filters),
-        fetchRecentActivity(filters),
+        fetchRecentActivity(filters, 100), // paged in the Recent Activity table
         fetchProjectTrend(filters),
         fetchDrilldownStudents({ filters, per_project: true }),
       ])

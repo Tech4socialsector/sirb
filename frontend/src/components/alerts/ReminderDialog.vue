@@ -442,7 +442,7 @@ const inputCls =
               <FeatherIcon v-if="recipientMode === m.v" name="check-circle" class="h-4 w-4 shrink-0 text-primary" />
             </button>
           </div>
-          <StudentPicker v-if="recipientMode === 'students'" v-model="picked" class="mb-3" />
+          <StudentPicker v-if="recipientMode === 'students'" v-model="picked" :timeline="timeline.name" class="mb-3" />
           <StatusChecklist
             v-model="statusSelection"
             :statuses="statuses"

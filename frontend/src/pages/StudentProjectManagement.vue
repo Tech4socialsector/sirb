@@ -88,10 +88,12 @@ function clearFilters() {
 const filteredStudents = computed(() => {
   let out = studentsView.value
   if (programmeFilter.value.length) out = out.filter((r) => programmeFilter.value.includes(r.programme))
-  const term = search.value.trim().toLowerCase()
+  const term = search.value.trim().toLowerCase().replace(/^#/, '')
   if (term) {
     out = out.filter((r) =>
-      [r.student_id, r.student_name, r.project_title, r.programme, r.faculty_mentor].filter(Boolean).some((v) => v!.toLowerCase().includes(term)),
+      [r.student_id, r.student_name, r.project_id ? String(r.project_id) : '', r.project_title, r.programme, r.faculty_mentor]
+        .filter(Boolean)
+        .some((v) => v!.toLowerCase().includes(term)),
     )
   }
   return out
@@ -100,14 +102,20 @@ const filteredStudents = computed(() => {
 const filteredGroups = computed(() => {
   let out = groupsView.value
   if (programmeFilter.value.length) out = out.filter((g) => programmeFilter.value.includes(g.programme))
-  const term = search.value.trim().toLowerCase()
+  const term = search.value.trim().toLowerCase().replace(/^#/, '')
   if (term) {
     out = out.filter((g) =>
-      [g.project_title, g.programme, g.faculty_mentor, ...g.members].filter(Boolean).some((v) => v!.toLowerCase().includes(term)),
+      [String(g.project_id), g.project_title, g.programme, g.faculty_mentor, ...g.members].filter(Boolean).some((v) => v!.toLowerCase().includes(term)),
     )
   }
   return out
 })
+
+// A student on several projects has several rows: key by student + project
+// (student_id alone repeats, which makes Vue reuse the wrong rows).
+const studentRows = computed(() =>
+  filteredStudents.value.map((r, i) => ({ ...r, _key: `${r.student_id}::${r.project_id || ''}::${i}` })),
+)
 
 const individualCount = computed(() => studentsView.value.filter((r) => r.project_type === 'Individual').length)
 
@@ -137,6 +145,7 @@ const studentColumns: DataTableColumn[] = [
   { key: 'student_id', label: 'Student ID', sortable: true },
   { key: 'student_name', label: 'Student Name', sortable: true },
   { key: 'programme', label: 'Programme', sortable: true },
+  { key: 'project_id', label: 'Project ID', sortable: true },
   { key: 'project_title', label: 'Project', sortable: true },
   { key: 'project_type', label: 'Type', sortable: true },
   { key: 'faculty_mentor', label: 'Mentor' },
@@ -146,6 +155,7 @@ const studentColumns: DataTableColumn[] = [
 ]
 
 const groupColumns: DataTableColumn[] = [
+  { key: 'project_id', label: 'Project ID', sortable: true },
   { key: 'project_title', label: 'Project', sortable: true },
   { key: 'programme', label: 'Programme', sortable: true },
   { key: 'members', label: 'Members' },
@@ -198,7 +208,7 @@ const groupColumns: DataTableColumn[] = [
             <input
               v-model="search"
               type="text"
-              placeholder="Search students, projects, mentors…"
+              placeholder="Search ID, students, projects, mentors…"
               class="w-64 rounded-md border border-line bg-canvas px-3 py-1.5 text-sm text-charcoal placeholder:text-muted focus:border-primary focus:outline-none"
             />
             <button
@@ -214,10 +224,14 @@ const groupColumns: DataTableColumn[] = [
         <DataTable
           v-if="view === 'students'"
           :columns="studentColumns"
-          :rows="filteredStudents as unknown as Record<string, unknown>[]"
-          row-key="student_id"
+          :rows="studentRows as unknown as Record<string, unknown>[]"
+          row-key="_key"
           empty-title="No students found"
         >
+          <template #cell-project_id="{ value }">
+            <button v-if="value" class="font-medium text-primary hover:underline" @click="openProject(value as string)">#{{ value }}</button>
+            <span v-else class="text-muted">—</span>
+          </template>
           <template #cell-project_type="{ value }">
             <span class="rounded-full px-2 py-0.5 text-xs font-medium" :class="value === 'Group' ? 'bg-blue-50 text-info' : 'bg-canvas text-muted'">
               {{ value }}
@@ -255,6 +269,9 @@ const groupColumns: DataTableColumn[] = [
           empty-title="No group projects found"
           empty-description="A group project is any project with more than one student mapped to it."
         >
+          <template #cell-project_id="{ value }">
+            <button class="font-medium text-primary hover:underline" @click="openProject(value as string)">#{{ value }}</button>
+          </template>
           <template #cell-members="{ value }">
             <div class="flex flex-wrap gap-1">
               <span v-for="name in value as string[]" :key="name" class="rounded-full bg-canvas px-2 py-0.5 text-xs text-charcoal">

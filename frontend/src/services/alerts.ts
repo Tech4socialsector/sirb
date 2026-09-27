@@ -80,8 +80,9 @@ export function fetchRun(name: string) {
   return call<AlertRunDetail>(`${NS}.get_run`, { name })
 }
 
-export function searchStudents(txt: string) {
-  return call<StudentOption[]>(`${NS}.search_students`, { txt })
+/** Empty `txt` lists the first students alphabetically; `timeline` limits to its unit and cycle. */
+export function searchStudents(txt: string, timeline: string | null = null) {
+  return call<{ rows: StudentOption[]; total: number }>(`${NS}.search_students`, { txt, timeline })
 }
 
 export function fetchStudentLabels(names: string[]) {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { FeatherIcon } from 'frappe-ui'
 import AppShell from '@/components/layout/AppShell.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import ErrorState from '@/components/common/ErrorState.vue'
@@ -17,8 +16,6 @@ import ActivityFeed from '@/components/admin/ActivityFeed.vue'
 import DrilldownDialog from '@/components/admin/DrilldownDialog.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useAdminDashboard } from '@/composables/useAdminDashboard'
-import { fetchRecordCounts, type ManagedDoctype } from '@/services/records'
-import { ApiError } from '@/services/api'
 import type { DashboardFilters, DrilldownRow } from '@/types/admin'
 
 const { currentUser } = useAuth()
@@ -52,7 +49,6 @@ async function initialLoad() {
 
 onMounted(() => {
   initialLoad()
-  loadRecordCounts()
 })
 
 async function onApplyFilters(newFilters: DashboardFilters) {
@@ -149,41 +145,6 @@ function onPipelineSelect(key: string) {
   else openDrilldown({ pending_group: key })
 }
 
-// ---- Manage Records counts --------------------------------------------
-// One lightweight COUNT query per doctype (frappe.client.get_count),
-// fetched once in parallel — not per-card network calls, and this
-// section's own failure never blocks the rest of the dashboard.
-interface ManagedCard {
-  label: string
-  description: string
-  icon: string
-  slug: string
-  doctype: ManagedDoctype
-}
-const managedCards: ManagedCard[] = [
-  { label: 'Academic Organizational Units', description: 'Universities, campuses, schools, departments and programmes.', icon: 'layers', slug: 'academic-organizational-unit', doctype: 'Academic Organizational Unit' },
-  { label: 'IRB Units', description: 'Review committees per academic unit, reviewer counts, mentor requirement.', icon: 'shield', slug: 'irb-unit', doctype: 'IRB Unit' },
-  { label: 'IRB Projects', description: 'Every submitted project and its current review status.', icon: 'file-text', slug: 'irb-project', doctype: 'IRB Project' },
-  { label: 'Faculty', description: 'Faculty records and their linked user accounts.', icon: 'user-check', slug: 'faculty', doctype: 'Faculty' },
-  { label: 'Students', description: 'Student records and their linked user accounts.', icon: 'users', slug: 'student', doctype: 'Student' },
-  { label: 'Faculty ↔ AO Unit Mapping', description: 'Which academic unit(s) each faculty member belongs to.', icon: 'link', slug: 'faculty-academic-organizational-unit', doctype: 'Faculty Academic Organizational Unit' },
-  { label: 'Student Project Mapping', description: 'Which student(s) are attached to each project.', icon: 'git-branch', slug: 'student-project-mapping', doctype: 'Student Project Mapping' },
-]
-const recordCounts = ref<Partial<Record<ManagedDoctype, number>>>({})
-const recordCountsLoading = ref(true)
-const recordCountsError = ref<ApiError | null>(null)
-
-async function loadRecordCounts() {
-  recordCountsLoading.value = true
-  recordCountsError.value = null
-  try {
-    recordCounts.value = await fetchRecordCounts()
-  } catch (e) {
-    recordCountsError.value = e instanceof ApiError ? e : new ApiError('Failed to load record counts.', 'server')
-  } finally {
-    recordCountsLoading.value = false
-  }
-}
 </script>
 
 <template>
@@ -306,42 +267,6 @@ async function loadRecordCounts() {
 
       <div class="mb-5">
         <ActivityFeed :activity="activity" />
-      </div>
-
-      <div class="rounded-xl border border-line bg-paper p-6 shadow-card">
-        <div class="mb-4 flex items-center justify-between gap-2">
-          <div>
-            <h3 class="text-base font-semibold text-charcoal">Manage Records</h3>
-            <p class="text-sm text-muted">
-              Create, edit or browse the underlying records. Opens in Frappe Desk, respecting your permissions.
-            </p>
-          </div>
-          <ErrorState v-if="recordCountsError" :error="recordCountsError" @retry="loadRecordCounts" />
-        </div>
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <a
-            v-for="dt in managedCards"
-            :key="dt.slug"
-            :href="`/app/${dt.slug}`"
-            target="_blank"
-            rel="noopener"
-            class="group flex flex-col gap-3 rounded-lg border border-line p-4 transition-colors hover:border-primary hover:bg-canvas"
-          >
-            <span class="flex h-9 w-9 items-center justify-center rounded-md bg-primary/5 text-primary">
-              <FeatherIcon :name="dt.icon" class="h-4.5 w-4.5" />
-            </span>
-            <div>
-              <p v-if="recordCountsLoading" class="h-7 w-12 animate-pulse rounded bg-canvas" />
-              <p v-else class="text-2xl font-semibold text-charcoal">{{ recordCounts[dt.doctype] ?? '—' }}</p>
-              <p class="mt-1 flex items-center gap-1 text-sm font-medium text-charcoal">{{ dt.label }}</p>
-              <p class="mt-0.5 text-xs text-muted">{{ dt.description }}</p>
-            </div>
-            <p class="flex items-center gap-1 text-xs font-medium text-primary">
-              View records
-              <FeatherIcon name="arrow-right" class="h-3 w-3" />
-            </p>
-          </a>
-        </div>
       </div>
 
       <DrilldownDialog

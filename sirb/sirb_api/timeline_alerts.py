@@ -894,6 +894,16 @@ def _alert_rows():
 	return alerts
 
 
+_STUDENT_FROM = """
+	from `tabStudent Project Mapping` as sp
+	join `tabIRB Project` as p on sp.irb_project = p.name
+	join `tabStudent` as s on sp.student = s.name
+	join `tabIRB Unit` as iu on p.irb_unit = iu.name
+	left join `tabUser` as u on u.name = s.system_user
+	where (sp.status = 'active' or p.status = 'Approved')
+"""
+
+
 def _student_search_rows(where, params, limit):
 	"""Students who can receive an alert (same membership rule as
 	_recipient_rows), one row per student with their projects summarised."""
@@ -903,14 +913,9 @@ def _student_search_rows(where, params, limit):
 			u.email as email, ifnull(u.enabled, 0) as user_enabled,
 			group_concat(distinct iu.ao_name order by iu.ao_name separator ', ') as programme,
 			count(distinct p.name) as project_count
-		from `tabStudent Project Mapping` as sp
-		join `tabIRB Project` as p on sp.irb_project = p.name
-		join `tabStudent` as s on sp.student = s.name
-		join `tabIRB Unit` as iu on p.irb_unit = iu.name
-		left join `tabUser` as u on u.name = s.system_user
-		where (sp.status = 'active' or p.status = 'Approved') and {where}
+		{_STUDENT_FROM} and {where}
 		group by s.name
-		order by s.full_name asc
+		order by s.full_name asc, s.name asc
 		limit {int(limit)}
 		""",
 		params,
@@ -918,19 +923,41 @@ def _student_search_rows(where, params, limit):
 	)
 
 
+def _timeline_scope_clause(timeline):
+	"""Same unit/cycle rule as with_timeline_scope, as SQL for the picker."""
+	if not timeline:
+		return "1=1", {}
+	scope = frappe.db.get_value(irb_timelines.TIMELINE, timeline, ["ao_unit", "irb_cycle"], as_dict=True)
+	clauses, params = [], {}
+	if scope and scope.ao_unit:
+		params["scope_unit"] = scope.ao_unit
+		clauses.append(
+			"""p.irb_unit in (select siu.name from `tabIRB Unit` as siu
+			join `tabAcademic Organizational Unit` as sa on siu.ao_unit = sa.name
+			join `tabAcademic Organizational Unit` as sc on sa.lft >= sc.lft and sa.rgt <= sc.rgt
+			where sc.name = %(scope_unit)s)"""
+		)
+	if scope and scope.irb_cycle:
+		params["scope_cycle"] = scope.irb_cycle
+		clauses.append("p.irb_cycle = %(scope_cycle)s")
+	return (" and ".join(clauses) or "1=1"), params
+
+
 @frappe.whitelist()
-def search_students(txt="", limit=20):
-	"""Picker search by name, student ID or e-mail."""
+def search_students(txt="", limit=50, timeline=None):
+	"""Picker list: every student with a project (in the timeline's unit and
+	cycle, when given), filtered by name, student ID or e-mail as the admin
+	types — an empty search lists the first `limit` alphabetically.
+	Returns {rows, total} so the picker can say "50 of 212"."""
 	_require_admin()
-	txt = (txt or "").strip()
-	if len(txt) < 2:
-		return []
-	like = "%" + txt.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
-	return _student_search_rows(
-		"(s.full_name like %(q)s or s.student_id like %(q)s or u.email like %(q)s or s.name like %(q)s)",
-		{"q": like},
-		min(max(cint(limit), 1), 50),
-	)
+	txt = (txt or "").strip()[:100]
+	where, params = _timeline_scope_clause(timeline)
+	if txt:
+		params["q"] = "%" + txt.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+		where += " and (s.full_name like %(q)s or s.student_id like %(q)s or u.email like %(q)s or s.name like %(q)s)"
+	limit = min(max(cint(limit), 1), 100)
+	total = frappe.db.sql(f"select count(distinct s.name) {_STUDENT_FROM} and {where}", params)[0][0]
+	return {"rows": _student_search_rows(where, params, limit), "total": total}
 
 
 @frappe.whitelist()

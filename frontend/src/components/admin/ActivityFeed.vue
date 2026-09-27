@@ -1,20 +1,41 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import EmptyState from '@/components/common/EmptyState.vue'
+import DataTable, { type DataTableColumn } from '@/components/common/DataTable.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import type { ActivityRow } from '@/types/admin'
 
 const props = defineProps<{ activity: ActivityRow[] }>()
 const router = useRouter()
+const search = ref('')
 
-function open(row: ActivityRow) {
-  router.push({ name: 'project-details', params: { name: row.project_id } })
+// Rows can repeat the same project, so give each a stable unique key.
+const rows = computed(() => props.activity.map((r, i) => ({ ...r, _key: `${r.project_id}::${r.date}::${i}`, by: actorLabel(r.performed_by) })))
+const filtered = computed(() => {
+  const term = search.value.trim().toLowerCase()
+  if (!term) return rows.value
+  return rows.value.filter((r) =>
+    [String(r.project_id), r.student_names, r.project_title, r.programme, r.from_status, r.to_status, r.by]
+      .filter(Boolean)
+      .some((v) => v!.toLowerCase().includes(term)),
+  )
+})
+
+const columns: DataTableColumn[] = [
+  { key: 'date', label: 'When', sortable: true },
+  { key: 'project_id', label: 'Project ID', sortable: true },
+  { key: 'student_names', label: 'Student(s)', sortable: true },
+  { key: 'programme', label: 'Programme', sortable: true },
+  { key: 'change', label: 'Status change' },
+  { key: 'by', label: 'By', sortable: true },
+]
+
+function open(row: Record<string, unknown>) {
+  router.push({ name: 'project-details', params: { name: String(row.project_id) } })
 }
 
 function relativeTime(value: string) {
-  const diffMs = Date.now() - new Date(value).getTime()
-  const diffMin = Math.round(diffMs / 60000)
+  const diffMin = Math.round((Date.now() - new Date(value).getTime()) / 60000)
   if (diffMin < 1) return 'just now'
   if (diffMin < 60) return `${diffMin}m ago`
   const diffHr = Math.round(diffMin / 60)
@@ -24,38 +45,53 @@ function relativeTime(value: string) {
   if (diffDay < 30) return `${diffDay}d ago`
   return new Date(value).toLocaleDateString(undefined, { dateStyle: 'medium' })
 }
-
 function actorLabel(email: string) {
-  return email === 'Administrator' ? 'Administrator' : email.split('@')[0].replace(/[._]/g, ' ')
+  return !email || email === 'Administrator' ? email || '—' : email.split('@')[0].replace(/[._]/g, ' ')
 }
-
-const entries = computed(() => props.activity.slice(0, 10))
+const asRow = (r: Record<string, unknown>) => r as unknown as ActivityRow
 </script>
 
 <template>
   <div class="rounded-xl border border-line bg-paper p-6 shadow-card">
-    <h3 class="mb-1 text-base font-semibold text-charcoal">Recent Activity</h3>
-    <p class="mb-4 text-sm text-muted">The latest status changes across every project.</p>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h3 class="text-base font-semibold text-charcoal">Recent Activity</h3>
+        <p class="text-sm text-muted">The latest status changes across every project. Click a row to open the project.</p>
+      </div>
+      <input
+        v-if="activity.length"
+        v-model="search"
+        type="text"
+        placeholder="Search ID, student, status…"
+        class="w-60 rounded-md border border-line bg-canvas px-3 py-1.5 text-sm text-charcoal placeholder:text-muted focus:border-primary focus:outline-none"
+      />
+    </div>
 
-    <EmptyState v-if="!entries.length" icon="activity" title="No recent status changes" />
-    <ol v-else class="space-y-0">
-      <li v-for="(row, i) in entries" :key="i" class="flex gap-3">
-        <div class="flex flex-col items-center">
-          <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-          <span v-if="i < entries.length - 1" class="w-px flex-1 bg-line" />
+    <DataTable
+      :columns="columns"
+      :rows="filtered as unknown as Record<string, unknown>[]"
+      row-key="_key"
+      clickable-rows
+      :page-size="10"
+      :empty-title="search ? 'No matching activity' : 'No recent status changes'"
+      @row-click="open"
+    >
+      <template #cell-date="{ value }">
+        <span class="whitespace-nowrap text-sm" :title="new Date(value as string).toLocaleString()">{{ relativeTime(value as string) }}</span>
+      </template>
+      <template #cell-project_id="{ value }"><span class="font-semibold text-primary">#{{ value }}</span></template>
+      <template #cell-student_names="{ row }">
+        <p class="max-w-[14rem] truncate font-medium text-charcoal">{{ asRow(row).student_names || '—' }}</p>
+        <p v-if="asRow(row).project_title" class="max-w-[14rem] truncate text-xs text-muted">{{ asRow(row).project_title }}</p>
+      </template>
+      <template #cell-change="{ row }">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <StatusBadge v-if="asRow(row).from_status" :status="asRow(row).from_status" />
+          <span v-if="asRow(row).from_status" class="text-muted">→</span>
+          <StatusBadge :status="asRow(row).to_status" />
         </div>
-        <button class="min-w-0 flex-1 pb-5 text-left" @click="open(row)">
-          <p class="truncate text-sm font-medium text-charcoal">
-            {{ row.student_names || row.project_title || row.project_id }}
-          </p>
-          <div class="mt-1 flex flex-wrap items-center gap-1.5">
-            <span class="text-xs text-muted">{{ row.programme }}</span>
-            <span class="text-xs text-muted">·</span>
-            <StatusBadge :status="row.to_status" />
-          </div>
-          <p class="mt-1 text-xs text-muted">{{ actorLabel(row.performed_by) }} · {{ relativeTime(row.date) }}</p>
-        </button>
-      </li>
-    </ol>
+      </template>
+      <template #cell-by="{ value }"><span class="whitespace-nowrap text-sm capitalize">{{ value }}</span></template>
+    </DataTable>
   </div>
 </template>

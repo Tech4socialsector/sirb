@@ -64,7 +64,7 @@ MENTOR_PENDING_STATUSES = [worklists.MENTOR_PENDING_STATUS]
 PRIMARY_REVIEWER_PENDING_STATUSES = worklists.PRIMARY_REVIEWER_PENDING_STATUSES
 SECONDARY_REVIEWER_PENDING_STATUSES = [worklists.SECONDARY_REVIEWER_PENDING_STATUS]
 
-ALLOWED_ROLES = {"System Manager", "Administrator"}
+ALLOWED_ROLES = {"System Manager", "Administrator", "IRB Dashboard Viewer"}
 
 
 def _check_permission():
@@ -155,6 +155,11 @@ BASE_JOIN = """
 	join `tabIRB Project` as p on sp.irb_project = p.name
 	join `tabStudent` as s on sp.student = s.name
 	join `tabIRB Unit` as iu on p.irb_unit = iu.name
+	join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+	left join `tabAcademic Organizational Unit` as campus_ao
+		on campus_ao.ao_type = "Campus"
+		and campus_ao.lft <= ao_unit.lft
+		and campus_ao.rgt >= ao_unit.rgt
 	where (sp.status = "active" or p.status = "Approved")
 """
 
@@ -366,6 +371,7 @@ def get_filter_options():
 	return {
 		"campuses": campuses,
 		"programmes": programmes,
+		"campuses": campuses,
 		"academic_years": [d["academic_year"] for d in academic_years],
 		"cycles": [d["irb_cycle"] for d in cycles],
 		"mentors": mentors,
@@ -400,6 +406,11 @@ def get_role_workload(filters=None):
 			join `tabIRB Project` as p on sp.irb_project = p.name
 			join `tabStudent` as s on sp.student = s.name
 			join `tabIRB Unit` as iu on p.irb_unit = iu.name
+			join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+			left join `tabAcademic Organizational Unit` as campus_ao
+				on campus_ao.ao_type = "Campus"
+				and campus_ao.lft <= ao_unit.lft
+				and campus_ao.rgt >= ao_unit.rgt
 			join `tabFaculty` as f on p.{role_field} = f.name
 			where sp.status = "active"
 			and p.status in ({','.join(placeholders)})
@@ -523,6 +534,11 @@ def get_drilldown_students(
 		join `tabIRB Project` as p on sp.irb_project = p.name
 		join `tabStudent` as s on sp.student = s.name
 		join `tabIRB Unit` as iu on p.irb_unit = iu.name
+		join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+		left join `tabAcademic Organizational Unit` as campus_ao
+			on campus_ao.ao_type = "Campus"
+			and campus_ao.lft <= ao_unit.lft
+			and campus_ao.rgt >= ao_unit.rgt
 		left join `tabFaculty` as fm on p.faculty_mentor = fm.name
 		left join `tabFaculty` as pr on p.primary_reviewer = pr.name
 		left join `tabFaculty` as sr on p.secondary_reviewer = sr.name

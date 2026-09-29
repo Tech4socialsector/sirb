@@ -1,0 +1,208 @@
+{
+ "actions": [],
+ "autoname": "format:ALR-{YYYY}-{#####}",
+ "creation": "2026-09-26 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "alert",
+  "alert_name",
+  "trigger",
+  "triggered_by",
+  "status",
+  "email_template",
+  "filters",
+  "request_id",
+  "timeline",
+  "milestone",
+  "deadline_label",
+  "counts_section",
+  "total_recipients",
+  "sent_count",
+  "column_break_counts",
+  "skipped_count",
+  "failed_count",
+  "timing_section",
+  "started_at",
+  "finished_at",
+  "error",
+  "recipients_section",
+  "recipients"
+ ],
+ "fields": [
+  {
+   "fieldname": "alert",
+   "fieldtype": "Link",
+   "label": "Timeline Alert",
+   "options": "IRB Timeline Alert",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "alert_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Alert Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "trigger",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Trigger",
+   "options": "Manual\nScheduled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "triggered_by",
+   "fieldtype": "Data",
+   "label": "Triggered By",
+   "read_only": 1
+  },
+  {
+   "default": "Queued",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Queued\nRunning\nCompleted\nCompleted with errors\nNo recipients\nFailed",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "email_template",
+   "fieldtype": "Data",
+   "label": "Email Template",
+   "read_only": 1
+  },
+  {
+   "fieldname": "filters",
+   "fieldtype": "Code",
+   "label": "Recipient Filters",
+   "options": "JSON",
+   "read_only": 1
+  },
+  {
+   "fieldname": "request_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Request ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "timeline",
+   "fieldtype": "Data",
+   "label": "Timeline",
+   "read_only": 1
+  },
+  {
+   "fieldname": "milestone",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Deadline Row",
+   "read_only": 1
+  },
+  {
+   "fieldname": "deadline_label",
+   "fieldtype": "Data",
+   "label": "Deadline",
+   "read_only": 1
+  },
+  {
+   "fieldname": "counts_section",
+   "fieldtype": "Section Break",
+   "label": "Result"
+  },
+  {
+   "fieldname": "total_recipients",
+   "fieldtype": "Int",
+   "label": "Matched",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sent_count",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Queued for Delivery",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_counts",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "skipped_count",
+   "fieldtype": "Int",
+   "label": "Skipped",
+   "read_only": 1
+  },
+  {
+   "fieldname": "failed_count",
+   "fieldtype": "Int",
+   "label": "Failed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "timing_section",
+   "fieldtype": "Section Break",
+   "label": "Timing"
+  },
+  {
+   "fieldname": "started_at",
+   "fieldtype": "Datetime",
+   "label": "Started At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "finished_at",
+   "fieldtype": "Datetime",
+   "label": "Finished At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "error",
+   "fieldtype": "Long Text",
+   "label": "Error",
+   "read_only": 1
+  },
+  {
+   "fieldname": "recipients_section",
+   "fieldtype": "Section Break",
+   "label": "Recipients"
+  },
+  {
+   "fieldname": "recipients",
+   "fieldtype": "Table",
+   "label": "Recipients",
+   "options": "IRB Alert Run Recipient",
+   "read_only": 1
+  }
+ ],
+ "in_create": 1,
+ "links": [],
+ "modified": "2026-09-26 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Sirb",
+ "name": "IRB Alert Run",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "alert_name"
+}

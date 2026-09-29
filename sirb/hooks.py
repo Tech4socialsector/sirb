@@ -11,15 +11,16 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "sirb",
-# 		"logo": "/assets/sirb/logo.png",
-# 		"title": "Sirb",
-# 		"route": "/sirb",
-# 		"has_permission": "sirb.api.permission.has_app_permission"
-# 	}
-# ]
+# Registering the app also makes Frappe's login send users to "/sirb"
+# (frappe.apps.get_default_path) instead of the Desk at "/app".
+add_to_apps_screen = [
+	{
+		"name": "sirb",
+		"logo": "/assets/sirb/frontend/favicon.svg",
+		"title": "SIRB",
+		"route": "/sirb",
+	}
+]
 
 # Includes in <head>
 # ------------------
@@ -46,6 +47,8 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+# Timeline Alert variables + "Preview as Timeline Alert" on the Email Template form.
+doctype_js = {"Email Template": "public/js/email_template.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -66,6 +69,15 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 # 	"Role": "home_page"
 # }
 
+# Website Route Rules
+# --------------------
+# Serves the Vue SPA (frontend/) for every /sirb/<path> sub-route so that
+# client-side (Vue Router) navigation, direct URL access, and browser
+# refresh all resolve to the same built index page.
+website_route_rules = [
+	{"from_route": "/sirb/<path:app_path>", "to_route": "sirb"},
+]
+
 # Generators
 # ----------
 
@@ -85,7 +97,7 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 # ------------
 
 # before_install = "sirb.install.before_install"
-# after_install = "sirb.install.after_install"
+after_install = "sirb.install.after_install"
 
 # Uninstallation
 # ------------
@@ -119,13 +131,14 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+# Row-level access: people only see IRB Projects they're on (sirb/permissions.py).
+permission_query_conditions = {
+	"IRB Project": "sirb.permissions.irb_project_query_conditions",
+}
+
+has_permission = {
+	"IRB Project": "sirb.permissions.has_irb_project_permission",
+}
 
 # DocType Class
 # ---------------
@@ -168,6 +181,13 @@ app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
 # 		"sirb.tasks.monthly"
 # 	],
 # }
+
+scheduler_events = {
+	"cron": {
+		# Timeline Alerts: fire scheduled alerts whose next run has passed.
+		"*/5 * * * *": ["sirb.sirb_api.timeline_alerts.run_due_alerts"],
+	},
+}
 
 # Testing
 # -------

@@ -1,0 +1,49 @@
+
+@keyframes dialog-overlay-in-3428e46c {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
+}
+@keyframes dialog-overlay-out-3428e46c {
+from {
+    opacity: 1;
+}
+to {
+    opacity: 0;
+}
+}
+@keyframes dialog-content-in-3428e46c {
+from {
+    opacity: 0.5;
+    transform: scale(0.98);
+}
+to {
+    opacity: 1;
+    transform: scale(1);
+}
+}
+@keyframes dialog-content-out-3428e46c {
+from {
+    opacity: 1;
+    transform: scale(1);
+}
+to {
+    opacity: 0.5;
+    transform: scale(0.98);
+}
+}
+.dialog-overlay[data-state='open'] {
+  animation: dialog-overlay-in-3428e46c 100ms ease-out;
+}
+.dialog-overlay[data-state='closed'] {
+  animation: dialog-overlay-out-3428e46c 150ms ease-in;
+}
+.dialog-content[data-state='open'] {
+  animation: dialog-content-in-3428e46c 100ms ease-out;
+}
+.dialog-content[data-state='closed'] {
+  animation: dialog-content-out-3428e46c 150ms ease-in;
+}

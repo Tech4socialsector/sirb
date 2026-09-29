@@ -3,7 +3,21 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe.utils import get_url
+from sirb.proposal_checks import format_issues, get_proposal_issues
+from sirb.workflow import validate_status_change
 from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
+
+# Statuses in which the student is filling in or correcting the proposal.
+STUDENT_DRAFT_STATUSES = (
+	"Awaiting proposal completion by student",
+	"Awaiting student correction for mentor feedback",
+	"Awaiting student correction for reviewer feedback",
+)
+
+
+class ProposalIncompleteError(frappe.ValidationError):
+	pass
 
 class IRBProject(Document):
 	def validate(self):
@@ -13,6 +27,10 @@ class IRBProject(Document):
 			# in the rest later, so skip mandatory checks for that creation only.
 			self.flags.ignore_mandatory = True
 			return
+
+		# Only the transitions the user's role on this project allows
+		# (status is read-only in the form but not enforced by Frappe).
+		validate_status_change(self)
 
 		# Roles allowed to edit an existing IRB Project without filling the
 		# mandatory fields (e.g. status/reviewer/mentor changes on a project
@@ -24,27 +42,27 @@ class IRBProject(Document):
 			self.flags.ignore_mandatory = True
 			return
 
-		if not self.i_hereby_confirm_the_above:
-			frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
+		if self.is_new():
+			# Not script-created: core mandatory validation runs as normal.
+			if not self.i_hereby_confirm_the_above:
+				frappe.throw("Please ensure that you have read the IRB policy and checked the student declaration in the \"Uploads & Declaration\" tab")
+			return
 
-		if not self.is_new():
-			if self.project_domain == "-- Select --":
-				frappe.throw("Please select a valid IRB project domain.")
-			elif self.project_domain in ["Humans", "BOTH Humans AND Non Humans"]:
-				if self.minor_participants == "-- Select --":
-					frappe.throw("Please select a valid answer for 4. Minors check")
-				if self.will_data_be_gathered_through_digital_means == "-- Select --":
-					frappe.throw("Please select a valid answer for 13.Gathering of Audio, Photographic and Video Data")
-			elif self.project_domain in ["Non Human Species", "BOTH Humans AND Non Humans"]:
-				if self.research_type ==  "-- Select --":
-					frappe.throw("Please select a valid answer for the Research Type in the Non-Human Questionnaire.")
-				if self.research_type in ["Lab based experiments", "BOTH Lab AND Field based"] and self.manipulative_experiments_select ==  "-- Select --":
-					frappe.throw("Please select a valid answer for \"7. Are you performing manipulative experiments with animals?\" in the Non-Human Questionnaire.")
+		if self.status in STUDENT_DRAFT_STATUSES:
+			# The student is still writing (or correcting) the proposal: let
+			# them save partial progress. Completeness is enforced when they
+			# submit, below.
+			self.flags.ignore_mandatory = True
+			return
 
-				if self.research_type in ["Field-based research (plants, animals included)", "BOTH Lab AND Field based"] and self.consent_for_people_interaction ==  "-- Select --":
-					frappe.throw("Please select a valid answer for \"If data collection involves interaction with people, will consent be taken?\" in the Non-Human Questionnaire.")
-		# else: new document, not script-created — core mandatory-field
-		# validation runs as normal.
+		previous = self.get_doc_before_save()
+		if previous and previous.status in STUDENT_DRAFT_STATUSES:
+			# Leaving a student-editing status = the student is submitting.
+			# Check every rule at once so they get the full list, not one
+			# error per attempt.
+			issues = get_proposal_issues(self)
+			if issues:
+				frappe.throw(format_issues(issues), exc=ProposalIncompleteError, title="Proposal incomplete")
 
 	def before_save(self):
 		# print("Before save")
@@ -144,9 +162,8 @@ class IRBProject(Document):
 					for n in notification_info:
 						student_name_list.append(n["student_name"])
 						student_email_list.append(n["student_email"])
-					student_names = ",".join(student_name_list)
-					if student_names[-1] == ',':
-						student_names = student_names[:-1]
+					# full_name is optional on Student; a blank one must not break the save.
+					student_names = ",".join(n for n in student_name_list if n)
 					mentor_email = notification_info[0]["mentor_email"]
 					faculty_recipient_list = []
 					to_students = to_faculty = False
@@ -186,10 +203,12 @@ class IRBProject(Document):
 						to_students = True
 					# print("Recipient list ", recipient_list)
 					# Create a system notification
+					project_url = get_url(f"/sirb/projects/{self.name}")
 					params = {
 						"project_status": self.status,
 						"project_name": self.title,
-						"student_names": student_names
+						"student_names": student_names,
+						"project_url": project_url,
 					}
 					if to_faculty:
 						send_email_if_configured("Status Change Email Template", params, faculty_recipient_list)
@@ -218,11 +237,15 @@ class IRBProject(Document):
 			})
 			# print("Mappings - ", sp_mappings)
 			for sp in sp_mappings:
-				# print("Mapping name ", sp["name"])
+				# Closing the student's mapping is a system consequence of the
+				# approval, not an edit by the approver — reviewers have no
+				# write access to Student Project Mapping, which made "Grant
+				# FINAL approval" fail with a PermissionError. Committing is left
+				# to the request so a later failure can't leave it half-done.
 				sp_doc = frappe.get_doc("Student Project Mapping", sp["name"])
 				sp_doc.status = "inactive"
+				sp_doc.flags.ignore_permissions = True
 				sp_doc.save()
-				frappe.db.commit()
 
 		versions = frappe.get_all(
 			"Version",

@@ -13,6 +13,7 @@ import EthicsQuestionnaire from '@/components/projects/EthicsQuestionnaire.vue'
 import ProposalIssues from '@/components/projects/ProposalIssues.vue'
 import { useProject } from '@/composables/useProject'
 import { useProjectActions } from '@/composables/useProjectActions'
+import { useRoles } from '@/composables/useRoles'
 import { useTimelineDrawer } from '@/composables/useTimelineDrawer'
 import { ApiError } from '@/services/api'
 import { fetchProposalIssues } from '@/services/projects'
@@ -77,6 +78,14 @@ const docRef = computed(() => localDoc.value)
 
 const allowedStatuses = computed(() => detail.value?.allowed_statuses)
 const { actions, canEdit } = useProjectActions(docRef, roles, hasSecondaryReviewer, allowedStatuses)
+
+// Admins/System Managers can reassign the mentor and reviewers and set the
+// status directly — the server lets them bypass the status workflow
+// (sirb.workflow) and still validates the combination (irb_project.py).
+const { isAdmin } = useRoles()
+const ADMIN_EDITABLE_FIELDS: ReadonlySet<string> = new Set(['status', 'faculty_mentor', 'primary_reviewer', 'secondary_reviewer'])
+const overrideEditable = computed<ReadonlySet<string>>(() => (isAdmin.value ? ADMIN_EDITABLE_FIELDS : new Set()))
+const canSave = computed(() => canEdit.value || isAdmin.value)
 
 // Statuses in which the student is writing/correcting the proposal —
 // must match STUDENT_DRAFT_STATUSES in irb_project.py.
@@ -259,6 +268,7 @@ const correctionNoticeStatuses = [
           :issue-messages="issueMessages"
           :link-titles="detail.link_titles"
           :disabled="!canEdit"
+          :override-editable="overrideEditable"
           @update="updateField"
         />
       </div>
@@ -269,7 +279,7 @@ const correctionNoticeStatuses = [
           <Button v-if="isStudentDraft && canEdit" variant="outline" icon-left="check-circle" :loading="checking" @click="onCheckClick">
             Check for missing answers
           </Button>
-          <Button v-if="canEdit && dirty" variant="solid" :loading="saving" @click="saveChanges()">Save</Button>
+          <Button v-if="canSave && dirty" variant="solid" :loading="saving" @click="saveChanges()">Save</Button>
         </div>
       </div>
     </template>

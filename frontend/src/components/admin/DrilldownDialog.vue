@@ -92,6 +92,8 @@ const allColumns: DataTableColumn[] = [
   { key: 'programme', label: 'Programme', sortable: true },
   { key: 'status', label: 'Status', sortable: true },
   { key: 'mentor', label: 'Mentor', path: 'faculty_mentor' },
+  { key: 'primary_reviewer', label: 'Primary Reviewer', path: 'primary_reviewer' },
+  { key: 'secondary_reviewer', label: 'Secondary Reviewer', path: 'secondary_reviewer' },
   { key: 'updated', label: 'Last Updated', path: 'last_updated', sortable: true },
   { key: 'actions', label: '', align: 'right' },
 ]

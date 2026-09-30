@@ -42,9 +42,9 @@ def get_reviewers(irb_unit, exclude_faculty_id = None):
             project_count_for_secondary_reviewers[fmember.faculty_member] = 0
     
     primary_reviewer_data = frappe.db.sql(
-        f'''select p.primary_reviewer, count(*) as count from `tabIRB Project` as p where 
-        p.primary_reviewer is not null and p.irb_unit = "{irb_unit}" and p.status != "Approved" 
-        group by p.primary_reviewer;''', as_dict=1
+        '''select p.primary_reviewer, count(*) as count from `tabIRB Project` as p where 
+        p.primary_reviewer is not null and p.irb_unit = %(irb_unit)s and p.status != "Approved" 
+        group by p.primary_reviewer;''', {"irb_unit": irb_unit}, as_dict=1
     )
     print(primary_reviewer_data)
     for d in primary_reviewer_data:
@@ -72,11 +72,11 @@ def get_reviewers(irb_unit, exclude_faculty_id = None):
 
     if num_reviewers == 2:
         print("Checking secondary")
-        query = f'''select p.secondary_reviewer, count(*) as count from `tabIRB Project` as p where 
-            p.secondary_reviewer is not null and p.irb_unit = "{irb_unit}" and p.status != "Approved" 
+        query = '''select p.secondary_reviewer, count(*) as count from `tabIRB Project` as p where 
+            p.secondary_reviewer is not null and p.irb_unit = %(irb_unit)s and p.status != "Approved" 
             group by p.secondary_reviewer;'''
         secondary_reviewer_data = frappe.db.sql(
-            query, as_dict=1
+            query, {"irb_unit": irb_unit}, as_dict=1
         )
         for d in secondary_reviewer_data:
             # frappe.log_error(
@@ -124,92 +124,40 @@ def set_mentor_and_reviewer_roles():
     # the status field itself was already committed — the frontend never
     # gets a clean response to refresh from.
 
-    # Get all current primary reviewers
-    query = '''
-        select u.email from tabUser as u join `tabIRB Project` as p join tabFaculty as f
-        where p.primary_reviewer is not null and p.status != "Approved" and 
-        p.primary_reviewer=f.name and f.system_user=u.email'''
-    result = frappe.db.sql(query, as_list=1)
-    if result:
-        prs = [pr[0] for pr in result]
-        print("Primary reviewers - ", prs)
-        pr_docs = {p: _get_user_ignoring_perms(p) for p in prs}
+    # User.add_roles()/remove_roles() save the user unconditionally, and this
+    # runs on every IRB Project save — so only touch users whose roles
+    # actually change. Re-saving every mentor/reviewer each time made bulk
+    # student uploads (one project save per CSV row) crawl.
+    for link_field, role in (
+        ("primary_reviewer", "Primary IRB Reviewer"),
+        ("secondary_reviewer", "Secondary IRB Reviewer"),
+        ("faculty_mentor", "Faculty Mentor"),
+    ):
+        _sync_role_holders(link_field, role)
 
-        print(pr_docs)
-        for _,p in pr_docs.items():
-            print("Adding for ", p)
-            p.add_roles("Primary IRB Reviewer")
 
-        all_prs = frappe.get_all(
-            "User",
-            filters={
-                "enabled": 1,
-                "role_profile_name": ["in", ["Primary IRB Reviewer"]]
-            },
-            pluck="name"
-        )        
-        all_prs_docs = {p: _get_user_ignoring_perms(p) for p in all_prs}
-        print(pr_docs, all_prs_docs)
-        for id, user in all_prs_docs.items():
-            if id not in pr_docs:
-                print("Removing for ", user)
-                user.remove_roles("Primary IRB Reviewer")
+def _sync_role_holders(link_field, role):
+    """Give `role` to every user linked via `link_field` on an unapproved
+    project, and take it from users with that role profile who no longer are."""
+    current = set(frappe.db.sql_list(
+        f"""select distinct u.name from tabUser as u join `tabIRB Project` as p join tabFaculty as f
+        where p.{link_field} is not null and p.status != "Approved" and
+        p.{link_field}=f.name and f.system_user=u.email"""
+    ))
+    if not current:
+        return
 
-    # Get all current secondary reviewers
-    query = '''
-        select u.email from tabUser as u join `tabIRB Project` as p join tabFaculty as f
-        where p.secondary_reviewer is not null and p.status != "Approved" and 
-        p.secondary_reviewer=f.name and f.system_user=u.email'''
-    result = frappe.db.sql(query, as_list=1)
-    if result:
-        srs = [sr[0] for sr in result]
-        print("Secondary reviewers - ", srs)
-        secondary_reviewers = {s: _get_user_ignoring_perms(s) for s in srs}
-        for _, s in secondary_reviewers.items():
-            s.add_roles("Secondary IRB Reviewer")
-                                
-        all_srs = frappe.get_all(
-            "User",
-            filters={
-                "enabled": 1,
-                "role_profile_name": ["in", ["Secondary IRB Reviewer"]]
-            },
-            pluck="name"
-        )
-        all_srs_docs = {s: _get_user_ignoring_perms(s) for s in all_srs}
-        for _, user in all_srs_docs.items():
-            if user not in secondary_reviewers:
-                user.remove_roles("Secondary IRB Reviewer")
+    has_role = set(frappe.db.sql_list(
+        "select parent from `tabHas Role` where parenttype='User' and role=%s", role
+    ))
+    for name in current - has_role:
+        _get_user_ignoring_perms(name).add_roles(role)
 
-    # Get all current mentors
-    query = '''
-        select u.email from tabUser as u join `tabIRB Project` as p join tabFaculty as f
-        where p.faculty_mentor is not null and p.status != "Approved" and 
-        p.faculty_mentor=f.name and f.system_user=u.email'''
-    #print(query)
-    result = frappe.db.sql(query, as_list=1)
-    if result:
-        current_mentor_ids = [m[0] for m in result]
-        #print("Faculty mentors - ", current_mentor_ids)
-        current_mentors = {cm: _get_user_ignoring_perms(cm) for cm in current_mentor_ids}
-        #print("Faculty mentors - ", current_mentors)
-        for _, m in current_mentors.items():
-            m.add_roles("Faculty Mentor")
-                               
-        all_mentors = frappe.get_all(
-            "User",
-            filters={
-                "enabled": 1,
-                "role_profile_name": ["in", ["Faculty Mentor"]]  # if using role profiles
-            },
-            pluck="name"
-        )        
-        #print(all_mentors)
-        all_mentor_docs = {m: _get_user_ignoring_perms(m) for m in all_mentors}
-        #print(all_mentor_docs)
-        for _, user in all_mentor_docs.items():
-            if user not in current_mentors:
-                user.remove_roles("Faculty Mentor")
+    profile_holders = set(frappe.get_all(
+        "User", filters={"enabled": 1, "role_profile_name": role}, pluck="name"
+    ))
+    for name in (profile_holders & has_role) - current:
+        _get_user_ignoring_perms(name).remove_roles(role)
 
 
 def send_email_if_configured(email_template, params, recipient_list):

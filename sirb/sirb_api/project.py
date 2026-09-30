@@ -34,6 +34,39 @@ def _link_titles(doc):
 	return titles
 
 
+# Label shown to students in place of whoever reviewed their project.
+REVIEWER_LABEL = "IRB Reviewer"
+REVIEWER_ROLES = {"Primary IRB Reviewer", "Secondary IRB Reviewer"}
+STAFF_ROLES = {"System Manager", "Administrator"}
+
+
+def _hide_reviewers_from(roles):
+	"""True when the caller sees this project only as its student. The
+	Student role has read on every permlevel of IRB Project, so Frappe's
+	field filtering doesn't hide reviewer identities or the reviewers'
+	internal notes from students — these helpers do it instead."""
+	if not roles or not roles.get("is_student"):
+		return False
+	if roles.get("is_mentor") or roles.get("is_primary_reviewer") or roles.get("is_secondary_reviewer"):
+		return False
+	return not (STAFF_ROLES & set(frappe.get_roles()))
+
+
+def _is_reviewer_only_field(fieldname):
+	"""Who the reviewers are, plus the notes they exchange between
+	themselves (_prn/_srn), as opposed to feedback meant for the student."""
+	return (
+		fieldname
+		in ("primary_reviewer", "secondary_reviewer", "num_reviewers", "secondary_reviewers_comments_to_primary_reviewer")
+		or fieldname.endswith("_prn")
+		or fieldname.endswith("_srn")
+	)
+
+
+def _student_roles(project_name):
+	return get_irb_project_roles(user=frappe.session.user, project_name=project_name)
+
+
 @frappe.whitelist()
 def get_project_detail(project_name):
 	"""Single aggregated payload for the Project Details page: the doc
@@ -48,9 +81,17 @@ def get_project_detail(project_name):
 	roles = get_irb_project_roles(user=frappe.session.user, project_name=project_name)
 	students = get_project_students(project_name)
 
+	doc_dict = doc.as_dict()
+	link_titles = _link_titles(doc)
+	if _hide_reviewers_from(roles):
+		for fieldname in [f for f in doc_dict if _is_reviewer_only_field(f)]:
+			doc_dict.pop(fieldname)
+		for fieldname in [f for f in link_titles if _is_reviewer_only_field(f)]:
+			link_titles.pop(fieldname)
+
 	return {
-		"doc": doc.as_dict(),
-		"link_titles": _link_titles(doc),
+		"doc": doc_dict,
+		"link_titles": link_titles,
 		"roles": roles,
 		"students": students,
 		"meta": {
@@ -68,7 +109,18 @@ def get_status_change_history(project_name):
 	derived from the Version doctype the same way irb_admin_console's
 	get_recent_activity() and the Projects by IRB Unit report already do.
 	"""
-	frappe.get_doc("IRB Project", project_name).check_permission("read")
+	doc = frappe.get_doc("IRB Project", project_name)
+	doc.check_permission("read")
+	hide_reviewers = _hide_reviewers_from(_student_roles(project_name))
+	mentor_user = doc.faculty_mentor and frappe.db.get_value("Faculty", doc.faculty_mentor, "system_user")
+	reviewer_cache = {}
+
+	def display_user(user):
+		if not hide_reviewers or user == mentor_user:
+			return user
+		if user not in reviewer_cache:
+			reviewer_cache[user] = bool(REVIEWER_ROLES & set(frappe.get_roles(user)))
+		return REVIEWER_LABEL if reviewer_cache[user] else user
 
 	versions = frappe.db.sql(
 		"""select data, owner, creation from `tabVersion`
@@ -90,7 +142,7 @@ def get_status_change_history(project_name):
 					{
 						"from_status": change[1],
 						"to_status": change[2],
-						"changed_by": v["owner"],
+						"changed_by": display_user(v["owner"]),
 						"date": v["creation"],
 					}
 				)
@@ -104,6 +156,7 @@ def get_field_changes_since_status(project_name, since_status):
 	students/mentors/reviewers (update_field_changes / get_versions_after_status_change).
 	"""
 	frappe.get_doc("IRB Project", project_name).check_permission("read")
+	hide_reviewers = _hide_reviewers_from(_student_roles(project_name))
 
 	versions = frappe.db.sql(
 		"""select data, modified from `tabVersion`
@@ -130,6 +183,8 @@ def get_field_changes_since_status(project_name, since_status):
 			if len(change) < 3:
 				continue
 			fieldname = change[0]
+			if hide_reviewers and _is_reviewer_only_field(fieldname):
+				continue
 			field_changes.setdefault(fieldname, []).append(
 				{"old_value": change[1], "new_value": change[2], "date": v["date"]}
 			)

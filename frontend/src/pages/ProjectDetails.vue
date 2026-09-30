@@ -70,6 +70,9 @@ const projectError = computed(() => {
 
 const roles = computed(() => detail.value?.roles ?? null)
 const hasSecondaryReviewer = computed(() => Boolean(localDoc.value?.secondary_reviewer))
+// Students must not see who is reviewing their project; the server also
+// strips the reviewer fields from their payload (sirb_api.project).
+const showReviewer = computed(() => Boolean(localDoc.value && 'primary_reviewer' in localDoc.value && !roles.value?.is_student))
 const docRef = computed(() => localDoc.value)
 
 const allowedStatuses = computed(() => detail.value?.allowed_statuses)
@@ -224,7 +227,7 @@ const correctionNoticeStatuses = [
         "Submit corrections" below once you're done.
       </div>
 
-      <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div class="mb-4 grid grid-cols-1 gap-4" :class="showReviewer ? 'md:grid-cols-3' : 'md:grid-cols-2'">
         <StudentInformation :students="detail.students" />
         <PersonCard
           label="Faculty Mentor"
@@ -233,6 +236,7 @@ const correctionNoticeStatuses = [
           :can-edit-link="false"
         />
         <PersonCard
+          v-if="showReviewer"
           label="Primary Reviewer"
           :name="localDoc.primary_reviewer"
           :display-name="detail.link_titles?.primary_reviewer"

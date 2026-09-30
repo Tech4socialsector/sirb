@@ -1,5 +1,6 @@
 import { computed, ref, type Ref } from 'vue'
 import { fetchProjectSchema } from '@/services/schema'
+import { useAuthStore } from '@/stores/auth'
 import type { ProjectSchema, SchemaField, SchemaSection, SchemaTab } from '@/types/schema'
 import type { IrbProjectDoc } from '@/types/project'
 
@@ -66,7 +67,11 @@ function groupIntoTabs(schema: ProjectSchema): SchemaTab[] {
  * conservative expression evaluator, not a general JS sandbox — it only
  * understands the shapes these expressions are written in.
  */
-export function evalDependsOn(expr: string | null, doc: Record<string, unknown>): boolean {
+export function evalDependsOn(
+  expr: string | null,
+  doc: Record<string, unknown>,
+  hasRole: (role: string) => boolean = () => false,
+): boolean {
   if (!expr) return true
   let e = expr.trim()
   if (e.startsWith('eval:')) e = e.slice(5).trim()
@@ -78,9 +83,11 @@ export function evalDependsOn(expr: string | null, doc: Record<string, unknown>)
       'frappe',
       `"use strict"; return (${e});`,
     )
+    // Expressions call frappe.user.has_role(...) (Desk's API); if that
+    // threw, the catch below would show role-gated fields to everyone.
     const frappeStub = {
-      user: 'sirb-frontend-user',
-      has_role: () => false,
+      user: { has_role: hasRole },
+      has_role: hasRole,
     }
     return Boolean(fn(doc, frappeStub))
   } catch {
@@ -88,7 +95,12 @@ export function evalDependsOn(expr: string | null, doc: Record<string, unknown>)
   }
 }
 
+// Fieldtypes that hold no value, so they're never keys of the doc payload.
+const LAYOUT_FIELDTYPES = new Set(['Section Break', 'Column Break', 'Tab Break', 'HTML', 'Heading', 'Button', 'Image'])
+
 export function useProjectSchema(doc: Ref<IrbProjectDoc | null>) {
+  const auth = useAuthStore()
+  const hasRole = (role: string) => auth.hasRole(role)
   const schema = ref<ProjectSchema | null>(null)
   const loading = ref(false)
 
@@ -105,18 +117,21 @@ export function useProjectSchema(doc: Ref<IrbProjectDoc | null>) {
 
   function isFieldVisible(field: SchemaField): boolean {
     if (!doc.value) return false
-    return evalDependsOn(field.depends_on, doc.value)
+    // The server omits fields this user may not see (e.g. reviewer
+    // identities for students) — absent means hidden, not empty.
+    if (!LAYOUT_FIELDTYPES.has(field.fieldtype) && !(field.fieldname in doc.value)) return false
+    return evalDependsOn(field.depends_on, doc.value, hasRole)
   }
 
   function isFieldMandatory(field: SchemaField): boolean {
     if (field.reqd) return true
     if (!field.mandatory_depends_on || !doc.value) return false
-    return evalDependsOn(field.mandatory_depends_on, doc.value)
+    return evalDependsOn(field.mandatory_depends_on, doc.value, hasRole)
   }
 
   function isSectionVisible(section: SchemaSection): boolean {
     if (!doc.value) return false
-    return evalDependsOn(section.depends_on ?? null, doc.value)
+    return evalDependsOn(section.depends_on ?? null, doc.value, hasRole)
   }
 
   function isTabVisible(tab: SchemaTab): boolean {

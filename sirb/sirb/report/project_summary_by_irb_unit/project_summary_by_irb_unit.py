@@ -25,11 +25,12 @@ def execute(filters=None):
 	query = f'''select iu.ao_name as irb_unit, count(*) as project_count, p.status as project_status
 		from `tabStudent Project Mapping` as sp join `tabIRB Project` as p join `tabIRB Unit` as iu 
 		where sp.irb_project = p.name and p.irb_unit = iu.name'''
-	if filters and filters["irb_unit"]:
-		query += f' and p.irb_unit = \"{filters["irb_unit"]}\" '
+	values = {}
+	if filters and filters.get("irb_unit"):
+		query += ' and p.irb_unit = %(irb_unit)s '
+		values["irb_unit"] = filters["irb_unit"]
 	query += ' and sp.status = "Active" group by project_status'
-	#print(query)
-	results = frappe.db.sql(query, as_dict=1)
+	results = frappe.db.sql(query, values, as_dict=1)
 	#print(results)
 	data = []
 	for r in results:

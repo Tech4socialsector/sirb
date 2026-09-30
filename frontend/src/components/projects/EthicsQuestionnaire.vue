@@ -10,6 +10,7 @@ const props = defineProps<{
   linkTitles?: Record<string, string>
   disabled: boolean
   issueMessages?: Map<string, string>
+  overrideEditable?: ReadonlySet<string>
 }>()
 
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
@@ -68,6 +69,7 @@ defineExpose({ focusField })
             :is-field-visible="isFieldVisible"
             :is-field-mandatory="isFieldMandatory"
             :issue-messages="issueMessages"
+            :override-editable="overrideEditable"
             @update="(fn, v) => emit('update', fn, v)"
           />
         </div>

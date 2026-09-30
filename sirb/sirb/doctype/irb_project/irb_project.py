@@ -5,7 +5,8 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import get_url
 from sirb.proposal_checks import format_issues, get_proposal_issues
-from sirb.workflow import validate_status_change
+from sirb.workflow import validate_assignments, validate_status_change
+from sirb.permissions import validate_project_field_writes
 from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
 
 # Statuses in which the student is filling in or correcting the proposal.
@@ -31,6 +32,8 @@ class IRBProject(Document):
 		# Only the transitions the user's role on this project allows
 		# (status is read-only in the form but not enforced by Frappe).
 		validate_status_change(self)
+		validate_assignments(self)
+		validate_project_field_writes(self)
 
 		# Roles allowed to edit an existing IRB Project without filling the
 		# mandatory fields (e.g. status/reviewer/mentor changes on a project

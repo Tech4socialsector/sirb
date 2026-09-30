@@ -95,9 +95,9 @@ def validate_status_change(doc):
 	if not before or before.status == doc.status:
 		return
 
-	from sirb.api import get_irb_project_roles
+	from sirb.api import _get_irb_project_roles
 
-	roles = get_irb_project_roles(user=frappe.session.user, project_name=doc.name) or {}
+	roles = _get_irb_project_roles(frappe.session.user, doc.name)
 	if doc.status in allowed_transitions(before, roles):
 		return
 
@@ -113,3 +113,47 @@ def validate_status_change(doc):
 		frappe.PermissionError,
 		title="Not allowed",
 	)
+
+
+# Who must be assigned before a project can sit in each status — otherwise
+# it waits on a person who doesn't exist and no one can move it on.
+_REQUIRED_FOR_STATUS = {
+	MENTOR_APPROVAL: ("faculty_mentor",),
+	STUDENT_FIX_MENTOR: ("faculty_mentor",),
+	REVIEWER_FEEDBACK: ("primary_reviewer",),
+	STUDENT_FIX_REVIEWER: ("primary_reviewer",),
+	PROVISIONAL: ("primary_reviewer",),
+	FINAL_APPROVAL: ("primary_reviewer",),
+	PRIMARY_TO_SECONDARY: ("primary_reviewer", "secondary_reviewer"),
+	SECONDARY_TO_PRIMARY: ("primary_reviewer", "secondary_reviewer"),
+}
+_PERSON_LABELS = {
+	"faculty_mentor": "a Faculty Mentor",
+	"primary_reviewer": "a Primary Reviewer",
+	"secondary_reviewer": "a Secondary Reviewer",
+}
+
+
+def validate_assignments(doc):
+	"""Reject mentor/reviewer combinations that break the workflow when
+	they're changed, and — for admins setting the status directly — a
+	status whose required people aren't assigned. Checks only what changed,
+	so existing projects with odd legacy data still save normally."""
+	if doc.is_new():
+		return
+
+	people = ("faculty_mentor", "primary_reviewer", "secondary_reviewer")
+	if any(doc.has_value_changed(f) for f in people):
+		mentor, primary, secondary = (str(doc.get(f)) if doc.get(f) else None for f in people)
+		if primary and primary == secondary:
+			frappe.throw("The Primary and Secondary Reviewer must be different people.", title="Invalid assignment")
+		if mentor and mentor in (primary, secondary):
+			frappe.throw("The Faculty Mentor can't also be a reviewer on the same project.", title="Invalid assignment")
+
+	if doc.has_value_changed("status") and set(frappe.get_roles()) & BYPASS_ROLES:
+		missing = [_PERSON_LABELS[f] for f in _REQUIRED_FOR_STATUS.get(doc.status, ()) if not doc.get(f)]
+		if missing:
+			frappe.throw(
+				f"Assign {' and '.join(missing)} before moving this project to “{doc.status}”.",
+				title="Missing assignment",
+			)

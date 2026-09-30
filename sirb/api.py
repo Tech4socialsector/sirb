@@ -125,6 +125,13 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
             # We read lines first to get the total count for the progress bar
             rows = list(csv.DictReader(f))
             total_rows = len(rows)
+            # Rows only report once fully processed, so say the job has
+            # started — otherwise the UI sits on "Starting upload…".
+            frappe.publish_realtime(
+                event = "sirb_student_import_progress",
+                user = logged_in_user,
+                message = {"progress": 0, "status": f"Processing {total_rows} row(s)…"}
+            )
             #limit_student_count = 1
             for i, row in enumerate(rows):
                 # frappe.publish_realtime(
@@ -185,9 +192,8 @@ def import_student_irb_information(logged_in_user, file_url, irb_unit, irb_cycle
                         else:
                             mentor_user = frappe.get_doc("User", existing_mentor_users[0]["name"])
                         print("Adding faculty role")
-                        mentor_user.add_roles("Faculty Member")
-                        mentor_user.add_roles("Faculty Mentor")
-                        mentor_user.save(ignore_permissions = True)
+                        mentor_user.flags.ignore_permissions = True
+                        mentor_user.add_roles("Faculty Member", "Faculty Mentor")
                         frappe.db.commit()                  
                         print("Added faculty role")
                         existing_faculty = frappe.get_all("Faculty", filters = {
@@ -545,6 +551,9 @@ import frappe
 
 @frappe.whitelist()
 def get_project_students(project_name):
+    # Raw SQL skips row-level permissions; only list a project's students
+    # to someone who can open that project.
+    frappe.get_doc("IRB Project", project_name).check_permission("read")
     return frappe.db.sql("""
         SELECT
             student.student_id as student_id,
@@ -793,54 +802,59 @@ def get_secondary_reviewer_pending_project_count():
         return_dict["fieldtype"] = "Int"
     return return_dict
 
-@frappe.whitelist()
-def get_irb_project_roles(user, project_name):
-    is_student = False
-    is_mentor = False
-    is_primary_reviewer = False
-    is_secondary_reviewer = False
-    query = f'''
-    select s.name as student_id, p.faculty_mentor as mentor_id, p.primary_reviewer as primary_reviewer, 
-    p.secondary_reviewer as secondary_reviewer from tabStudent as s join `tabIRB Project` as p 
-    join `tabStudent Project Mapping` as sp where sp.student = s.name and sp.status="active" and
-    sp.irb_project = p.name and p.name = "{project_name}"
-    '''
-    project_info = frappe.db.sql(query, as_dict = 1)
-    # print(project_info)
-    if project_info:
-        for p in project_info:
-            query = f''' select u.email from tabStudent as s join tabUser as u where 
-            s.system_user = u.name and u.email = "{user}" and s.name = "{p["student_id"]}"'''
-            results = frappe.db.sql(query)
-            print(results)
-            if results:
-                is_student = True
-            query = f''' select u.email from tabFaculty as f join tabUser as u where 
-            f.system_user = u.email and u.email = "{user}" and f.name = "{p["mentor_id"]}"'''
-            results = frappe.db.sql(query)
-            print(results)
-            if results:
-                is_mentor = True
-            query = f''' select u.email from tabFaculty as f join tabUser as u where 
-            f.system_user = u.email and u.email = "{user}" and f.name = "{p["primary_reviewer"]}"'''
-            results = frappe.db.sql(query)
-            print(results)
-            if results:
-                is_primary_reviewer = True
-            query = f''' select u.email from tabFaculty as f join tabUser as u where 
-            f.system_user = u.email and u.email = "{user}" and f.name = "{p["secondary_reviewer"]}"'''
-            results = frappe.db.sql(query)
-            print(results)
-            if results:
-                is_secondary_reviewer = True
-    ret_dict = {
-        "is_student": is_student, 
-        "is_mentor": is_mentor, 
-        "is_primary_reviewer":  is_primary_reviewer, 
-        "is_secondary_reviewer": is_secondary_reviewer
+def _get_irb_project_roles(user, project_name):
+    """The roles `user` (an email) holds on `project_name`, counting only
+    projects with an active student mapping. Internal: callers pass the
+    session user. Values are bound as query parameters, never formatted in."""
+    roles = {
+        "is_student": False,
+        "is_mentor": False,
+        "is_primary_reviewer": False,
+        "is_secondary_reviewer": False,
     }
-    print(ret_dict)
-    return ret_dict
+    if not user or not project_name:
+        return roles
+
+    rows = frappe.db.sql(
+        """select s.name as student_id, p.faculty_mentor, p.primary_reviewer, p.secondary_reviewer
+        from tabStudent as s
+        join `tabStudent Project Mapping` as sp on sp.student = s.name
+        join `tabIRB Project` as p on sp.irb_project = p.name
+        where sp.status = "active" and p.name = %(project)s""",
+        {"project": project_name},
+        as_dict=1,
+    )
+    if not rows:
+        return roles
+
+    user_names = frappe.get_all("User", filters={"email": user}, pluck="name")
+    if not user_names:
+        return roles
+    student_ids = {str(s) for s in frappe.get_all("Student", filters={"system_user": ["in", user_names]}, pluck="name")}
+    faculty_ids = {str(f) for f in frappe.get_all("Faculty", filters={"system_user": user}, pluck="name")}
+
+    for row in rows:
+        if str(row.student_id) in student_ids:
+            roles["is_student"] = True
+        if row.faculty_mentor and str(row.faculty_mentor) in faculty_ids:
+            roles["is_mentor"] = True
+        if row.primary_reviewer and str(row.primary_reviewer) in faculty_ids:
+            roles["is_primary_reviewer"] = True
+        if row.secondary_reviewer and str(row.secondary_reviewer) in faculty_ids:
+            roles["is_secondary_reviewer"] = True
+    return roles
+
+
+@frappe.whitelist()
+def get_irb_project_roles(project_name, user=None):
+    """The caller's own roles on a project they can open (used by the Desk
+    form). `user` is accepted for backward compatibility but only admins may
+    ask about someone else — otherwise anyone could find out who reviews a
+    project."""
+    frappe.get_doc("IRB Project", project_name).check_permission("read")
+    if not user or user == frappe.session.user or not (set(frappe.get_roles()) & {"System Manager", "Administrator"}):
+        user = frappe.session.user
+    return _get_irb_project_roles(user, project_name)
 
 # WAS USED WHEN I TRIED WEB FORMS NOT USING NOW BUT KEEPING IT JUST IN CASE
 # @frappe.whitelist()

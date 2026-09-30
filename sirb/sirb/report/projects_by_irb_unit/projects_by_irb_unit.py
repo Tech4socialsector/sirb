@@ -98,14 +98,10 @@ def execute(filters=None):
 		for sp_data in sp_data_list:
 			data_item = {}
 			print(sp_data)
-			student_ids = sp_data["student_ids"].split(',')
-			student_ids = [f"'{s}'" for s in student_ids]
-			student_ids_str = ', '.join(student_ids)
-			print(student_ids_str)
-			q = f'''select s.name, s.full_name, u.email from tabStudent as s join 
-			tabUser as u where s.system_user = u.name and s.name in ({student_ids_str})'''
-			print(q)
-			student_data = frappe.db.sql(q, as_dict = 1)
+			student_ids = [s.strip() for s in sp_data["student_ids"].split(',')]
+			q = '''select s.name, s.full_name, u.email from tabStudent as s join 
+			tabUser as u where s.system_user = u.name and s.name in %(student_ids)s'''
+			student_data = frappe.db.sql(q, {"student_ids": student_ids}, as_dict = 1)
 			print(student_data)
 			student_info = []
 			for s in student_data:
@@ -119,12 +115,16 @@ def execute(filters=None):
 								left join tabFaculty as f1 on p.faculty_mentor = f1.name left join 
 								tabFaculty as f2 on p.primary_reviewer = f2.name left join 
 								tabFaculty as f3 on p.secondary_reviewer = f3.name where 
-								p.name = "{sp_data["project_id"]}"'''
+								p.name = %(project_id)s'''
+			q2_values = {"project_id": sp_data["project_id"]}
 			if filters:
+				# Filter values are bound as parameters, never formatted into the SQL.
 				if "irb_unit" in filters:
-					q2 += f' and p.irb_unit = "{filters["irb_unit"]}"'
+					q2 += ' and p.irb_unit = %(irb_unit)s'
+					q2_values["irb_unit"] = filters["irb_unit"]
 				if "status" in filters:
-					q2 += f' and p.status = "{filters["status"]}"'
+					q2 += ' and p.status = %(status)s'
+					q2_values["status"] = filters["status"]
 				if filters.get("campus"):
 					campus_bounds = frappe.db.get_value(
 						"Academic Organizational Unit", filters["campus"], ["lft", "rgt"]
@@ -136,8 +136,7 @@ def execute(filters=None):
 							join `tabAcademic Organizational Unit` as a on iu.ao_unit = a.name
 							where a.lft >= {lft} and a.rgt <= {rgt}
 						)'''
-			print(q2)
-			project_data = frappe.db.sql(q2, as_dict = 1)
+			project_data = frappe.db.sql(q2, q2_values, as_dict = 1)
 			print('Project data ', project_data)
 			if project_data:
 				data_item["project_status"] = project_data[0]["status"]
@@ -151,9 +150,9 @@ def execute(filters=None):
 				data_item["days_in_state"] = days_since_field_set_to_current_value("IRB Project", project_data[0]["name"], "status")
 				data_item["irb_unit"] = ''
 				if project_data[0]["irb_unit"]:
-					q3 = f'''select a.ao_name from `tabIRB Unit` as u join `tabAcademic Organizational Unit` 
-					as a where u.ao_unit = a.name and u.name = "{project_data[0]["irb_unit"]}"'''
-					ao_data = frappe.db.sql(q3, as_dict = 1)
+					q3 = '''select a.ao_name from `tabIRB Unit` as u join `tabAcademic Organizational Unit` 
+					as a where u.ao_unit = a.name and u.name = %(irb_unit)s'''
+					ao_data = frappe.db.sql(q3, {"irb_unit": project_data[0]["irb_unit"]}, as_dict = 1)
 					if ao_data:
 						data_item["irb_unit"] = ao_data[0]["ao_name"]
 				data.append(data_item)

@@ -18,6 +18,9 @@ const props = defineProps<{
   isFieldMandatory: (field: SchemaField) => boolean
   /** fieldname -> what the student must do, for questions blocking submission. */
   issueMessages?: Map<string, string>
+  /** Fields this user may edit even when the form is `disabled` or the
+   * field is read-only (admins: status, mentor and reviewers). */
+  overrideEditable?: ReadonlySet<string>
 }>()
 
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
@@ -73,7 +76,8 @@ function hasReviewContentAnywhere() {
               :field="field"
               :model-value="doc[field.fieldname]"
               :display-value="linkTitles?.[field.fieldname]"
-              :disabled="disabled || Boolean(field.read_only)"
+              :disabled="!overrideEditable?.has(field.fieldname) && (disabled || Boolean(field.read_only))"
+              :editable-link="overrideEditable?.has(field.fieldname)"
               :required="isFieldMandatory(field)"
               :docname="String(doc.name)"
               @update:model-value="(v) => emit('update', field.fieldname, v)"

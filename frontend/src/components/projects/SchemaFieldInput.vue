@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { FormControl } from 'frappe-ui'
 import AttachField from './AttachField.vue'
+import LinkField from '@/components/common/LinkField.vue'
 import type { SchemaField } from '@/types/schema'
 
 const props = defineProps<{
@@ -12,6 +13,8 @@ const props = defineProps<{
   required: boolean
   /** Name of the IRB Project — Attach fields upload onto it. */
   docname?: string
+  /** Render a Link field as a record picker instead of read-only text. */
+  editableLink?: boolean
 }>()
 
 const emit = defineEmits<{ 'update:modelValue': [unknown] }>()
@@ -93,6 +96,16 @@ function onInput(value: unknown) {
     :docname="docname"
     :fieldname="field.fieldname"
     @update:model-value="(v) => emit('update:modelValue', v)"
+  />
+  <LinkField
+    v-else-if="isLink && editableLink && !disabled && field.options"
+    :doctype="field.options"
+    :label="field.label || field.fieldname"
+    :required="required"
+    :model-value="modelValue as string | null"
+    :display-value="displayValue"
+    :clearable="!required"
+    @update:model-value="(v) => emit('update:modelValue', v ?? null)"
   />
   <div v-else-if="isLink">
     <label v-if="field.label" class="mb-1.5 block text-sm text-charcoal">{{ field.label }}</label>

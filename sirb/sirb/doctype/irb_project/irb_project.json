@@ -3180,6 +3180,11 @@
    "write": 1
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "write": 1
+  },
+  {
    "permlevel": 1,
    "read": 1,
    "role": "System Manager",
@@ -3213,6 +3218,11 @@
    "role": "Secondary IRB Reviewer"
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 1
+  },
+  {
    "permlevel": 2,
    "read": 1,
    "role": "System Manager",
@@ -3244,6 +3254,11 @@
    "permlevel": 2,
    "read": 1,
    "role": "Secondary IRB Reviewer"
+  },
+  {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 2
   },
   {
    "permlevel": 3,
@@ -3280,6 +3295,11 @@
    "write": 1
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 3
+  },
+  {
    "permlevel": 4,
    "read": 1,
    "role": "System Manager",
@@ -3313,6 +3333,11 @@
    "role": "Secondary IRB Reviewer"
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 4
+  },
+  {
    "permlevel": 5,
    "read": 1,
    "role": "System Manager",
@@ -3343,6 +3368,12 @@
    "permlevel": 5,
    "read": 1,
    "role": "Secondary IRB Reviewer",
+   "write": 1
+  },
+  {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 5,
    "write": 1
   },
   {
@@ -3382,6 +3413,11 @@
    "write": 1
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 6
+  },
+  {
    "permlevel": 7,
    "read": 1,
    "role": "System Manager",
@@ -3415,6 +3451,11 @@
    "role": "Secondary IRB Reviewer"
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 7
+  },
+  {
    "permlevel": 8,
    "read": 1,
    "role": "System Manager",
@@ -3446,6 +3487,11 @@
    "permlevel": 8,
    "read": 1,
    "role": "Secondary IRB Reviewer"
+  },
+  {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 8
   }
  ],
  "row_format": "Dynamic",

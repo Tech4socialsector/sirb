@@ -16,6 +16,8 @@ with the project (sirb_api.project.get_project_detail).
 
 import frappe
 
+from sirb.permissions import manages_project
+
 PROPOSAL = "Awaiting proposal completion by student"
 MENTOR_APPROVAL = "Awaiting Faculty mentor approval"
 STUDENT_FIX_MENTOR = "Awaiting student correction for mentor feedback"
@@ -83,7 +85,8 @@ def allowed_transitions(doc, roles):
 
 def validate_status_change(doc):
 	"""Throw unless the current user may move `doc` from its saved status
-	to its new one. Admins, imports, patches and system jobs are exempt."""
+	to its new one. Admins, programme managers (on their programmes'
+	projects), imports, patches and system jobs are exempt."""
 	if doc.is_new() or doc.flags.ignore_permissions or doc.flags.script_created:
 		return
 	if frappe.flags.in_import or frappe.flags.in_patch or frappe.flags.in_migrate or frappe.flags.in_install:
@@ -93,6 +96,8 @@ def validate_status_change(doc):
 
 	before = doc.get_doc_before_save()
 	if not before or before.status == doc.status:
+		return
+	if manages_project(frappe.session.user, before):
 		return
 
 	from sirb.api import _get_irb_project_roles
@@ -134,6 +139,14 @@ _PERSON_LABELS = {
 }
 
 
+def _sets_status_directly(doc):
+	"""Admins and programme managers pick any status, so they're the ones
+	who could leave a project waiting on someone who isn't assigned."""
+	if set(frappe.get_roles()) & BYPASS_ROLES:
+		return True
+	return manages_project(frappe.session.user, doc.get_doc_before_save() or doc)
+
+
 def validate_assignments(doc):
 	"""Reject mentor/reviewer combinations that break the workflow when
 	they're changed, and — for admins setting the status directly — a
@@ -150,7 +163,7 @@ def validate_assignments(doc):
 		if mentor and mentor in (primary, secondary):
 			frappe.throw("The Faculty Mentor can't also be a reviewer on the same project.", title="Invalid assignment")
 
-	if doc.has_value_changed("status") and set(frappe.get_roles()) & BYPASS_ROLES:
+	if doc.has_value_changed("status") and _sets_status_directly(doc):
 		missing = [_PERSON_LABELS[f] for f in _REQUIRED_FOR_STATUS.get(doc.status, ()) if not doc.get(f)]
 		if missing:
 			frappe.throw(

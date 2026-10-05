@@ -64,7 +64,9 @@ export interface ProjectDetailPayload {
   link_titles: Record<string, string>
   roles: ProjectRoles
   students: ProjectStudent[]
-  meta: { can_write: boolean }
+  /** can_override: may reassign mentor/reviewers and set any status
+   * (admins; programme managers on their programmes' projects). */
+  meta: { can_write: boolean; can_override?: boolean }
   /** Status changes the server will accept from this user right now (sirb/workflow.py). */
   allowed_statuses?: string[]
 }

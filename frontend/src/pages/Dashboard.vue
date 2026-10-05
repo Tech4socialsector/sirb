@@ -13,7 +13,7 @@ import { ApiError } from '@/services/api'
 import { fetchMyDashboard, type DashboardPayload, type DashboardRoleSummary } from '@/services/projects'
 
 const { currentUser } = useAuth()
-const { isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isAdmin, isAnchor } = useRoles()
+const { isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isAnchor, canViewAdminConsole } = useRoles()
 
 const data = ref<DashboardPayload | null>(null)
 const loading = ref(true)
@@ -57,7 +57,7 @@ const subtitle = computed(() => {
   return `${n} project${n === 1 ? ' is' : 's are'} waiting on you.`
 })
 
-const hasAnything = computed(() => roles.value.length > 0 || !!student.value || isAdmin.value || isAnchor.value)
+const hasAnything = computed(() => roles.value.length > 0 || !!student.value || canViewAdminConsole.value || isAnchor.value)
 
 function tabLink(route: string, tab: 'pending' | 'unapproved' | 'approved') {
   return tab === 'pending' ? route : { path: route, query: { tab } }
@@ -72,8 +72,8 @@ function tabLink(route: string, tab: 'pending' | 'unapproved' | 'approved') {
     <ErrorState v-else-if="error" :error="error" @retry="load" />
     <div v-else class="space-y-8">
       <!-- Admin / Anchor shortcuts -->
-      <div v-if="isAdmin || isAnchor" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard v-if="isAdmin" label="Admin Console" value="Open" icon="grid" action-label="Go to console" to="/sirb/admin" />
+      <div v-if="canViewAdminConsole || isAnchor" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard v-if="canViewAdminConsole" label="Admin Console" value="Open" icon="grid" action-label="Go to console" to="/sirb/admin" />
         <KpiCard v-if="isAnchor" label="Reports" value="Open" icon="bar-chart-2" action-label="View reports" to="/sirb/admin/reports" />
       </div>
 

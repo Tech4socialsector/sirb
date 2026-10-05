@@ -6,7 +6,8 @@ import DataTable, { type DataTableColumn } from '@/components/common/DataTable.v
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import type { AttentionRow } from '@/composables/useAdminDashboard'
 
-const props = defineProps<{ rows: AttentionRow[] }>()
+// `clickable: false` for users who can't open project records (programme viewers).
+const props = withDefaults(defineProps<{ rows: AttentionRow[]; clickable?: boolean }>(), { clickable: true })
 const router = useRouter()
 const search = ref('')
 
@@ -30,6 +31,7 @@ const columns: DataTableColumn[] = [
 ]
 
 function open(row: Record<string, unknown>) {
+  if (!props.clickable) return
   router.push({ name: 'project-details', params: { name: String(row.project_id) } })
 }
 </script>
@@ -44,7 +46,7 @@ function open(row: Record<string, unknown>) {
         <div>
           <h3 class="text-base font-semibold text-charcoal">Projects Needing Attention</h3>
           <p class="text-sm text-muted">
-            {{ rows.length }} project{{ rows.length === 1 ? '' : 's' }} waiting more than 7 days with no update. Click a row to open it.
+            {{ rows.length }} project{{ rows.length === 1 ? '' : 's' }} waiting more than 7 days with no update.<template v-if="clickable"> Click a row to open it.</template>
           </p>
         </div>
       </div>
@@ -61,7 +63,7 @@ function open(row: Record<string, unknown>) {
       :columns="columns"
       :rows="filtered as unknown as Record<string, unknown>[]"
       row-key="project_id"
-      clickable-rows
+      :clickable-rows="clickable"
       :page-size="10"
       :empty-title="search ? 'No matching projects' : 'Nothing overdue'"
       :empty-description="search ? 'Try a different search.' : 'Every active project has moved within the last week.'"

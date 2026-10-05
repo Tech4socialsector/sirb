@@ -14,6 +14,8 @@ const routes: RouteRecordRaw[] = [
     name: 'dashboard',
     component: () => import('@/pages/Dashboard.vue'),
     meta: { title: 'Home' },
+    // Runs after the global guard has loaded the session.
+    beforeEnter: () => (useAuthStore().isConsoleOnly ? { name: 'admin-console' } : true),
   },
   {
     path: '/sirb/my-projects',
@@ -29,7 +31,11 @@ const routes: RouteRecordRaw[] = [
     name: 'project-details',
     component: () => import('@/pages/ProjectDetails.vue'),
     props: true,
-    meta: { title: 'Project Details' },
+    meta: {
+      title: 'Project Details',
+      // Programme viewers get console figures only, never a project record.
+      requiresRole: (s) => !s.isViewerOnly,
+    },
   },
   {
     path: '/sirb/review/mentor',
@@ -66,7 +72,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/AdminConsole.vue'),
     meta: {
       title: 'IRB Admin Console',
-      requiresRole: (s) => s.isAdmin,
+      requiresRole: (s) => s.canViewAdminConsole,
     },
   },
   {
@@ -75,6 +81,15 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/Setup.vue'),
     meta: {
       title: 'Setup',
+      requiresRole: (s) => s.isAdmin,
+    },
+  },
+  {
+    path: '/sirb/admin/programme-access',
+    name: 'programme-access',
+    component: () => import('@/pages/ProgrammeAccess.vue'),
+    meta: {
+      title: 'Programme Access',
       requiresRole: (s) => s.isAdmin,
     },
   },

@@ -79,13 +79,15 @@ const docRef = computed(() => localDoc.value)
 const allowedStatuses = computed(() => detail.value?.allowed_statuses)
 const { actions, canEdit } = useProjectActions(docRef, roles, hasSecondaryReviewer, allowedStatuses)
 
-// Admins/System Managers can reassign the mentor and reviewers and set the
-// status directly — the server lets them bypass the status workflow
+// Admins/System Managers — and programme managers on their programmes'
+// projects (meta.can_override) — can reassign the mentor and reviewers and
+// set the status directly — the server lets them bypass the status workflow
 // (sirb.workflow) and still validates the combination (irb_project.py).
 const { isAdmin } = useRoles()
+const canOverride = computed(() => isAdmin.value || Boolean(detail.value?.meta.can_override))
 const ADMIN_EDITABLE_FIELDS: ReadonlySet<string> = new Set(['status', 'faculty_mentor', 'primary_reviewer', 'secondary_reviewer'])
-const overrideEditable = computed<ReadonlySet<string>>(() => (isAdmin.value ? ADMIN_EDITABLE_FIELDS : new Set()))
-const canSave = computed(() => canEdit.value || isAdmin.value)
+const overrideEditable = computed<ReadonlySet<string>>(() => (canOverride.value ? ADMIN_EDITABLE_FIELDS : new Set()))
+const canSave = computed(() => canEdit.value || canOverride.value)
 
 // Statuses in which the student is writing/correcting the proposal —
 // must match STUDENT_DRAFT_STATUSES in irb_project.py.

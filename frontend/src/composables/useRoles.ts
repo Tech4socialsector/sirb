@@ -9,8 +9,21 @@ import { useAuthStore } from '@/stores/auth'
  */
 export function useRoles() {
   const store = useAuthStore()
-  const { isAdmin, isAnchor, isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isFaculty } =
-    storeToRefs(store)
+  const {
+    isAdmin,
+    isAnchor,
+    isStudent,
+    isFacultyMentor,
+    isPrimaryReviewer,
+    isSecondaryReviewer,
+    isFaculty,
+    isProgrammeViewer,
+    isProgrammeManager,
+    canViewAdminConsole,
+    canOpenConsoleProjects,
+    isConsoleOnly,
+    isViewerOnly,
+  } = storeToRefs(store)
 
   return {
     isAdmin,
@@ -20,6 +33,12 @@ export function useRoles() {
     isPrimaryReviewer,
     isSecondaryReviewer,
     isFaculty,
+    isProgrammeViewer,
+    isProgrammeManager,
+    canViewAdminConsole,
+    canOpenConsoleProjects,
+    isConsoleOnly,
+    isViewerOnly,
     hasRole: store.hasRole,
   }
 }

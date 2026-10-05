@@ -10,7 +10,7 @@ const emit = defineEmits<{ 'toggle-mobile-nav': [] }>()
 
 const router = useRouter()
 const { state, open: openTimeline } = useTimelineDrawer()
-const { isAdmin } = useRoles()
+const { isAdmin, isViewerOnly } = useRoles()
 
 // Jumps straight to a project by its ID — there's no project search API on
 // the backend today, so this stays scoped to what's actually possible
@@ -35,7 +35,7 @@ function goToProject() {
     </div>
 
     <div class="flex shrink-0 items-center gap-2">
-      <div class="relative hidden sm:block">
+      <div v-if="!isViewerOnly" class="relative hidden sm:block">
         <FeatherIcon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
         <input
           v-model="searchValue"

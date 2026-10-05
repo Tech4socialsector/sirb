@@ -6,7 +6,7 @@ from frappe.model.document import Document
 from frappe.utils import get_url
 from sirb.proposal_checks import format_issues, get_proposal_issues
 from sirb.workflow import validate_assignments, validate_status_change
-from sirb.permissions import validate_project_field_writes
+from sirb.permissions import manages_project, validate_project_field_writes
 from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
 
 # Statuses in which the student is filling in or correcting the proposal.
@@ -41,6 +41,11 @@ class IRBProject(Document):
 		MANDATORY_BYPASS_ROLES = {"System Manager", "Administrator"}
 
 		is_admin_edit = not self.is_new() and set(frappe.get_roles()) & MANDATORY_BYPASS_ROLES
+		# Programme managers make the same status/mentor/reviewer edits as
+		# admins on their programmes' projects (sirb.permissions), and can't
+		# touch the proposal itself, so they skip the same checks.
+		if not is_admin_edit and not self.is_new():
+			is_admin_edit = manages_project(frappe.session.user, self.get_doc_before_save() or self)
 		if is_admin_edit:
 			self.flags.ignore_mandatory = True
 			return

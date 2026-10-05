@@ -35,6 +35,7 @@ declare module 'vue' {
     PersonCell: typeof import('./src/components/common/PersonCell.vue')['default']
     PieChartCard: typeof import('./src/components/reports/PieChartCard.vue')['default']
     PipelineFlow: typeof import('./src/components/dashboard/PipelineFlow.vue')['default']
+    ProgrammeAccessDialog: typeof import('./src/components/admin/ProgrammeAccessDialog.vue')['default']
     ProgrammeAnalyticsTable: typeof import('./src/components/admin/ProgrammeAnalyticsTable.vue')['default']
     ProgressLog: typeof import('./src/components/uploads/ProgressLog.vue')['default']
     ProjectActions: typeof import('./src/components/projects/ProjectActions.vue')['default']

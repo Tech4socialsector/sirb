@@ -15,10 +15,16 @@ import RoleWorkloadPanel from '@/components/admin/RoleWorkloadPanel.vue'
 import ActivityFeed from '@/components/admin/ActivityFeed.vue'
 import DrilldownDialog from '@/components/admin/DrilldownDialog.vue'
 import { useAuth } from '@/composables/useAuth'
+import { useRoles } from '@/composables/useRoles'
 import { useAdminDashboard } from '@/composables/useAdminDashboard'
 import type { DashboardFilters, DrilldownRow } from '@/types/admin'
 
 const { currentUser } = useAuth()
+// Programme viewers get a read-only console scoped (server-side) to their
+// programmes: no links into project records or worklists they can't open.
+// Programme managers may open their programmes' projects (not worklists).
+const { isAdmin, canOpenConsoleProjects } = useRoles()
+const noProgrammesAssigned = computed(() => !!filterOptions.value?.restricted && !filterOptions.value.assigned_programmes)
 const {
   filterOptions,
   dashboard,
@@ -111,7 +117,7 @@ async function openDrilldown(args: {
 
   drilldownTitle.value = titleParts.join(' — ')
   drilldownDescription.value = 'Matching project records — search, filter and open any of them below.'
-  drilldownOpenProjectsTo.value = routeFor(args)
+  drilldownOpenProjectsTo.value = isAdmin.value ? routeFor(args) : undefined
   drilldownOpen.value = true
   drilldownLoading.value = true
   try {
@@ -151,11 +157,21 @@ function onPipelineSelect(key: string) {
   <AppShell>
     <DashboardGreeting
       :name="currentUser?.full_name.split(' ')[0] || 'Administrator'"
-      subtitle="Here's what's happening across student project approvals."
+      :subtitle="
+        filterOptions?.restricted
+          ? 'Here\'s what\'s happening across student project approvals in your programmes.'
+          : 'Here\'s what\'s happening across student project approvals.'
+      "
     />
 
     <LoadingState v-if="loading && !dashboard" label="Loading dashboard…" />
     <ErrorState v-else-if="error" :error="error" @retry="initialLoad" />
+    <div
+      v-else-if="noProgrammesAssigned"
+      class="rounded-lg border border-line bg-paper p-8 text-center text-sm text-muted"
+    >
+      No programmes are assigned to your account yet. Ask an administrator to add them to your IRB Programme Access.
+    </div>
     <template v-else-if="dashboard && workload && filterOptions">
       <FilterBar :options="filterOptions" @apply="onApplyFilters" />
 
@@ -258,7 +274,7 @@ function onPipelineSelect(key: string) {
       </div>
 
       <div class="mb-5">
-        <AttentionList :rows="attentionRows" />
+        <AttentionList :rows="attentionRows" :clickable="canOpenConsoleProjects" />
       </div>
 
       <div class="mb-5">
@@ -266,7 +282,7 @@ function onPipelineSelect(key: string) {
       </div>
 
       <div class="mb-5">
-        <ActivityFeed :activity="activity" />
+        <ActivityFeed :activity="activity" :clickable="canOpenConsoleProjects" />
       </div>
 
       <DrilldownDialog
@@ -276,6 +292,7 @@ function onPipelineSelect(key: string) {
         :rows="drilldownRows"
         :loading="drilldownLoading"
         :open-projects-to="drilldownOpenProjectsTo"
+        :read-only="!canOpenConsoleProjects"
       />
     </template>
   </AppShell>

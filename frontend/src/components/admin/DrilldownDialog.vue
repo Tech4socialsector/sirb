@@ -20,8 +20,10 @@ const props = withDefaults(
      * this drill-down's context, e.g. /sirb/review/primary. Omit to hide
      * the button rather than link somewhere generic. */
     openProjectsTo?: string
+    /** Rows only — no project / timeline actions (programme viewers). */
+    readOnly?: boolean
   }>(),
-  { loading: false },
+  { loading: false, readOnly: false },
 )
 const emit = defineEmits<{ 'update:modelValue': [boolean] }>()
 
@@ -81,8 +83,18 @@ function clearFilters() {
 // Anchor-only users see the report rows but have nothing to open, so the
 // View / timeline actions would only ever fail for them.
 const { hasRole } = useRoles()
-const canOpenProjects = computed(() =>
-  hasRole('System Manager', 'Administrator', 'Student', 'Faculty Mentor', 'Primary IRB Reviewer', 'Secondary IRB Reviewer'),
+const canOpenProjects = computed(
+  () =>
+    !props.readOnly &&
+    hasRole(
+      'System Manager',
+      'Administrator',
+      'Student',
+      'Faculty Mentor',
+      'Primary IRB Reviewer',
+      'Secondary IRB Reviewer',
+      'IRB Programme Manager',
+    ),
 )
 
 const allColumns: DataTableColumn[] = [
@@ -195,7 +207,7 @@ function exportCsv() {
               <Button v-if="filteredRows.length" variant="outline" size="sm" icon-left="download" @click="exportCsv">
                 Export CSV
               </Button>
-              <Button v-if="openProjectsTo" variant="outline" size="sm" @click="openProjects">Open Projects</Button>
+              <Button v-if="openProjectsTo && !readOnly" variant="outline" size="sm" @click="openProjects">Open Projects</Button>
               <button
                 class="rounded-md p-1.5 text-muted transition-colors hover:bg-canvas hover:text-charcoal"
                 aria-label="Close"

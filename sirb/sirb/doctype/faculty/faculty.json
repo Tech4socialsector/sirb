@@ -43,6 +43,10 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "role": "IRB Programme Manager",
+   "select": 1
   }
  ],
  "route": "faculty-mentors",

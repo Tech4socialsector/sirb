@@ -5,7 +5,8 @@ import DataTable, { type DataTableColumn } from '@/components/common/DataTable.v
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import type { ActivityRow } from '@/types/admin'
 
-const props = defineProps<{ activity: ActivityRow[] }>()
+// `clickable: false` for users who can't open project records (programme viewers).
+const props = withDefaults(defineProps<{ activity: ActivityRow[]; clickable?: boolean }>(), { clickable: true })
 const router = useRouter()
 const search = ref('')
 
@@ -31,6 +32,7 @@ const columns: DataTableColumn[] = [
 ]
 
 function open(row: Record<string, unknown>) {
+  if (!props.clickable) return
   router.push({ name: 'project-details', params: { name: String(row.project_id) } })
 }
 
@@ -56,7 +58,7 @@ const asRow = (r: Record<string, unknown>) => r as unknown as ActivityRow
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h3 class="text-base font-semibold text-charcoal">Recent Activity</h3>
-        <p class="text-sm text-muted">The latest status changes across every project. Click a row to open the project.</p>
+        <p class="text-sm text-muted">The latest status changes across every project.<template v-if="clickable"> Click a row to open the project.</template></p>
       </div>
       <input
         v-if="activity.length"
@@ -71,7 +73,7 @@ const asRow = (r: Record<string, unknown>) => r as unknown as ActivityRow
       :columns="columns"
       :rows="filtered as unknown as Record<string, unknown>[]"
       row-key="_key"
-      clickable-rows
+      :clickable-rows="clickable"
       :page-size="10"
       :empty-title="search ? 'No matching activity' : 'No recent status changes'"
       @row-click="open"

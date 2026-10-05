@@ -5,6 +5,11 @@ import json
 
 import frappe
 
+from sirb.sirb.doctype.irb_programme_access.irb_programme_access import (
+	PROGRAMME_MANAGER_ROLE,
+	PROGRAMME_VIEWER_ROLE,
+	get_viewer_irb_units,
+)
 from sirb.sirb_api import worklists
 
 # Canonical status list — must match the "status" Select field options on
@@ -64,7 +69,11 @@ MENTOR_PENDING_STATUSES = [worklists.MENTOR_PENDING_STATUS]
 PRIMARY_REVIEWER_PENDING_STATUSES = worklists.PRIMARY_REVIEWER_PENDING_STATUSES
 SECONDARY_REVIEWER_PENDING_STATUSES = [worklists.SECONDARY_REVIEWER_PENDING_STATUS]
 
-ALLOWED_ROLES = {"System Manager", "Administrator", "IRB Dashboard Viewer"}
+# See every programme. IRB Programme Viewers / Managers see only the
+# programmes on their IRB Programme Access record; every endpoint below is
+# read-only.
+UNRESTRICTED_ROLES = {"System Manager", "Administrator", "IRB Dashboard Viewer"}
+ALLOWED_ROLES = UNRESTRICTED_ROLES | {PROGRAMME_VIEWER_ROLE, PROGRAMME_MANAGER_ROLE}
 
 
 def _check_permission():
@@ -73,6 +82,37 @@ def _check_permission():
 			"You do not have permission to view this dashboard.",
 			frappe.PermissionError,
 		)
+
+
+def allowed_irb_units():
+	"""None when the user may see every programme, else the IRB Units they
+	may see — possibly none, which must show nothing rather than everything."""
+	user = frappe.session.user
+	if user == "Administrator" or set(frappe.get_roles(user)) & UNRESTRICTED_ROLES:
+		return None
+	return get_viewer_irb_units(user)
+
+
+def _scope_clause(params, column="p.irb_unit"):
+	"""" and <column> in (...)" limiting a query to the caller's programmes,
+	or "" for unrestricted users. Adds its placeholders to `params`."""
+	units = allowed_irb_units()
+	if units is None:
+		return ""
+	if not units:
+		return " and 1=0"
+	placeholders = []
+	for i, unit in enumerate(units):
+		params[f"scope_unit_{i}"] = unit
+		placeholders.append(f"%(scope_unit_{i})s")
+	return f" and {column} in ({','.join(placeholders)})"
+
+
+def _scoped_filters_clause(filters):
+	"""_build_filters_clause plus the caller's programme scope. The scope is
+	ANDed on, so client-sent filters (irb_unit, campus, …) can only narrow it."""
+	clause, params = _build_filters_clause(filters)
+	return clause + _scope_clause(params), params
 
 
 def _build_filters_clause(filters):
@@ -174,7 +214,7 @@ def get_dashboard_data(filters=None):
 	_check_permission()
 	if isinstance(filters, str):
 		filters = json.loads(filters) if filters else {}
-	where_extra, params = _build_filters_clause(filters)
+	where_extra, params = _scoped_filters_clause(filters)
 
 	# ---- Programme x status matrix -------------------------------------------------
 	# Distinct projects: BASE_JOIN has one row per Student Project Mapping, so
@@ -274,7 +314,7 @@ def get_project_trend(filters=None, months=6):
 	if isinstance(filters, str):
 		filters = json.loads(filters) if filters else {}
 	months = int(months or 6)
-	where_extra, params = _build_filters_clause(filters)
+	where_extra, params = _scoped_filters_clause(filters)
 
 	rows = frappe.db.sql(
 		f"""
@@ -308,17 +348,23 @@ def get_filter_options():
 	"""
 	_check_permission()
 
+	# Programme viewers only get options from their own programmes' projects.
+	params = {}
+	scope = _scope_clause(params)
+
 	# Each programme carries the Campus it sits under (if any), so the filter
 	# bar can narrow the programme list to the selected campuses.
 	programmes = frappe.db.sql(
-		"""select distinct iu.name, iu.ao_name,
+		f"""select distinct iu.name, iu.ao_name,
 			(select c.name from `tabAcademic Organizational Unit` as c
 				where c.ao_type = 'Campus' and a.lft >= c.lft and a.rgt <= c.rgt
 				order by c.lft desc limit 1) as campus
 		from `tabIRB Unit` as iu
 		join `tabIRB Project` as p on p.irb_unit = iu.name
 		left join `tabAcademic Organizational Unit` as a on iu.ao_unit = a.name
+		where 1=1 {scope}
 		order by iu.ao_name""",
+		params,
 		as_dict=True,
 	)
 
@@ -335,41 +381,60 @@ def get_filter_options():
 		else []
 	)
 
-	academic_years = frappe.db.sql(
-		"""select distinct academic_year from `tabStudent`
-		where academic_year is not null and academic_year != ''
-		order by academic_year desc""",
-		as_dict=True,
-	)
+	if scope:
+		academic_years = frappe.db.sql(
+			f"""select distinct s.academic_year from `tabStudent` as s
+			join `tabStudent Project Mapping` as sp on sp.student = s.name
+			join `tabIRB Project` as p on sp.irb_project = p.name
+			where s.academic_year is not null and s.academic_year != '' {scope}
+			order by s.academic_year desc""",
+			params,
+			as_dict=True,
+		)
+	else:
+		academic_years = frappe.db.sql(
+			"""select distinct academic_year from `tabStudent`
+			where academic_year is not null and academic_year != ''
+			order by academic_year desc""",
+			as_dict=True,
+		)
 
 	cycles = frappe.db.sql(
-		"""select distinct irb_cycle from `tabIRB Project`
-		where irb_cycle is not null and irb_cycle != ''
-		order by irb_cycle desc""",
+		f"""select distinct p.irb_cycle from `tabIRB Project` as p
+		where p.irb_cycle is not null and p.irb_cycle != '' {scope}
+		order by p.irb_cycle desc""",
+		params,
 		as_dict=True,
 	)
 
 	mentors = frappe.db.sql(
-		"""select distinct f.name, f.full_name
+		f"""select distinct f.name, f.full_name
 		from `tabFaculty` as f
 		join `tabIRB Project` as p on p.faculty_mentor = f.name
+		where 1=1 {scope}
 		order by f.full_name""",
+		params,
 		as_dict=True,
 	)
 
 	reviewers = frappe.db.sql(
-		"""select distinct f.name, f.full_name from `tabFaculty` as f
+		f"""select distinct f.name, f.full_name from `tabFaculty` as f
 		where f.name in (
-			select primary_reviewer from `tabIRB Project` where primary_reviewer is not null
+			select p.primary_reviewer from `tabIRB Project` as p where p.primary_reviewer is not null {scope}
 			union
-			select secondary_reviewer from `tabIRB Project` where secondary_reviewer is not null
+			select p.secondary_reviewer from `tabIRB Project` as p where p.secondary_reviewer is not null {scope}
 		)
 		order by f.full_name""",
+		params,
 		as_dict=True,
 	)
 
+	units = allowed_irb_units()
 	return {
-		"campuses": campuses,
+		# Lets the page tell a programme viewer with no programmes assigned
+		# why it's empty, instead of showing a wall of zeros.
+		"restricted": units is not None,
+		"assigned_programmes": None if units is None else len(units),
 		"programmes": programmes,
 		"campuses": campuses,
 		"academic_years": [d["academic_year"] for d in academic_years],
@@ -389,7 +454,7 @@ def get_role_workload(filters=None):
 	_check_permission()
 	if isinstance(filters, str):
 		filters = json.loads(filters) if filters else {}
-	where_extra, params = _build_filters_clause(filters)
+	where_extra, params = _scoped_filters_clause(filters)
 
 	def _workload(role_field, pending_statuses, role_key):
 		placeholders = []
@@ -466,7 +531,7 @@ def get_drilldown_students(
 	if irb_unit:
 		filters["irb_unit"] = irb_unit
 
-	where_extra, params = _build_filters_clause(filters)
+	where_extra, params = _scoped_filters_clause(filters)
 
 	# The drilled status is ANDed with the dashboard's Status filter rather
 	# than replacing it, so a drill-down never shows projects the filtered
@@ -567,7 +632,7 @@ def get_recent_activity(filters=None, limit=25):
 		filters = json.loads(filters) if filters else {}
 	limit = int(limit or 25)
 
-	where_extra, params = _build_filters_clause(filters)
+	where_extra, params = _scoped_filters_clause(filters)
 
 	# Restrict candidate projects using the same filters as the rest of the
 	# dashboard, then scan their recent versions for status changes.

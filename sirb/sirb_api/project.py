@@ -11,7 +11,7 @@ import json
 import frappe
 
 from sirb.api import _get_irb_project_roles, get_project_students
-from sirb.permissions import project_membership
+from sirb.permissions import manages_project, project_membership
 from sirb.workflow import allowed_transitions
 
 
@@ -124,6 +124,9 @@ def get_project_detail(project_name):
 		"students": students,
 		"meta": {
 			"can_write": doc.has_permission("write"),
+			# Admin-style edits (reassign mentor/reviewers, set any status):
+			# admins, and programme managers on their programmes' projects.
+			"can_override": bool(STAFF_ROLES & set(frappe.get_roles())) or manages_project(frappe.session.user, doc),
 		},
 		# Status changes this user may make right now — the server enforces
 		# exactly this set (sirb.workflow), so the UI shows only these.

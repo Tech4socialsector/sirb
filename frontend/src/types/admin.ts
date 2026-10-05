@@ -7,6 +7,10 @@ export interface FilterOptions {
   mentors: { name: string; full_name: string }[]
   reviewers: { name: string; full_name: string }[]
   statuses: string[]
+  /** True for programme viewers, whose console is limited to their programmes. */
+  restricted?: boolean
+  /** How many programmes a programme viewer is assigned (null when unrestricted). */
+  assigned_programmes?: number | null
 }
 
 export interface DashboardFilters {

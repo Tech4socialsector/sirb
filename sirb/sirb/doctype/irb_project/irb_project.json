@@ -3144,8 +3144,6 @@
    "write": 1
   },
   {
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -3156,8 +3154,6 @@
    "write": 1
   },
   {
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -3168,8 +3164,6 @@
    "write": 1
   },
   {
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -3180,15 +3174,23 @@
    "write": 1
   },
   {
-   "permlevel": 1,
+   "role": "IRB Programme Manager",
    "read": 1,
-   "role": "System Manager",
    "write": 1
+  },
+  {
+   "role": "Anchor",
+   "read": 1,
+   "write": 1
+  },
+  {
+   "role": "IRB Demo",
+   "read": 1
   },
   {
    "permlevel": 1,
    "read": 1,
-   "role": "Administrator",
+   "role": "System Manager",
    "write": 1
   },
   {
@@ -3213,15 +3215,19 @@
    "role": "Secondary IRB Reviewer"
   },
   {
-   "permlevel": 2,
+   "role": "IRB Programme Manager",
    "read": 1,
-   "role": "System Manager",
-   "write": 1
+   "permlevel": 1
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 1,
+   "read": 1
   },
   {
    "permlevel": 2,
    "read": 1,
-   "role": "Administrator",
+   "role": "System Manager",
    "write": 1
   },
   {
@@ -3246,15 +3252,19 @@
    "role": "Secondary IRB Reviewer"
   },
   {
-   "permlevel": 3,
+   "role": "IRB Programme Manager",
    "read": 1,
-   "role": "System Manager",
-   "write": 1
+   "permlevel": 2
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 2,
+   "read": 1
   },
   {
    "permlevel": 3,
    "read": 1,
-   "role": "Administrator",
+   "role": "System Manager",
    "write": 1
   },
   {
@@ -3276,7 +3286,22 @@
   {
    "permlevel": 3,
    "read": 1,
-   "role": "Secondary IRB Reviewer",
+   "role": "Secondary IRB Reviewer"
+  },
+  {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 3
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 3,
+   "read": 1
+  },
+  {
+   "role": "IRB Reviewer",
+   "permlevel": 3,
+   "read": 1,
    "write": 1
   },
   {
@@ -3284,22 +3309,6 @@
    "read": 1,
    "role": "System Manager",
    "write": 1
-  },
-  {
-   "permlevel": 4,
-   "read": 1,
-   "role": "Administrator",
-   "write": 1
-  },
-  {
-   "permlevel": 4,
-   "read": 1,
-   "role": "Student"
-  },
-  {
-   "permlevel": 4,
-   "read": 1,
-   "role": "Faculty Mentor"
   },
   {
    "permlevel": 4,
@@ -3313,21 +3322,20 @@
    "role": "Secondary IRB Reviewer"
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 4
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 4,
+   "read": 1
+  },
+  {
    "permlevel": 5,
    "read": 1,
    "role": "System Manager",
    "write": 1
-  },
-  {
-   "permlevel": 5,
-   "read": 1,
-   "role": "Administrator",
-   "write": 1
-  },
-  {
-   "permlevel": 5,
-   "read": 1,
-   "role": "Student"
   },
   {
    "permlevel": 5,
@@ -3346,6 +3354,17 @@
    "write": 1
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 5,
+   "write": 1
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 5,
+   "read": 1
+  },
+  {
    "permlevel": 6,
    "read": 1,
    "role": "System Manager",
@@ -3354,55 +3373,50 @@
   {
    "permlevel": 6,
    "read": 1,
-   "role": "Administrator",
-   "write": 1
+   "role": "Student"
   },
   {
    "permlevel": 6,
+   "read": 1,
+   "role": "Faculty Mentor"
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "Primary IRB Reviewer"
+  },
+  {
+   "permlevel": 6,
+   "read": 1,
+   "role": "Secondary IRB Reviewer"
+  },
+  {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 6
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 6,
+   "read": 1
+  },
+  {
+   "permlevel": 7,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 7,
    "read": 1,
    "role": "Student",
    "write": 1
   },
   {
-   "permlevel": 6,
+   "permlevel": 7,
    "read": 1,
    "role": "Faculty Mentor",
    "write": 1
-  },
-  {
-   "permlevel": 6,
-   "read": 1,
-   "role": "Primary IRB Reviewer",
-   "write": 1
-  },
-  {
-   "permlevel": 6,
-   "read": 1,
-   "role": "Secondary IRB Reviewer",
-   "write": 1
-  },
-  {
-   "permlevel": 7,
-   "read": 1,
-   "role": "System Manager",
-   "write": 1
-  },
-  {
-   "permlevel": 7,
-   "read": 1,
-   "role": "Administrator",
-   "write": 1
-  },
-  {
-   "permlevel": 7,
-   "read": 1,
-   "role": "Student",
-   "write": 1
-  },
-  {
-   "permlevel": 7,
-   "read": 1,
-   "role": "Faculty Mentor"
   },
   {
    "permlevel": 7,
@@ -3415,21 +3429,20 @@
    "role": "Secondary IRB Reviewer"
   },
   {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 7
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 7,
+   "read": 1
+  },
+  {
    "permlevel": 8,
    "read": 1,
    "role": "System Manager",
    "write": 1
-  },
-  {
-   "permlevel": 8,
-   "read": 1,
-   "role": "Administrator",
-   "write": 1
-  },
-  {
-   "permlevel": 8,
-   "read": 1,
-   "role": "Student"
   },
   {
    "permlevel": 8,
@@ -3446,6 +3459,16 @@
    "permlevel": 8,
    "read": 1,
    "role": "Secondary IRB Reviewer"
+  },
+  {
+   "role": "IRB Programme Manager",
+   "read": 1,
+   "permlevel": 8
+  },
+  {
+   "role": "Anchor",
+   "permlevel": 8,
+   "read": 1
   }
  ],
  "row_format": "Dynamic",

@@ -7,3 +7,6 @@
 sirb.patches.v1_0.create_timeline_alert_templates
 sirb.patches.v1_0.create_deadline_reminder_template
 sirb.patches.v1_0.create_status_email_templates
+sirb.patches.v1_0.create_programme_viewer_role
+sirb.patches.v1_0.create_programme_manager_role
+sirb.patches.v1_0.add_programme_manager_custom_perms

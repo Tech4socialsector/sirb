@@ -6,6 +6,8 @@ export type SirbRole =
   | 'Secondary IRB Reviewer'
   | 'IRB Reviewer'
   | 'Anchor'
+  | 'IRB Programme Viewer'
+  | 'IRB Programme Manager'
   | 'System Manager'
   | 'Administrator'
 

@@ -17,14 +17,16 @@ interface NavGroup {
   items: NavItem[]
 }
 
-const { isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isAnchor, isAdmin } = useRoles()
+const { isStudent, isFacultyMentor, isPrimaryReviewer, isSecondaryReviewer, isAnchor, isAdmin, canViewAdminConsole, isConsoleOnly } =
+  useRoles()
 
 // Every entry here maps to a route that already exists in router/index.ts —
 // this only groups/relabels the existing pages per role, it does not
 // introduce new pages per role (see architecture note: one shared
 // ProjectDetails.vue + role-scoped worklists, not five separate apps).
 const groups = computed<NavGroup[]>(() => {
-  const list: NavGroup[] = [{ label: null, items: [{ label: 'Home', to: '/sirb', icon: 'home' }] }]
+  // Programme viewers/managers have nothing but the console, so Home would only bounce there.
+  const list: NavGroup[] = isConsoleOnly.value ? [] : [{ label: null, items: [{ label: 'Home', to: '/sirb', icon: 'home' }] }]
 
   const myWork: NavItem[] = []
   if (isStudent.value) myWork.push({ label: 'My Projects', to: '/sirb/my-projects', icon: 'file-text' })
@@ -37,10 +39,11 @@ const groups = computed<NavGroup[]>(() => {
   if (myWork.length) list.push({ label: 'My Work', items: myWork })
 
   const admin: NavItem[] = []
+  if (canViewAdminConsole.value) admin.push({ label: 'Admin Console', to: '/sirb/admin', icon: 'grid' })
   if (isAdmin.value) {
-    admin.push({ label: 'Admin Console', to: '/sirb/admin', icon: 'grid' })
     admin.push({ label: 'Setup', to: '/sirb/admin/setup', icon: 'settings' })
     admin.push({ label: 'Student & Project Management', to: '/sirb/admin/students', icon: 'users' })
+    admin.push({ label: 'Programme Access', to: '/sirb/admin/programme-access', icon: 'key' })
     admin.push({ label: 'Timeline Alerts', to: '/sirb/admin/alerts', icon: 'bell' })
   }
   if (isAnchor.value) {

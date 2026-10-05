@@ -1,0 +1,2 @@
+import{$ as e,B as t,Rt as n,U as r,W as i}from"./runtime-dom.esm-bundler-BJ-qJ23c.js";var a=[`innerHTML`],o=e({__name:`ErrorMessage`,props:{message:{}},setup(e){let o=e,s=t(()=>o.message?o.message instanceof Error?o.message.messages||o.message.message:o.message:``);return(t,o)=>e.message?(n(),i(`div`,{key:0,class:`whitespace-pre-line text-sm text-ink-red-4`,role:`alert`,innerHTML:s.value},null,8,a)):r(``,!0)}});export{o as t};
+//# sourceMappingURL=ErrorMessage-DzBgcIVd.js.map

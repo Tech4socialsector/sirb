@@ -10,6 +10,8 @@ files attached to it. A user may only access a project they're on:
 - Student: has a Student Project Mapping to it (active or not, so an
   approved project stays visible to its students)
 - Faculty: is its faculty mentor, primary reviewer or secondary reviewer
+- IRB Programme Manager: every project in their programmes (IRB Programme
+  Access), to reassign the mentor/reviewers and set the status
 - System Manager / Administrator: every project
 
 Frappe controller hooks can only narrow what role permissions allow,
@@ -18,7 +20,16 @@ never widen it.
 
 import frappe
 
+from sirb.sirb.doctype.irb_programme_access.irb_programme_access import (
+	PROGRAMME_MANAGER_ROLE,
+	get_viewer_irb_units,
+)
+
 UNRESTRICTED_ROLES = {"System Manager", "Administrator"}
+
+# What a programme manager may change on their programmes' projects — the
+# same fields an administrator edits on Project Details. Nothing else.
+PROGRAMME_MANAGER_FIELDS = ("status", "faculty_mentor", "primary_reviewer", "secondary_reviewer")
 
 
 def _unrestricted(user):
@@ -31,6 +42,26 @@ def _faculty_ids(user):
 
 def _student_ids(user):
 	return frappe.get_all("Student", filters={"system_user": user}, pluck="name")
+
+
+def _managed_irb_units(user):
+	if PROGRAMME_MANAGER_ROLE not in frappe.get_roles(user):
+		return []
+	return get_viewer_irb_units(user)
+
+
+def manages_project(user, doc):
+	"""True if `user` manages `doc` as an IRB Programme Manager: it belongs
+	to one of their programmes and they aren't one of its students (no one
+	may override the workflow on their own project). Pass the doc as saved,
+	so the check can't follow an unsaved irb_unit change."""
+	unit = doc.get("irb_unit")
+	if not unit or unit not in _managed_irb_units(user):
+		return False
+	students = _student_ids(user)
+	if students and doc.get("name"):
+		return not frappe.db.exists("Student Project Mapping", {"irb_project": doc.name, "student": ("in", students)})
+	return True
 
 
 def project_membership(user, doc):
@@ -64,6 +95,12 @@ def has_irb_project_permission(doc, ptype=None, user=None, debug=False):
 	if students and frappe.db.exists("Student Project Mapping", {"irb_project": doc.name, "student": ("in", students)}):
 		return True
 
+	# Programme managers: projects in their programmes, judged by the saved
+	# irb_unit so an unsaved change can't move a project into reach.
+	managed = _managed_irb_units(user)
+	if managed and frappe.db.get_value("IRB Project", doc.name, "irb_unit") in managed:
+		return True
+
 	return False
 
 
@@ -88,6 +125,10 @@ def irb_project_query_conditions(user=None):
 			"`tabIRB Project`.name in (select sp.irb_project from `tabStudent Project Mapping` sp"
 			f" where sp.student in ({ids}))"
 		)
+	managed = _managed_irb_units(user)
+	if managed:
+		ids = ", ".join(frappe.db.escape(str(u)) for u in managed)
+		conditions.append(f"`tabIRB Project`.irb_unit in ({ids})")
 	return "(" + " or ".join(conditions) + ")" if conditions else "1=0"
 
 
@@ -109,7 +150,8 @@ PROJECT_ROLE_TO_ROLE = {
 
 def _normalized(df, value):
 	"""Compare values the way they're stored, so a client sending "" for a
-	NULL (or "1" for 1) isn't mistaken for an edit."""
+	NULL (or "1" for 1, or a browser's \n line endings for stored \r\n)
+	isn't mistaken for an edit."""
 	from frappe.utils import cint, flt
 
 	if value in (None, ""):
@@ -118,7 +160,7 @@ def _normalized(df, value):
 		return cint(value)
 	if df.fieldtype in ("Float", "Currency", "Percent"):
 		return flt(value)
-	return str(value)
+	return str(value).replace("\r\n", "\n")
 
 
 def validate_project_field_writes(doc):
@@ -146,6 +188,22 @@ def validate_project_field_writes(doc):
 	if not changed:
 		return
 
+	# Programme managers may change the status / mentor / reviewers of their
+	# programmes' projects; anything else falls through to the checks below.
+	is_manager = manages_project(frappe.session.user, before)
+	if is_manager:
+		# Fetch-from fields (e.g. num_reviewers <- irb_unit) are re-copied by
+		# Frappe on every save, overwriting anything the client sent, so a
+		# change there is the linked record's, not the manager's.
+		changed = [
+			df
+			for df in changed
+			if df.fieldname not in PROGRAMME_MANAGER_FIELDS
+			and not (df.fetch_from and not df.fetch_if_empty and doc.get(df.fetch_from.split(".")[0]))
+		]
+		if not changed:
+			return
+
 	reassigned = [df.label or df.fieldname for df in changed if df.fieldname in ADMIN_ONLY_FIELDS]
 	if reassigned:
 		frappe.throw(
@@ -156,18 +214,33 @@ def validate_project_field_writes(doc):
 
 	# Assignments as saved — reassigning is admin-only, checked above.
 	project_roles = project_membership(frappe.session.user, before)
+	if is_manager and not any(project_roles.values()):
+		# The manager role writes permlevel 0, where most proposal answers
+		# live; without a role on the project, those stay the student's.
+		frappe.throw(
+			"As a programme manager you can only change the status, mentor and reviewers.",
+			frappe.PermissionError,
+			title="Not allowed",
+		)
 	roles = {role for flag, role in PROJECT_ROLE_TO_ROLE.items() if project_roles.get(flag)}
 	writable = {p.permlevel for p in doc.get_permissions() if p.role in roles and p.write}
 	# permlevel 0 (status, attachments) is governed by the status workflow
 	# and role permissions; only the role-specific levels are narrowed here.
-	blocked = [df.label or df.fieldname for df in changed if df.permlevel and df.permlevel not in writable]
+	blocked = [df for df in changed if df.permlevel and df.permlevel not in writable]
 	if blocked:
-		frappe.throw(
-			f"Your role on this project doesn't allow editing: {', '.join(blocked[:5])}"
-			+ (f" and {len(blocked) - 5} more" if len(blocked) > 5 else "")
-			+ ". Reload the page and try again.",
-			frappe.PermissionError,
-			title="Not allowed",
+		# Put those fields back and save the rest, as Frappe itself does for
+		# permlevels a user can't write. Throwing here discarded a reviewer's
+		# whole save when Desk let them type into a field their global roles
+		# allow (e.g. a reviewer who also has the Student role) but their
+		# role on this project doesn't.
+		for df in blocked:
+			doc.set(df.fieldname, before.get(df.fieldname))
+		labels = [df.label or df.fieldname for df in blocked]
+		frappe.msgprint(
+			"Your other changes were saved. These weren't, because your role on this project doesn't allow "
+			f"editing them: {', '.join(labels[:5])}" + (f" and {len(labels) - 5} more" if len(labels) > 5 else "") + ".",
+			title="Some changes not saved",
+			indicator="orange",
 		)
 
 

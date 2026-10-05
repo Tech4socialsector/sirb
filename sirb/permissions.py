@@ -150,7 +150,8 @@ PROJECT_ROLE_TO_ROLE = {
 
 def _normalized(df, value):
 	"""Compare values the way they're stored, so a client sending "" for a
-	NULL (or "1" for 1) isn't mistaken for an edit."""
+	NULL (or "1" for 1, or a browser's \n line endings for stored \r\n)
+	isn't mistaken for an edit."""
 	from frappe.utils import cint, flt
 
 	if value in (None, ""):
@@ -159,7 +160,7 @@ def _normalized(df, value):
 		return cint(value)
 	if df.fieldtype in ("Float", "Currency", "Percent"):
 		return flt(value)
-	return str(value)
+	return str(value).replace("\r\n", "\n")
 
 
 def validate_project_field_writes(doc):
@@ -225,14 +226,21 @@ def validate_project_field_writes(doc):
 	writable = {p.permlevel for p in doc.get_permissions() if p.role in roles and p.write}
 	# permlevel 0 (status, attachments) is governed by the status workflow
 	# and role permissions; only the role-specific levels are narrowed here.
-	blocked = [df.label or df.fieldname for df in changed if df.permlevel and df.permlevel not in writable]
+	blocked = [df for df in changed if df.permlevel and df.permlevel not in writable]
 	if blocked:
-		frappe.throw(
-			f"Your role on this project doesn't allow editing: {', '.join(blocked[:5])}"
-			+ (f" and {len(blocked) - 5} more" if len(blocked) > 5 else "")
-			+ ". Reload the page and try again.",
-			frappe.PermissionError,
-			title="Not allowed",
+		# Put those fields back and save the rest, as Frappe itself does for
+		# permlevels a user can't write. Throwing here discarded a reviewer's
+		# whole save when Desk let them type into a field their global roles
+		# allow (e.g. a reviewer who also has the Student role) but their
+		# role on this project doesn't.
+		for df in blocked:
+			doc.set(df.fieldname, before.get(df.fieldname))
+		labels = [df.label or df.fieldname for df in blocked]
+		frappe.msgprint(
+			"Your other changes were saved. These weren't, because your role on this project doesn't allow "
+			f"editing them: {', '.join(labels[:5])}" + (f" and {len(labels) - 5} more" if len(labels) > 5 else "") + ".",
+			title="Some changes not saved",
+			indicator="orange",
 		)
 
 

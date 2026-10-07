@@ -28,7 +28,10 @@ add_to_apps_screen = [
 # include js, css files in header of desk.html
 # app_include_css = "/assets/sirb/css/sirb.css"
 # app_include_js = "/assets/sirb/js/sirb.js"
-app_include_js = ["assets/sirb/js/hide_search_for_roles.js"]
+app_include_js = [
+	"assets/sirb/js/hide_search_for_roles.js",
+	"assets/sirb/js/redirect_students_to_portal.js",
+]
 
 
 # include js, css files in header of web template

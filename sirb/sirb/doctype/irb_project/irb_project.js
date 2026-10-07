@@ -26,221 +26,81 @@ var field_word_length_map = {
     "photos_confidentiality":  200,
     "other_data":  200
 }
-async function get_previous_login() {
-    let res = await frappe.db.get_list("Activity Log",
-        { fields: ["creation"], filters: { user: frappe.session.user, operation: "Login" }, order_by: "creation desc", limit: 2 });
-    //console.log("ACTIVITY LOG ", res)
-    if(res.length > 1) 
-        return new Date(res[1].creation.replace(" ", "T"));
-    else if (res.length === 1)
-        return new Date(res[0].creation.replace(" ", "T"));
-    return null;
-}
-async function get_versions_after_status_change(doctype, docname, status) {
-    console.log("Checking versions after ", status)
-    let versions = await frappe.db.get_list("Version",
-        {
-            fields: ["data", "modified"],
-            filters: [
-                ["docname", "=", docname],
-                ["ref_doctype", "=", doctype]
-            ],
-            order_by: "modified desc",
-            limit_page_length: 9999
-        });
-    let changed_versions = []
-    for (let version of versions) {
-        found_needed_status_change = false;
-        if (version.data) {
-            let version_data = JSON.parse(version.data);
-            for (let change_info of version_data.changed) {
-                if (change_info && change_info[0] === "status" && change_info[2] === status) {
-                        // console.log("FOUND NEEDED STATUS CHANGE! ", change_info)
-                        found_needed_status_change = true;
-                        break;
-                }
-            }
-            if (!found_needed_status_change)
-                changed_versions.push(version)
-            else
-                break;
-        }
-    }
-    if (found_needed_status_change) {
-        console.log("CHANGES ", changed_versions);
-        return changed_versions;
-    } else
-        console.log("NO CHANGES FOUND!")
-        return []
+var FIELD_CHANGED_MARK = '<span class="sirb-changed-mark" style="background-color: yellow;"><i> (Field Changed) </i></span>';
+var REVIEW_CHANGED_MARK = ' <span style="background-color: yellow;"><i> (Review Section Changed) </i></span>';
 
+function mark_label_changed(frm, fieldname) {
+    const field = frm.get_field(fieldname);
+    if (!field || !field.$wrapper) return;
+    const $label = field.$wrapper.find('.control-label').first();
+    if ($label.length && !$label.find('.sirb-changed-mark').length)
+        $label.append(' ' + FIELD_CHANGED_MARK);
 }
-function get_field_changes_from_version_list(versions, fieldname) {
-    let changes = []
-    for (let version of versions) {
-        let version_data = JSON.parse(version.data);
-        for (let change_info of version_data.changed) {
-            if (change_info && change_info[0] === fieldname) {
-                change = {}
-                change["date"] = version.modified
-                change["old_value"] = change_info[1]
-                change["new_value"] = change_info[2]
-                changes.push(change)
-            }
-        }
-    }
-    // console.log("FOUND NEEDED FIELD CHANGE! ", changes)
-    return changes
-}
+
+// Undo update_field_changes(), so marks from an earlier round don't linger
+// after a status change reloads the form.
 function clear_all_field_changes(frm) {
-    console.log("TRYING TO CLEAR!")
-    Object.keys(frm.fields_dict).forEach(fieldname => {
-        let field = frm.get_field(fieldname);
-        if (!field || !field.$wrapper) return;
-        let $label = field.$wrapper.find('.control-label');
-        // Remove any span whose text contains "(Field Changed)"
-        $label.find('span').each(function() {
-            if ($(this).text().includes('(Field Changed)')) {
-                console.log("REMOVING!")
-                $(this).remove();
-            }
-        });
+    $(frm.wrapper).find('.control-label .sirb-changed-mark').remove();
+    for (let section of section_list) {
+        const toggle = frm.get_field("toggle_" + section);
+        if (toggle && toggle.df.label.includes(REVIEW_CHANGED_MARK))
+            frm.set_df_property("toggle_" + section, "label", toggle.df.label.replace(REVIEW_CHANGED_MARK, ''));
+    }
+    frm.__review_changed_sections = [];
+}
+
+// Show the viewer what others changed since the project was last handed to
+// them (sirb.sirb_api.project.get_review_highlights decides from the status):
+// changed answers and review notes get "(Field Changed)", the answer changes
+// are listed in the section's "Field Changes" box, and a section whose review
+// notes changed gets its review button marked. Returns those sections.
+async function update_field_changes(frm) {
+    const r = await frappe.call({
+        method: "sirb.sirb_api.project.get_review_highlights",
+        args: { project_name: frm.doc.name },
     });
+    const changes = r.message || {};
+    const esc = (v) => frappe.utils.escape_html(v == null ? '' : String(v));
+    const changed_sections = [];
+    for (let section of section_list) {
+        let field_changes_str = '';
+        for (let field of get_fields_in_section(frm, section)) {
+            if (!changes[field]) continue;
+            for (let c of changes[field])
+                field_changes_str += field + ' changed from "' + esc(c.old_value) + '" to "<b>' + esc(c.new_value) + '</b>" on ' + c.date + "\n";
+            mark_label_changed(frm, field);
+        }
+        // Shown only, never saved: no-one but admins can write these.
+        if (field_changes_str && frm.get_field(section + "_fc"))
+            frm.set_value(section + "_fc", field_changes_str, null, true);
+
+        const changed_notes = Object.keys(extns).map(ext => section + ext).filter(f => changes[f] && frm.get_field(f));
+        if (!changed_notes.length) continue;
+        changed_notes.forEach(f => mark_label_changed(frm, f));
+        const toggle = frm.get_field("toggle_" + section);
+        if (toggle && !toggle.df.label.includes(REVIEW_CHANGED_MARK))
+            frm.set_df_property("toggle_" + section, "label", toggle.df.label + REVIEW_CHANGED_MARK);
+        changed_sections.push(section);
+    }
+    frm.__review_changed_sections = changed_sections;
+    return changed_sections;
 }
 
-async function update_field_changes(frm, doctype, docname, status) {
-    console.log("CHECKING FIELD UPDATES AFTER ", status, " !!")
-    let changed_versions = await get_versions_after_status_change(doctype, docname, status)
-    if (changed_versions.length > 0) {
-        console.log("FOUND CHANGED VERSIONS!")
-        for (let section of section_list) {
-            field_changes_str = '';
-            field_list = get_fields_in_section(frm, section);
-            for (let field of field_list) {
-                //console.log(field);
-                field_changes = get_field_changes_from_version_list(changed_versions, field)
-                if (field_changes.length > 0) {
-                    console.log(field, " changed so updating field changes label!")
-                    for (let field_change of field_changes) {
-                        field_changes_str += field + " changed from \"" + field_change.old_value + "\" to \"<b>" + field_change.new_value + "</b>\" on " + field_change.date + "\n"
-                    }
-                    updated_label = get_updated_label(frm, field);
-                    if (!(updated_label.toLowerCase().includes("changed"))) {
-                        let orig_label = frm.get_field(field).df.label;
-                        if (field && field.$wrapper) {
-                            let $label = field.$wrapper.find('.control-label');
-                            if ($label.length) {
-                                // Keep the original text inside the label, append the marker as HTML
-                                $label.html(orig_label + ' <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>');
-                            }
-                        }                        
-                        // frm.set_df_property(field, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
-                    }                    
-                }
-            }
-            if (field_changes_str !== '') {
-                frm.set_value(section+"_fc", field_changes_str, null, false);
-            }
-            let section_ext_changed = false;
-            for (let ext in extns) {
-                if (ext === "_fc")
-                    continue;
-                section_with_ext = section + ext;
-                title_ext = [];
-                field_changes = get_field_changes_from_version_list(changed_versions, section_with_ext);
-                //console.log("checking extension ", section_with_ext)
-                if (field_changes.length > 0) {
-                    console.log(section_with_ext, " changed so updating field changes label!")
-                    section_ext_changed = true;
-                    updated_label = get_updated_label(frm, section_with_ext);
-                    if (!(updated_label.toLowerCase().includes("changed"))) {
-                        let orig_label = frm.get_field(section_with_ext).df.label;
-                        //frm.set_df_property(section_with_ext, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>");
-                        if (section_with_ext && section_with_ext.$wrapper) {
-                            let $label = section_with_ext.$wrapper.find('.control-label');
-                            if ($label.length) {
-                                // Keep the original text inside the label, append the marker as HTML
-                                $label.html(orig_label + ' <span style=\"background-color: yellow;\"><i> (Field Changed) </i></span>');
-                            }
-                        }                        
-                    }
-                }
-            }
-            if (section_ext_changed) {
-                console.log("UPDATEING TOGGLE BUTTON LABEL!")
-                orig_label = frm.get_field("toggle_"+section).df.label;
-                if (!orig_label.toLowerCase().includes("changed")) {
-                    frm.set_df_property("toggle_"+section, "label", orig_label + " <span style=\"background-color: yellow;\"><i> (Review Section Changed) </i></span>");
-                    frm.get_field(section_with_ext).refresh()
-                }
-            }
+// Open a section's review notes. Students may write to their reviewer only
+// while correcting for reviewer feedback.
+function show_review_section(frm, section, is_student) {
+    const target_name = section + '_addons';
+    const target_field = frm.fields_dict[target_name];
+    if (!target_field) return;
+    $(target_field.wrapper).show();
+    frm.set_df_property(target_name, 'hidden', 0);
+    if (is_student) {
+        const show_talk_to_reviewer = frm.doc.status === "Awaiting student correction for reviewer feedback";
+        for (let s of section_list) {
+            if (frm.get_field(s + "_sc"))
+                frm.set_df_property(s + "_sc", 'hidden', show_talk_to_reviewer ? 0 : 1);
         }
     }
-}
-
-async function get_versions_after_login(doctype, docname, prev_login_time) {
-    let prev_login_str = prev_login_time.getFullYear() + '-' +
-                            String(prev_login_time.getMonth() + 1).padStart(2, '0') + '-' +
-                            String(prev_login_time.getDate()).padStart(2, '0') + ' ' +
-                            String(prev_login_time.getHours()).padStart(2, '0') + ':' +
-                            String(prev_login_time.getMinutes()).padStart(2, '0') + ':' +
-                            String(prev_login_time.getSeconds()).padStart(2, '0');
-    // console.log("Prev login str is ", prev_login_str)
-    let versions = await frappe.db.get_list("Version",
-        {
-            fields: ["data", "modified"],
-            filters: [
-                ["docname", "=", docname],
-                ["ref_doctype", "=", doctype],
-                ["modified", ">", prev_login_str]
-            ],
-            order_by: "modified desc",
-            limit_page_length: 9999
-        });
-    return versions;
-}
-
-function get_updated_label(frm, fieldname) {
-    //console.log("Passed fieldname ", fieldname)
-    var field_instance = frm.get_field(fieldname);
-    //console.log(field_instance)
-    if (field_instance) {
-
-        var $wrapper = $(field_instance.$wrapper);
-        //field_instance.wrapper;
-        //console.log("Looking in ", $wrapper)
-        var $label_element = $wrapper.find('.control-label');
-        
-        if ($label_element.length) {
-            // 4. Extract the visible text content
-            var currentLabelText = $label_element.text().trim();
-            
-            //console.log("Current displayed label for " + fieldname + ":", currentLabelText);
-            
-            return currentLabelText;
-        } else {
-            //console.log("Label element not found for field:", fieldname);
-        }
-    }
-    return null;
-}
-function field_changed_since_last_login(versions, fieldname) {
-    field_changed = false;
-    // console.log("Checking changes for ", fieldname)
-    for (let v of versions) {
-        if (v.data) {
-            let version_data = JSON.parse(v.data);
-            for (let change of version_data.changed) {
-                // console.log(change);
-                if (change[0] === fieldname) {
-                    // console.log("!!")
-                    field_changed = true;
-                    break;
-                }
-            }
-        }
-    }
-    // console.log("Returning ", field_changed)
-    return field_changed
 }
 
 var get_fields_in_section = function(frm, section_fieldname) {
@@ -571,7 +431,8 @@ frappe.ui.form.on("IRB Project", {
         setTimeout(() => {
             if (!frm.__addons_hidden_initially) {
                 Object.keys(frm.fields_dict).forEach(fieldname => {
-                    if (fieldname.endsWith('_addons')) {
+                    // Sections with new review notes stay open (see the end of refresh).
+                    if (fieldname.endsWith('_addons') && !(frm.__review_changed_sections || []).includes(fieldname.slice(0, -7))) {
                         // Update metadata
                         frm.set_df_property(fieldname, 'hidden', 1);
                         // Force physical hide via jQuery
@@ -597,24 +458,7 @@ frappe.ui.form.on("IRB Project", {
                     wrapper.hide();
                     frm.set_df_property(target_name, 'hidden', 1);
                 } else {
-                    wrapper.show();
-                    frm.set_df_property(target_name, 'hidden', 0);
-                    if (is_student) {
-                        let show_talk_to_reviewer = false;
-                        if (["Awaiting student correction for reviewer feedback"].includes(frm.doc.status)) 
-                            show_talk_to_reviewer = true;
-                        else
-                            show_talk_to_reviewer = false;
-                        // console.log("talk ", show_talk_to_reviewer)
-                        for (let s of section_list) {
-                            fname = s+"_sc";
-                            // console.log(fname);
-                            if (!show_talk_to_reviewer)
-                                frm.set_df_property(fname, 'hidden', 1);
-                            else
-                                frm.set_df_property(fname, 'hidden', 0);
-                        }
-                    }
+                    show_review_section(frm, btn_fieldname.replace('toggle_', ''), is_student);
                     frappe.utils.scroll_to(target_field.wrapper, true, 30);
                 }
             }
@@ -704,23 +548,14 @@ frappe.ui.form.on("IRB Project", {
         if (!frm.doc.manipulative_experiments_select)
             frm.set_value('manipulative_experiments_select', '-- Select --');         
 
-        // SHOW FIELD UPDATES
+        // SHOW FIELD UPDATES (the student sees the mentor's / reviewer's
+        // feedback, the mentor / reviewer sees the student's corrections).
+        // A failure here must not stop the rest of the form from loading.
         clear_all_field_changes(frm);
-        if (frm.doc.status == "Awaiting student correction for mentor feedback") {
-            // SHOW STUDENT THE UPDATES FROM MENTOR
-            await update_field_changes(frm, "IRB Project", frm.doc.name, "Awaiting Faculty mentor approval");
-        }
-        else if (frm.doc.status == "Awaiting student correction for reviewer feedback") {
-            // SHOW STUDENT THE UPDATES FROM REVIEWER
-            await update_field_changes(frm, "IRB Project", frm.doc.name, "Awaiting reviewer feedback to student");
-        }
-        else if (frm.doc.status === "Awaiting Faculty mentor approval") {
-            // SHOW MENTOR THE UPDATES FROM STUDENT
-            await update_field_changes(frm, "IRB Project", frm.doc.name,"Awaiting student correction for mentor feedback");
-        }
-        else if (frm.doc.status ==="Awaiting reviewer feedback to student") {
-            // SHOW REVIEWER THE UPDATES FROM STUDENT
-            await update_field_changes(frm, "IRB Project", frm.doc.name,"Awaiting student correction for reviewer feedback")
+        try {
+            await update_field_changes(frm);
+        } catch (e) {
+            console.error("Could not load review highlights", e);
         }
         frappe.call({
             method: "sirb.api.get_project_students",
@@ -789,7 +624,14 @@ frappe.ui.form.on("IRB Project", {
             );
 
         if (is_student && ["Awaiting student correction for mentor feedback", "Awaiting student correction for reviewer feedback"].includes(frm.doc.status)) {
+            let where = [];
+            const n = (frm.__review_changed_sections || []).length;
+            if (n)
+                where.push(__('{0} question(s) in the questionnaire tab(s) have new feedback, marked "(Review Section Changed)" and opened below each question.', [n]));
+            if (frm.doc.reviewers_comments_to_student || frm.doc.mentor_comment_to_student)
+                where.push(__('Overall comments are in the "General comments" tab.'));
             frm.set_intro(
+                (where.length ? where.join(' ') + '<br><br>' : '') +
                 __('Saving this form only stores your changes. To send your updated documents/answers back to the reviewer, you must also click "Submit Corrections" under the Actions menu once you are done making changes.'),
                 'orange', { no_dirty: true }
             );
@@ -1250,6 +1092,9 @@ frappe.ui.form.on("IRB Project", {
                 frm.set_df_property(fieldname, 'hidden', 1);
             }
         });
+        // ...except those with new review notes, so they can't be missed.
+        for (let section of frm.__review_changed_sections || [])
+            show_review_section(frm, section, is_student);
     }
 });
 

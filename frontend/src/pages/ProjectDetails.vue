@@ -21,7 +21,7 @@ import type { IrbProjectDoc, ProposalIssue } from '@/types/project'
 
 const props = defineProps<{ name: string }>()
 
-const { detail, history, loading, error, transitioning, load, transitionTo } = useProject(props.name)
+const { detail, history, highlights, loading, error, transitioning, load, transitionTo } = useProject(props.name)
 const { setContext, clearContext } = useTimelineDrawer()
 
 // Local editable copy of the doc so field edits don't mutate the loaded
@@ -77,6 +77,22 @@ const showReviewer = computed(() => Boolean(localDoc.value && 'primary_reviewer'
 const docRef = computed(() => localDoc.value)
 
 const allowedStatuses = computed(() => detail.value?.allowed_statuses)
+
+// What others changed since this user last had the project — for a student,
+// the mentor's / reviewer's feedback (sirb_api.project.get_review_highlights).
+const changedFields = computed<ReadonlySet<string>>(() => new Set(Object.keys(highlights.value)))
+const FEEDBACK_FIELDS = ['reviewers_comments_to_student', 'mentor_comment_to_student']
+const newFeedbackCount = computed(
+  () => [...changedFields.value].filter((f) => /_(rf|mf)$/.test(f) || FEEDBACK_FIELDS.includes(f)).length,
+)
+// Permlevels whose edits this user's saves keep (absent: older server, no limit).
+const writableLevels = computed<ReadonlySet<number> | undefined>(() => {
+  const levels = detail.value?.meta.writable_permlevels
+  return levels ? new Set(levels) : undefined
+})
+// The proposal's own answers (title, abstract, ... in irb_project.json).
+const PROPOSAL_PERMLEVEL = 7
+const overviewDisabled = computed(() => !canEdit.value || (writableLevels.value ? !writableLevels.value.has(PROPOSAL_PERMLEVEL) : false))
 const { actions, canEdit } = useProjectActions(docRef, roles, hasSecondaryReviewer, allowedStatuses)
 
 // Admins/System Managers — and programme managers on their programmes'
@@ -234,6 +250,11 @@ const correctionNoticeStatuses = [
         v-if="roles.is_student && correctionNoticeStatuses.includes(String(localDoc.status))"
         class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
       >
+        <p v-if="newFeedbackCount" class="mb-1 font-semibold">
+          You have new feedback on {{ newFeedbackCount }} {{ newFeedbackCount === 1 ? 'item' : 'items' }}. It's highlighted
+          below each question in the questionnaire tabs (look for “updated” on the tab names), and overall comments are in the
+          “General comments” tab.
+        </p>
         Saving this form only stores your changes. To send your updated documents/answers back to the reviewer, use
         "Submit corrections" below once you're done.
       </div>
@@ -260,7 +281,7 @@ const correctionNoticeStatuses = [
       </div>
 
       <div class="mb-4">
-        <ProjectOverview :doc="localDoc" :disabled="!canEdit" :issue-messages="issueMessages" @update="updateField" />
+        <ProjectOverview :doc="localDoc" :disabled="overviewDisabled" :issue-messages="issueMessages" @update="updateField" />
       </div>
 
       <div class="mb-4">
@@ -271,6 +292,8 @@ const correctionNoticeStatuses = [
           :link-titles="detail.link_titles"
           :disabled="!canEdit"
           :override-editable="overrideEditable"
+          :changed-fields="changedFields"
+          :writable-levels="writableLevels"
           @update="updateField"
         />
       </div>

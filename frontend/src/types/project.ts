@@ -66,7 +66,12 @@ export interface ProjectDetailPayload {
   students: ProjectStudent[]
   /** can_override: may reassign mentor/reviewers and set any status
    * (admins; programme managers on their programmes' projects). */
-  meta: { can_write: boolean; can_override?: boolean }
+  meta: {
+    can_write: boolean
+    can_override?: boolean
+    /** Permlevels this user's saves keep; fields at other levels are read-only. */
+    writable_permlevels?: number[]
+  }
   /** Status changes the server will accept from this user right now (sirb/workflow.py). */
   allowed_statuses?: string[]
 }

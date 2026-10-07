@@ -17,6 +17,10 @@ const props = defineProps<{
   allFields: SchemaField[]
   doc: IrbProjectDoc
   disabled: boolean
+  /** Fields others changed since this user last had the project. */
+  changedFields?: ReadonlySet<string>
+  /** Permlevels this user may save; absent means no restriction known. */
+  writableLevels?: ReadonlySet<number>
 }>()
 
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
@@ -30,7 +34,15 @@ const channels = computed(() => {
       // user has permlevel read access to it — absence means "not visible
       // to me", not "empty".
       if (!field || !(fieldname in props.doc)) return null
-      return { fieldname, label, field, value: props.doc[fieldname] }
+      return {
+        fieldname,
+        label,
+        field,
+        value: props.doc[fieldname],
+        changed: Boolean(props.changedFields?.has(fieldname)),
+        // Frappe drops edits to permlevels the user can't write, so don't offer them.
+        readOnly: Boolean(field.read_only) || (props.writableLevels ? !props.writableLevels.has(field.permlevel) : false),
+      }
     })
     .filter((c): c is NonNullable<typeof c> => Boolean(c))
 })
@@ -38,11 +50,18 @@ const channels = computed(() => {
 
 <template>
   <div v-if="channels.length" class="mt-2 space-y-3 rounded-md border border-line bg-canvas p-3">
-    <div v-for="channel in channels" :key="channel.fieldname">
+    <div
+      v-for="channel in channels"
+      :id="`field-${channel.fieldname}`"
+      :key="channel.fieldname"
+      class="rounded-md"
+      :class="channel.changed ? 'bg-amber-50 p-2 ring-2 ring-amber-300' : ''"
+    >
+      <p v-if="channel.changed" class="mb-1 text-xs font-semibold text-amber-800">New since you last had this project</p>
       <FormControl
         type="textarea"
         :label="channel.label"
-        :disabled="disabled || Boolean(channel.field.read_only)"
+        :disabled="disabled || channel.readOnly"
         :model-value="channel.value"
         @update:model-value="(v: unknown) => emit('update', channel.fieldname, v)"
       />

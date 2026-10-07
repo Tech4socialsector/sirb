@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import {
   fetchFieldChangesSinceStatus,
   fetchProjectDetail,
+  fetchReviewHighlights,
   fetchStatusChangeHistory,
   setProjectStatus,
 } from '@/services/projects'
@@ -11,6 +12,7 @@ import type { FieldChangeEntry, ProjectDetailPayload, StatusChangeEntry } from '
 export function useProject(projectName: string) {
   const detail = ref<ProjectDetailPayload | null>(null)
   const history = ref<StatusChangeEntry[]>([])
+  const highlights = ref<Record<string, FieldChangeEntry[]>>({})
   const loading = ref(false)
   const error = ref<ApiError | null>(null)
   const transitioning = ref(false)
@@ -19,12 +21,14 @@ export function useProject(projectName: string) {
     loading.value = true
     error.value = null
     try {
-      const [detailResult, historyResult] = await Promise.all([
+      const [detailResult, historyResult, highlightsResult] = await Promise.all([
         fetchProjectDetail(projectName),
         fetchStatusChangeHistory(projectName).catch(() => [] as StatusChangeEntry[]),
+        fetchReviewHighlights(projectName).catch(() => ({}) as Record<string, FieldChangeEntry[]>),
       ])
       detail.value = detailResult
       history.value = historyResult
+      highlights.value = highlightsResult
     } catch (e) {
       error.value = e instanceof ApiError ? e : new ApiError('Failed to load project.', 'server')
     } finally {
@@ -50,5 +54,5 @@ export function useProject(projectName: string) {
     }
   }
 
-  return { detail, history, loading, error, transitioning, load, transitionTo, fieldChangesSince }
+  return { detail, history, highlights, loading, error, transitioning, load, transitionTo, fieldChangesSince }
 }

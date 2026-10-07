@@ -4,6 +4,7 @@ import { Tabs } from 'frappe-ui'
 import QuestionnaireSection from './QuestionnaireSection.vue'
 import { useProjectSchema } from '@/composables/useProjectSchema'
 import type { IrbProjectDoc } from '@/types/project'
+import type { SchemaTab } from '@/types/schema'
 
 const props = defineProps<{
   doc: IrbProjectDoc
@@ -11,6 +12,10 @@ const props = defineProps<{
   disabled: boolean
   issueMessages?: Map<string, string>
   overrideEditable?: ReadonlySet<string>
+  /** Fields others changed since this user last had the project. */
+  changedFields?: ReadonlySet<string>
+  /** Permlevels this user may save; absent means no restriction known. */
+  writableLevels?: ReadonlySet<number>
 }>()
 
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
@@ -24,7 +29,19 @@ const visibleTabs = computed(() =>
   tabs.value.filter((t) => t.fieldname !== '__default__' && isTabVisible(t)),
 )
 
-const tabItems = computed(() => visibleTabs.value.map((t) => ({ label: t.label })))
+// Tab label -> tab; labels carry a count of changes, so look tabs up here.
+const tabsByLabel = computed(() => {
+  const map = new Map<string, SchemaTab>()
+  for (const t of visibleTabs.value) {
+    const changed = t.sections
+      .filter(isSectionVisible)
+      .flatMap((s) => s.columns.flat())
+      .filter((f) => props.changedFields?.has(f.fieldname) && isFieldVisible(f)).length
+    map.set(changed ? `${t.label} (${changed} updated)` : t.label, t)
+  }
+  return map
+})
+const tabItems = computed(() => [...tabsByLabel.value.keys()].map((label) => ({ label })))
 const activeTabIndex = ref(0)
 
 watch(visibleTabs, (val) => {
@@ -59,7 +76,7 @@ defineExpose({ focusField })
       <template #tab-panel="{ tab }">
         <div class="mt-4 space-y-4">
           <QuestionnaireSection
-            v-for="section in (visibleTabs.find((t) => t.label === tab.label)?.sections || []).filter(isSectionVisible)"
+            v-for="section in (tabsByLabel.get(tab.label)?.sections || []).filter(isSectionVisible)"
             :key="section.fieldname"
             :section="section"
             :all-fields="tabs.flatMap((t) => t.sections.flatMap((s) => s.columns.flat()))"
@@ -70,6 +87,8 @@ defineExpose({ focusField })
             :is-field-mandatory="isFieldMandatory"
             :issue-messages="issueMessages"
             :override-editable="overrideEditable"
+            :changed-fields="changedFields"
+            :writable-levels="writableLevels"
             @update="(fn, v) => emit('update', fn, v)"
           />
         </div>

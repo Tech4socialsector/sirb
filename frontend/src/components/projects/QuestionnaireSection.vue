@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Button, FeatherIcon } from 'frappe-ui'
 import SchemaFieldInput from './SchemaFieldInput.vue'
 import ReviewChannel from './ReviewChannel.vue'
@@ -21,11 +21,23 @@ const props = defineProps<{
   /** Fields this user may edit even when the form is `disabled` or the
    * field is read-only (admins: status, mentor and reviewers). */
   overrideEditable?: ReadonlySet<string>
+  /** Fields others changed since this user last had the project. */
+  changedFields?: ReadonlySet<string>
+  /** Permlevels this user may save; absent means no restriction known. */
+  writableLevels?: ReadonlySet<number>
 }>()
 
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
 
-const showReview = ref(false)
+// Frappe drops edits to permlevels the user can't write, so don't offer them.
+function canWrite(field: SchemaField) {
+  return !props.writableLevels || props.writableLevels.has(field.permlevel)
+}
+
+function isFieldDisabled(field: SchemaField) {
+  if (props.overrideEditable?.has(field.fieldname)) return false
+  return props.disabled || Boolean(field.read_only) || !canWrite(field)
+}
 
 function isBaseField(field: SchemaField) {
   return !CHANNEL_SUFFIXES.some((suffix) => field.fieldname.endsWith(suffix))
@@ -45,6 +57,18 @@ const visibleColumns = computed(() =>
 // A section whose every field is hidden or a spacer would be an empty card.
 const hasContent = computed(() => visibleColumns.value.some((c) => c.length))
 
+// New review notes (e.g. reviewer feedback for a student) open by themselves,
+// so they can't be missed behind the "Show review notes" button.
+const hasNewNotes = computed(() =>
+  visibleColumns.value.some((column) =>
+    column.some((f) => CHANNEL_SUFFIXES.some((suffix) => props.changedFields?.has(f.fieldname + suffix))),
+  ),
+)
+const showReview = ref(hasNewNotes.value)
+watch(hasNewNotes, (isNew) => {
+  if (isNew) showReview.value = true
+})
+
 function hasReviewContentAnywhere() {
   return props.section.columns
     .flat()
@@ -57,9 +81,12 @@ function hasReviewContentAnywhere() {
   <div v-if="hasContent" class="rounded-lg border border-line bg-paper p-5">
     <div v-if="section.label || hasReviewContentAnywhere()" class="mb-4 flex items-center justify-between">
       <h3 v-if="section.label" class="text-sm font-semibold text-charcoal">{{ section.label }}</h3>
-      <Button v-if="hasReviewContentAnywhere()" variant="ghost" size="sm" @click="showReview = !showReview">
-        {{ showReview ? 'Hide review notes' : 'Show review notes' }}
-      </Button>
+      <div v-if="hasReviewContentAnywhere()" class="flex items-center gap-2">
+        <span v-if="hasNewNotes" class="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">New review notes</span>
+        <Button variant="ghost" size="sm" @click="showReview = !showReview">
+          {{ showReview ? 'Hide review notes' : 'Show review notes' }}
+        </Button>
+      </div>
     </div>
 
     <div class="grid gap-x-6 gap-y-4" :class="visibleColumns.filter((c) => c.length).length > 1 ? 'md:grid-cols-2' : ''">
@@ -70,13 +97,22 @@ function hasReviewContentAnywhere() {
             :id="`field-${field.fieldname}`"
             :key="field.fieldname"
             class="scroll-mt-24 rounded-md transition-shadow"
-            :class="issueMessages?.has(field.fieldname) ? 'p-3 ring-2 ring-danger/60' : ''"
+            :class="
+              issueMessages?.has(field.fieldname)
+                ? 'p-3 ring-2 ring-danger/60'
+                : changedFields?.has(field.fieldname)
+                  ? 'bg-amber-50 p-3 ring-2 ring-amber-300'
+                  : ''
+            "
           >
+            <p v-if="changedFields?.has(field.fieldname)" class="mb-1 text-xs font-semibold text-amber-800">
+              Changed since you last had this project
+            </p>
             <SchemaFieldInput
               :field="field"
               :model-value="doc[field.fieldname]"
               :display-value="linkTitles?.[field.fieldname]"
-              :disabled="!overrideEditable?.has(field.fieldname) && (disabled || Boolean(field.read_only))"
+              :disabled="isFieldDisabled(field)"
               :editable-link="overrideEditable?.has(field.fieldname)"
               :required="isFieldMandatory(field)"
               :docname="String(doc.name)"
@@ -92,6 +128,8 @@ function hasReviewContentAnywhere() {
               :all-fields="allFields"
               :doc="doc"
               :disabled="disabled"
+              :changed-fields="changedFields"
+              :writable-levels="writableLevels"
               @update="(fn, v) => emit('update', fn, v)"
             />
           </div>

@@ -60,6 +60,15 @@ export function fetchFieldChangesSinceStatus(projectName: string, sinceStatus: s
   })
 }
 
+/** What others changed since the project was last handed to this user
+ * (the reviewer's feedback for a student, the student's corrections for a
+ * reviewer or mentor), by fieldname; empty when there's nothing to show. */
+export function fetchReviewHighlights(projectName: string) {
+  return call<Record<string, FieldChangeEntry[]>>('sirb.sirb_api.project.get_review_highlights', {
+    project_name: projectName,
+  })
+}
+
 export function setProjectStatus(projectId: string, status: string) {
   return call<{ message: string }>('sirb.api.set_project_status', { project_id: projectId, status })
 }

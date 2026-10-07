@@ -148,6 +148,24 @@ PROJECT_ROLE_TO_ROLE = {
 }
 
 
+def _project_role_write_levels(doc, project_roles):
+	roles = {role for flag, role in PROJECT_ROLE_TO_ROLE.items() if project_roles.get(flag)}
+	return {p.permlevel for p in doc.get_permissions() if p.role in roles and p.write}
+
+
+def writable_permlevels(doc, user=None):
+	"""Permlevels whose fields a save by `user` on `doc` keeps: their global
+	roles must allow it (Frappe resets the rest) and, for non-admins, so must
+	their role on this project (validate_project_field_writes). Level 0 is
+	governed by the status workflow instead."""
+	user = user or frappe.session.user
+	levels = set(doc.get_permlevel_access("write"))
+	if _unrestricted(user):
+		return levels
+	allowed = _project_role_write_levels(doc, project_membership(user, doc)) | {0}
+	return levels & allowed
+
+
 def _normalized(df, value):
 	"""Compare values the way they're stored, so a client sending "" for a
 	NULL (or "1" for 1, or a browser's \n line endings for stored \r\n)
@@ -222,8 +240,7 @@ def validate_project_field_writes(doc):
 			frappe.PermissionError,
 			title="Not allowed",
 		)
-	roles = {role for flag, role in PROJECT_ROLE_TO_ROLE.items() if project_roles.get(flag)}
-	writable = {p.permlevel for p in doc.get_permissions() if p.role in roles and p.write}
+	writable = _project_role_write_levels(doc, project_roles)
 	# permlevel 0 (status, attachments) is governed by the status workflow
 	# and role permissions; only the role-specific levels are narrowed here.
 	blocked = [df for df in changed if df.permlevel and df.permlevel not in writable]

@@ -11,8 +11,15 @@ import json
 import frappe
 
 from sirb.api import _get_irb_project_roles, get_project_students
-from sirb.permissions import manages_project, project_membership
-from sirb.workflow import allowed_transitions
+from sirb.permissions import manages_project, project_membership, writable_permlevels
+from sirb.workflow import (
+	MENTOR_APPROVAL,
+	PROPOSAL,
+	REVIEWER_FEEDBACK,
+	STUDENT_FIX_MENTOR,
+	STUDENT_FIX_REVIEWER,
+	allowed_transitions,
+)
 
 
 def _link_titles(doc):
@@ -124,6 +131,9 @@ def get_project_detail(project_name):
 		"students": students,
 		"meta": {
 			"can_write": doc.has_permission("write"),
+			# Edits to fields at other permlevels are dropped on save, so the
+			# page shows those fields read-only.
+			"writable_permlevels": sorted(writable_permlevels(doc)),
 			# Admin-style edits (reassign mentor/reviewers, set any status):
 			# admins, and programme managers on their programmes' projects.
 			"can_override": bool(STAFF_ROLES & set(frappe.get_roles())) or manages_project(frappe.session.user, doc),
@@ -171,47 +181,101 @@ def get_status_change_history(project_name):
 	return history
 
 
-@frappe.whitelist()
-def get_field_changes_since_status(project_name, since_status):
-	"""Field-level diffs recorded since the doc last held `since_status` —
-	powers the "here's what changed" banners the legacy DocType JS shows
-	students/mentors/reviewers (update_field_changes / get_versions_after_status_change).
-	"""
-	doc = frappe.get_doc("IRB Project", project_name)
-	doc.check_permission("read")
+# Old name -> current name, for Versions saved before a field was renamed.
+_RENAMED_FIELDS = {"heq_s18_": "heq_s18_mf"}
+
+
+def _changes_since(doc, is_boundary, exclude_owner=None):
+	"""Changes recorded on `doc` after the newest Version whose status
+	change (old, new) satisfies `is_boundary`, newest first, as
+	({fieldname: [{old_value, new_value, date}]}, boundary_found). Fields
+	this user may not read are left out, as are edits by `exclude_owner`."""
 	hide_reviewers = _hide_reviewers_from(doc)
+	readable = set(doc.get_permlevel_access("read")) | {0}
 
 	versions = frappe.db.sql(
-		"""select data, modified from `tabVersion`
+		"""select data, owner, modified from `tabVersion`
 		where ref_doctype = 'IRB Project' and docname = %(name)s
 		order by modified desc""",
-		{"name": project_name},
+		{"name": str(doc.name)},
 		as_dict=True,
 	)
 
-	relevant = []
+	field_changes = {}
 	for v in versions:
 		try:
 			changed = json.loads(v["data"]).get("changed") or []
 		except (TypeError, ValueError):
 			continue
-		hit_boundary = any(c[0] == "status" and c[2] == since_status for c in changed)
-		if hit_boundary:
-			break
-		relevant.append({"changed": changed, "date": v["modified"]})
-
-	field_changes = {}
-	for v in relevant:
-		for change in v["changed"]:
-			if len(change) < 3:
+		changed = [c for c in changed if len(c) >= 3]
+		if any(c[0] == "status" and is_boundary(c[1], c[2]) for c in changed):
+			return field_changes, True
+		if exclude_owner and v["owner"] == exclude_owner:
+			continue
+		for fieldname, old_value, new_value in (c[:3] for c in changed):
+			fieldname = _RENAMED_FIELDS.get(fieldname, fieldname)
+			df = doc.meta.get_field(fieldname)
+			if not df or df.permlevel not in readable:
 				continue
-			fieldname = change[0]
 			if hide_reviewers and _is_reviewer_only_field(fieldname):
 				continue
 			field_changes.setdefault(fieldname, []).append(
-				{"old_value": change[1], "new_value": change[2], "date": v["date"]}
+				{"old_value": old_value, "new_value": new_value, "date": v["modified"]}
 			)
-	return field_changes
+	return field_changes, False
+
+
+@frappe.whitelist()
+def get_field_changes_since_status(project_name, since_status):
+	"""Field-level diffs recorded since the doc last held `since_status`."""
+	doc = frappe.get_doc("IRB Project", project_name)
+	doc.check_permission("read")
+	return _changes_since(doc, lambda old, new: new == since_status)[0]
+
+
+# Statuses in which the proposal is with the student or their mentor; it
+# reaches the reviewers when it leaves them.
+_BEFORE_REVIEW = {PROPOSAL, MENTOR_APPROVAL, STUDENT_FIX_MENTOR, STUDENT_FIX_REVIEWER}
+
+# For each status: the status change (old, new) that handed the project to
+# whoever acts on it now. What others changed since then is what they need
+# to look at.
+_ROUND_START = {
+	# Mentor feedback: since the student last sent it to the mentor.
+	STUDENT_FIX_MENTOR: lambda old, new: new == MENTOR_APPROVAL,
+	# Reviewer feedback: since it reached the reviewers. With two reviewers
+	# that is before the primary's notes to the secondary, not when the
+	# secondary passes it back, so the primary's early feedback counts.
+	STUDENT_FIX_REVIEWER: lambda old, new: old in _BEFORE_REVIEW and new not in _BEFORE_REVIEW,
+	# Mentor / reviewer: the student's corrections since they asked for them.
+	MENTOR_APPROVAL: lambda old, new: new == STUDENT_FIX_MENTOR,
+	REVIEWER_FEEDBACK: lambda old, new: new == STUDENT_FIX_REVIEWER,
+}
+
+
+@frappe.whitelist()
+def get_review_highlights(project_name):
+	"""What others changed on this project since it was last handed to the
+	people who act on it now — the reviewer's feedback for a student asked
+	for corrections, the student's corrections for the reviewer or mentor.
+	{fieldname: [{old_value, new_value, date}]}, newest first; empty when
+	nothing is being returned (e.g. a first submission).
+
+	Done here rather than in the browser so it needs no read access to
+	Version, which can't be limited to one's own projects."""
+	doc = frappe.get_doc("IRB Project", project_name)
+	doc.check_permission("read")
+	is_boundary = _ROUND_START.get(doc.status)
+	if not is_boundary:
+		return {}
+	changes, found = _changes_since(doc, is_boundary, exclude_owner=frappe.session.user)
+	changes.pop("status", None)
+	if found or doc.status in (STUDENT_FIX_MENTOR, STUDENT_FIX_REVIEWER):
+		# A student's feedback still shows if the hand-over was never
+		# recorded (e.g. a status set by import): it's all others wrote.
+		return changes
+	# Otherwise this is the first submission: everything would be "new".
+	return {}
 
 
 @frappe.whitelist()

@@ -35,33 +35,37 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-05-13 11:54:22.718257",
+ "modified": "2026-10-08 17:58:41.465502",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "All Un-approved Primary Reviewer Projects",
  "owner": "Administrator",
  "prepared_report": 0,
+ "query": "",
  "ref_doctype": "IRB Project",
  "report_name": "All Un-approved Primary Reviewer Projects",
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "System Manager"
-  },
-  {
    "role": "Administrator"
   },
   {
-   "role": "Faculty Member"
+   "role": "System Manager"
   },
   {
    "role": "Anchor"
+  },
+  {
+   "role": "Faculty Member"
   },
   {
    "role": "Faculty Mentor"
   },
   {
    "role": "Primary IRB Reviewer"
+  },
+  {
+   "role": "Secondary IRB Reviewer"
   }
  ],
  "timeout": 0

@@ -262,3 +262,29 @@ def get_my_dashboard():
 		}
 
 	return {"roles": roles, "student": student}
+
+
+def worklist_report_columns():
+	"""Columns of the Desk worklist reports (Mentor's/Primary/Secondary
+	Reviewer's pending worklist, All (Un-)Approved * Projects). Frappe's
+	report runner refuses a report whose Link column points at a doctype
+	the viewer can't read, and reviewers have no read on Student, so the
+	student record is only a link for those who may open it."""
+	can_open_student = frappe.has_permission("Student", "read")
+	return [
+		{
+			"fieldname": "student_id",
+			"label": "Student Record (Click to view)" if can_open_student else "Student ID",
+			"fieldtype": "Link" if can_open_student else "Data",
+			"options": "Student" if can_open_student else None,
+		},
+		{"fieldname": "student_name", "label": "Student name(s)", "fieldtype": "Data"},
+		{"fieldname": "project_title", "label": "Project Title", "fieldtype": "Data"},
+		{
+			"fieldname": "project_name",
+			"label": "Project Record (Click to view)",
+			"fieldtype": "Link",
+			"options": "IRB Project",
+		},
+		{"fieldname": "project_status", "label": "Project Status", "fieldtype": "Data"},
+	]

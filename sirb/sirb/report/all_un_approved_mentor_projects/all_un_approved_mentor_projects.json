@@ -36,27 +36,37 @@
  "is_standard": "Yes",
  "json": "{}",
  "letterhead": null,
- "modified": "2026-05-13 11:54:49.346394",
+ "modified": "2026-10-08 17:58:41.465502",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "All Un-approved Mentor Projects",
  "owner": "Administrator",
  "prepared_report": 0,
+ "query": "",
  "ref_doctype": "IRB Project",
  "report_name": "All Un-approved Mentor Projects",
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "System Manager"
+   "role": "Administrator"
   },
   {
-   "role": "Administrator"
+   "role": "System Manager"
   },
   {
    "role": "Anchor"
   },
   {
+   "role": "Faculty Member"
+  },
+  {
    "role": "Faculty Mentor"
+  },
+  {
+   "role": "Primary IRB Reviewer"
+  },
+  {
+   "role": "Secondary IRB Reviewer"
   }
  ],
  "timeout": 0

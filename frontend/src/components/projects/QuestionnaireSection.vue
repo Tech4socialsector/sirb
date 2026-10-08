@@ -57,31 +57,31 @@ const visibleColumns = computed(() =>
 // A section whose every field is hidden or a spacer would be an empty card.
 const hasContent = computed(() => visibleColumns.value.some((c) => c.length))
 
+// Review notes belong to a whole question section and are named after it
+// (section `heq_s1` -> `heq_s1_rf`, `heq_s1_mf`, …), as in the Desk form.
+// Only the channels ReviewChannel shows count; `_fc` isn't one of them.
+const REVIEW_SUFFIXES = ['_sc', '_mf', '_rf', '_prn', '_srn']
+// The server leaves out the channels this user may not read.
+const hasReviewContent = computed(() =>
+  REVIEW_SUFFIXES.some((suffix) => props.section.fieldname + suffix in props.doc),
+)
+
 // New review notes (e.g. reviewer feedback for a student) open by themselves,
 // so they can't be missed behind the "Show review notes" button.
 const hasNewNotes = computed(() =>
-  visibleColumns.value.some((column) =>
-    column.some((f) => CHANNEL_SUFFIXES.some((suffix) => props.changedFields?.has(f.fieldname + suffix))),
-  ),
+  REVIEW_SUFFIXES.some((suffix) => props.changedFields?.has(props.section.fieldname + suffix)),
 )
 const showReview = ref(hasNewNotes.value)
 watch(hasNewNotes, (isNew) => {
   if (isNew) showReview.value = true
 })
-
-function hasReviewContentAnywhere() {
-  return props.section.columns
-    .flat()
-    .filter(isBaseField)
-    .some((f) => CHANNEL_SUFFIXES.some((suffix) => f.fieldname + suffix in props.doc))
-}
 </script>
 
 <template>
-  <div v-if="hasContent" class="rounded-lg border border-line bg-paper p-5">
-    <div v-if="section.label || hasReviewContentAnywhere()" class="mb-4 flex items-center justify-between">
+  <div v-if="hasContent || hasReviewContent" class="rounded-lg border border-line bg-paper p-5">
+    <div v-if="section.label || hasReviewContent" class="mb-4 flex items-center justify-between">
       <h3 v-if="section.label" class="text-sm font-semibold text-charcoal">{{ section.label }}</h3>
-      <div v-if="hasReviewContentAnywhere()" class="flex items-center gap-2">
+      <div v-if="hasReviewContent" class="flex items-center gap-2">
         <span v-if="hasNewNotes" class="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">New review notes</span>
         <Button variant="ghost" size="sm" @click="showReview = !showReview">
           {{ showReview ? 'Hide review notes' : 'Show review notes' }}
@@ -122,19 +122,20 @@ function hasReviewContentAnywhere() {
               <FeatherIcon name="alert-circle" class="h-3.5 w-3.5 shrink-0" />
               {{ issueMessages.get(field.fieldname) }}
             </p>
-            <ReviewChannel
-              v-if="showReview"
-              :base-fieldname="field.fieldname"
-              :all-fields="allFields"
-              :doc="doc"
-              :disabled="disabled"
-              :changed-fields="changedFields"
-              :writable-levels="writableLevels"
-              @update="(fn, v) => emit('update', fn, v)"
-            />
           </div>
         </div>
       </template>
     </div>
+
+    <ReviewChannel
+      v-if="hasReviewContent && showReview"
+      :base-fieldname="section.fieldname"
+      :all-fields="allFields"
+      :doc="doc"
+      :disabled="disabled"
+      :changed-fields="changedFields"
+      :writable-levels="writableLevels"
+      @update="(fn, v) => emit('update', fn, v)"
+    />
   </div>
 </template>

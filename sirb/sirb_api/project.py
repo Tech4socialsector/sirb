@@ -11,7 +11,7 @@ import json
 import frappe
 
 from sirb.api import _get_irb_project_roles, get_project_students
-from sirb.permissions import manages_project, project_membership, writable_permlevels
+from sirb.permissions import hidden_project_fields, manages_project, person_masker, writable_permlevels
 from sirb.workflow import (
 	MENTOR_APPROVAL,
 	PROPOSAL,
@@ -42,68 +42,15 @@ def _link_titles(doc):
 	return titles
 
 
-# Label shown to students in place of whoever reviewed their project.
-REVIEWER_LABEL = "IRB Reviewer"
-REVIEWER_ROLES = {"Primary IRB Reviewer", "Secondary IRB Reviewer"}
 STAFF_ROLES = {"System Manager", "Administrator"}
-
-
-def _hide_reviewers_from(doc):
-	"""True when the caller sees this project only as its student. The
-	Student role has read on every permlevel of IRB Project and as_dict()
-	applies no field filtering, so these helpers hide reviewer identities
-	and the reviewers' internal notes from students. Membership ignores the
-	mapping's status, so this still holds after the project is approved
-	(approval deactivates the student's mapping)."""
-	if STAFF_ROLES & set(frappe.get_roles()):
-		return False
-	membership = project_membership(frappe.session.user, doc)
-	if membership["is_mentor"] or membership["is_primary_reviewer"] or membership["is_secondary_reviewer"]:
-		return False
-	return membership["is_student"]
-
-
-def _reviewer_masker(doc):
-	"""Maps a user id to what a student may see: a reviewer's own identity
-	becomes REVIEWER_LABEL; everyone else (students, the mentor, admins) is
-	shown as-is."""
-	mentor_user = doc.get("faculty_mentor") and frappe.db.get_value("Faculty", doc.faculty_mentor, "system_user")
-	cache = {}
-
-	def mask(user):
-		if not user or user == mentor_user:
-			return user
-		if user not in cache:
-			cache[user] = bool(REVIEWER_ROLES & set(frappe.get_roles(user)))
-		return REVIEWER_LABEL if cache[user] else user
-
-	return mask
-
-
-def _is_reviewer_only_field(fieldname):
-	"""Who the reviewers are, plus the notes they exchange between
-	themselves (_prn/_srn), as opposed to feedback meant for the student."""
-	return (
-		fieldname
-		in (
-			"primary_reviewer",
-			"secondary_reviewer",
-			"num_reviewers",
-			"primary_reviewers_comments_to_secondary_reviewer",
-			"secondary_reviewers_comments_to_primary_reviewer",
-			"mentor_comments_to_reviewers",
-		)
-		or fieldname.endswith("_prn")
-		or fieldname.endswith("_srn")
-	)
 
 
 @frappe.whitelist()
 def get_project_detail(project_name):
 	"""Single aggregated payload for the Project Details page: the doc
-	itself (minus reviewer-only fields for students — see
-	_hide_reviewers_from), the caller's role(s) on this project, and the
-	student roster. Vue should treat any field absent from `doc` as "not
+	itself (minus the fields this user may not see on it — see
+	sirb.permissions.hidden_project_fields), the caller's role(s) on this
+	project, and the student roster. Vue should treat any field absent from `doc` as "not
 	visible to me", not "empty".
 	"""
 	doc = frappe.get_doc("IRB Project", project_name)
@@ -114,13 +61,14 @@ def get_project_detail(project_name):
 
 	doc_dict = doc.as_dict()
 	link_titles = _link_titles(doc)
-	if _hide_reviewers_from(doc):
-		for fieldname in [f for f in doc_dict if _is_reviewer_only_field(f)]:
-			doc_dict.pop(fieldname)
-		for fieldname in [f for f in link_titles if _is_reviewer_only_field(f)]:
-			link_titles.pop(fieldname)
-		# The last editor may be a reviewer (e.g. sending corrections back).
-		mask = _reviewer_masker(doc)
+	hidden = hidden_project_fields(doc)
+	if hidden:
+		for fieldname in hidden:
+			doc_dict.pop(fieldname, None)
+			link_titles.pop(fieldname, None)
+		# The last editor may be someone they may not see (e.g. a reviewer
+		# sending corrections back).
+		mask = person_masker(doc)
 		for fieldname in ("owner", "modified_by"):
 			doc_dict[fieldname] = mask(doc_dict.get(fieldname))
 
@@ -131,6 +79,9 @@ def get_project_detail(project_name):
 		"students": students,
 		"meta": {
 			"can_write": doc.has_permission("write"),
+			# Where the mentor's approval sends the project (sirb.workflow),
+			# without revealing who the secondary reviewer is.
+			"has_secondary_reviewer": bool(doc.get("secondary_reviewer")),
 			# Edits to fields at other permlevels are dropped on save, so the
 			# page shows those fields read-only.
 			"writable_permlevels": sorted(writable_permlevels(doc)),
@@ -152,7 +103,7 @@ def get_status_change_history(project_name):
 	"""
 	doc = frappe.get_doc("IRB Project", project_name)
 	doc.check_permission("read")
-	display_user = _reviewer_masker(doc) if _hide_reviewers_from(doc) else (lambda user: user)
+	display_user = person_masker(doc)
 
 	versions = frappe.db.sql(
 		"""select data, owner, creation from `tabVersion`
@@ -190,7 +141,7 @@ def _changes_since(doc, is_boundary, exclude_owner=None):
 	change (old, new) satisfies `is_boundary`, newest first, as
 	({fieldname: [{old_value, new_value, date}]}, boundary_found). Fields
 	this user may not read are left out, as are edits by `exclude_owner`."""
-	hide_reviewers = _hide_reviewers_from(doc)
+	hidden = hidden_project_fields(doc)
 	readable = set(doc.get_permlevel_access("read")) | {0}
 
 	versions = frappe.db.sql(
@@ -217,7 +168,7 @@ def _changes_since(doc, is_boundary, exclude_owner=None):
 			df = doc.meta.get_field(fieldname)
 			if not df or df.permlevel not in readable:
 				continue
-			if hide_reviewers and _is_reviewer_only_field(fieldname):
+			if fieldname in hidden:
 				continue
 			field_changes.setdefault(fieldname, []).append(
 				{"old_value": old_value, "new_value": new_value, "date": v["modified"]}

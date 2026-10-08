@@ -424,6 +424,11 @@ frappe.ui.form.on("IRB Project", {
                 }
             });
         }
+        // Fields this user may not see on this project (e.g. the reviewers and
+        // their comments, for the mentor) — the server leaves their values out.
+        const hidden_fields = (frm.doc.__onload || {}).hidden_fields || [];
+        if (hidden_fields.length)
+            frm.toggle_display(hidden_fields, false);
         // Get the roles of the currently logged in user
         const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
         if (is_student && ["Humans","Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain) && frm.doc.status !== "Awaiting proposal completion by student")
@@ -598,11 +603,12 @@ frappe.ui.form.on("IRB Project", {
 
         //console.log(frm)
         //console.log(is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer)
-        console.log("Secondary reviewer ", frm.doc.secondary_reviewer)
-        if (frm.doc.secondary_reviewer != null && frm.doc.secondary_reviewer != "")
-            has_secondary_reviewer = true
+        // From the server: the mentor isn't sent the reviewer fields.
+        const onload = frm.doc.__onload || {};
+        if ("has_secondary_reviewer" in onload)
+            has_secondary_reviewer = Boolean(onload.has_secondary_reviewer)
         else
-            has_secondary_reviewer = false
+            has_secondary_reviewer = Boolean(frm.doc.secondary_reviewer)
         console.log("has_secondary_reviewer ", has_secondary_reviewer)
 
         // Display the role in the form intro..

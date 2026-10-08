@@ -261,6 +261,113 @@ def validate_project_field_writes(doc):
 		)
 
 
+# Field-level read rules, per project. Like the write rules above, the
+# doctype's read permlevels come from global roles (a faculty member who
+# reviews any project reads reviewer-level fields on every project they can
+# open), so these narrow what a user is shown on THIS project. Applied to
+# Desk (IRBProject.apply_fieldlevel_read_permissions, sirb.overrides)
+# and to the Vue page's API (sirb.sirb_api.project).
+
+# Who reviews the project, and who mentors it.
+REVIEWER_IDENTITY_FIELDS = ("primary_reviewer", "secondary_reviewer")
+MENTOR_IDENTITY_FIELDS = ("faculty_mentor",)
+# What the reviewers write: feedback to the student (_rf) and the notes they
+# exchange between themselves (_prn/_srn).
+REVIEWER_COMMENT_FIELDS = (
+	"reviewers_comments_to_student",
+	"primary_reviewers_comments_to_secondary_reviewer",
+	"secondary_reviewers_comments_to_primary_reviewer",
+)
+REVIEWER_COMMENT_SUFFIXES = ("_rf", "_prn", "_srn")
+# Reviewer-only fields a student may not see. Feedback addressed to them
+# (_rf, reviewers_comments_to_student) is theirs to read.
+STUDENT_HIDDEN_FIELDS = (
+	*REVIEWER_IDENTITY_FIELDS,
+	"num_reviewers",
+	"primary_reviewers_comments_to_secondary_reviewer",
+	"secondary_reviewers_comments_to_primary_reviewer",
+	"mentor_comments_to_reviewers",
+)
+STUDENT_HIDDEN_SUFFIXES = ("_prn", "_srn")
+
+
+def hidden_project_fields(doc, user=None):
+	"""Fieldnames of `doc` that `user` may not see:
+
+	- its students: who the reviewers are and the reviewers' internal notes
+	- its faculty mentor: who the reviewers are and everything they write
+	- its reviewers: who the faculty mentor is (not what the mentor writes)
+
+	Admins and its programme managers (who assign mentors and reviewers)
+	see everything. Pass the doc as saved, so membership can't follow an
+	unsaved reassignment."""
+	user = user or frappe.session.user
+	if _unrestricted(user) or manages_project(user, doc):
+		return set()
+	membership = project_membership(user, doc)
+	if membership["is_primary_reviewer"] or membership["is_secondary_reviewer"]:
+		if membership["is_mentor"]:
+			return set()
+		names, suffixes = MENTOR_IDENTITY_FIELDS, ()
+	elif membership["is_mentor"]:
+		names, suffixes = REVIEWER_IDENTITY_FIELDS + REVIEWER_COMMENT_FIELDS, REVIEWER_COMMENT_SUFFIXES
+	elif membership["is_student"]:
+		names, suffixes = STUDENT_HIDDEN_FIELDS, STUDENT_HIDDEN_SUFFIXES
+	else:
+		return set()
+	return {
+		df.fieldname
+		for df in doc.meta.fields
+		if df.fieldname in names or df.fieldname.endswith(suffixes)
+	}
+
+
+def restore_hidden_project_fields(doc):
+	"""Put back the stored value of every field the saving user may not see.
+	Desk leaves those fields out of the form (they come back empty on save),
+	and such a user has no business changing them anyway — even when their
+	global roles would let them write that permlevel."""
+	if doc.is_new():
+		return
+	before = doc.get_doc_before_save()
+	if not before:
+		return
+	for fieldname in hidden_project_fields(before):
+		doc.set(fieldname, before.get(fieldname))
+
+
+# Shown instead of a name to those who may not know who it is.
+REVIEWER_LABEL = "IRB Reviewer"
+MENTOR_LABEL = "Faculty Mentor"
+REVIEWER_ROLES = {"Primary IRB Reviewer", "Secondary IRB Reviewer"}
+
+
+def person_masker(doc):
+	"""Maps a user id (e.g. who made a change) to what the current user is
+	shown on `doc`, as saved, following hidden_project_fields: anyone
+	holding a reviewer role becomes REVIEWER_LABEL for those who may not see
+	the reviewers, and the project's mentor becomes MENTOR_LABEL for those
+	who may not see the mentor. Admins and the viewer are shown as-is."""
+	hidden = hidden_project_fields(doc)
+	mask_reviewers = any(f in hidden for f in REVIEWER_IDENTITY_FIELDS)
+	mask_mentor = any(f in hidden for f in MENTOR_IDENTITY_FIELDS)
+	mentor_user = doc.get("faculty_mentor") and frappe.db.get_value("Faculty", doc.faculty_mentor, "system_user")
+	cache = {}
+
+	def mask(user):
+		if not user or user == frappe.session.user:
+			return user
+		if user == mentor_user:
+			return MENTOR_LABEL if mask_mentor else user
+		if not mask_reviewers:
+			return user
+		if user not in cache:
+			cache[user] = not _unrestricted(user) and bool(REVIEWER_ROLES & set(frappe.get_roles(user)))
+		return REVIEWER_LABEL if cache[user] else user
+
+	return mask
+
+
 # Student records: the Student / Faculty Mentor roles can read (and write)
 # the whole doctype, which exposed every student's email and let anyone
 # re-point a Student at their own login — and so take over that student's

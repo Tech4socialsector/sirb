@@ -6,7 +6,12 @@ from frappe.model.document import Document
 from frappe.utils import get_url
 from sirb.proposal_checks import format_issues, get_proposal_issues
 from sirb.workflow import validate_assignments, validate_status_change
-from sirb.permissions import manages_project, validate_project_field_writes
+from sirb.permissions import (
+	hidden_project_fields,
+	manages_project,
+	restore_hidden_project_fields,
+	validate_project_field_writes,
+)
 from sirb.utils import set_mentor_and_reviewer_roles, send_email_if_configured
 
 # Statuses in which the student is filling in or correcting the proposal.
@@ -21,6 +26,23 @@ class ProposalIncompleteError(frappe.ValidationError):
 	pass
 
 class IRBProject(Document):
+	def onload(self):
+		# The Desk form hides these per project (sirb.permissions); the
+		# mentor's "Approve for review" needs to know whether there is a
+		# secondary reviewer without being sent who it is.
+		self.set_onload("hidden_fields", sorted(hidden_project_fields(self)))
+		self.set_onload("has_secondary_reviewer", bool(self.secondary_reviewer))
+
+	def apply_fieldlevel_read_permissions(self):
+		"""Frappe drops the permlevels the user's roles can't read; also drop
+		what they may not see on this project (Desk form, REST and
+		frappe.client reads)."""
+		hidden = hidden_project_fields(self)
+		super().apply_fieldlevel_read_permissions()
+		for fieldname in hidden:
+			if fieldname in self.__dict__:
+				delattr(self, fieldname)
+
 	def validate(self):
 		if self.flags.script_created:
 			# Bulk import (see api.py:import_student_irb_information) creates a bare
@@ -29,6 +51,9 @@ class IRBProject(Document):
 			self.flags.ignore_mandatory = True
 			return
 
+		# A save from Desk comes back without the fields this user may not
+		# see; keep what's stored rather than clearing them.
+		restore_hidden_project_fields(self)
 		# Only the transitions the user's role on this project allows
 		# (status is read-only in the form but not enforced by Frappe).
 		validate_status_change(self)

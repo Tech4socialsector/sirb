@@ -69,6 +69,9 @@ export interface ProjectDetailPayload {
   meta: {
     can_write: boolean
     can_override?: boolean
+    /** Whether the project has a secondary reviewer, for callers who
+     * aren't shown the reviewer fields (its mentor). */
+    has_secondary_reviewer?: boolean
     /** Permlevels this user's saves keep; fields at other levels are read-only. */
     writable_permlevels?: number[]
   }

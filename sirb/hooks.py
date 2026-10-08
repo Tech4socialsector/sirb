@@ -205,6 +205,13 @@ scheduler_events = {
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "sirb.event.get_events"
 # }
+
+# Without what a user may not see on an IRB Project (sirb/overrides.py).
+override_whitelisted_methods = {
+	"frappe.desk.form.load.getdoc": "sirb.overrides.getdoc",
+	"frappe.desk.form.load.get_docinfo": "sirb.overrides.get_docinfo",
+	"frappe.client.set_value": "sirb.overrides.set_value",
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,

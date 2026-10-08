@@ -70,10 +70,16 @@ const projectError = computed(() => {
 })
 
 const roles = computed(() => detail.value?.roles ?? null)
-const hasSecondaryReviewer = computed(() => Boolean(localDoc.value?.secondary_reviewer))
-// Students must not see who is reviewing their project; the server also
-// strips the reviewer fields from their payload (sirb_api.project).
+// The mentor isn't sent the reviewer fields, so fall back to the server's flag.
+const hasSecondaryReviewer = computed(() =>
+  Boolean(localDoc.value?.secondary_reviewer || detail.value?.meta.has_secondary_reviewer),
+)
+// Students and the mentor must not see who is reviewing the project; the
+// server also strips the reviewer fields from their payload (sirb_api.project).
 const showReviewer = computed(() => Boolean(localDoc.value && 'primary_reviewer' in localDoc.value && !roles.value?.is_student))
+// Likewise reviewers aren't shown (or sent) who the mentor is.
+const showMentor = computed(() => Boolean(localDoc.value && 'faculty_mentor' in localDoc.value))
+const peopleColumns = computed(() => 1 + Number(showMentor.value) + Number(showReviewer.value))
 const docRef = computed(() => localDoc.value)
 
 const allowedStatuses = computed(() => detail.value?.allowed_statuses)
@@ -251,17 +257,21 @@ const correctionNoticeStatuses = [
         class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
       >
         <p v-if="newFeedbackCount" class="mb-1 font-semibold">
-          You have new feedback on {{ newFeedbackCount }} {{ newFeedbackCount === 1 ? 'item' : 'items' }}. It's highlighted
-          below each question in the questionnaire tabs (look for “updated” on the tab names), and overall comments are in the
-          “General comments” tab.
+          You have new feedback on {{ newFeedbackCount }} {{ newFeedbackCount === 1 ? 'item' : 'items' }}. It's shown
+          under each question marked “New review notes” in the questionnaire tabs (look for “updated” on the tab names), and
+          overall comments are in the “General comments” tab.
         </p>
         Saving this form only stores your changes. To send your updated documents/answers back to the reviewer, use
         "Submit corrections" below once you're done.
       </div>
 
-      <div class="mb-4 grid grid-cols-1 gap-4" :class="showReviewer ? 'md:grid-cols-3' : 'md:grid-cols-2'">
+      <div
+        class="mb-4 grid grid-cols-1 gap-4"
+        :class="{ 'md:grid-cols-2': peopleColumns === 2, 'md:grid-cols-3': peopleColumns === 3 }"
+      >
         <StudentInformation :students="detail.students" />
         <PersonCard
+          v-if="showMentor"
           label="Faculty Mentor"
           :name="localDoc.faculty_mentor"
           :display-name="detail.link_titles?.faculty_mentor"

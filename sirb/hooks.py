@@ -215,6 +215,12 @@ override_whitelisted_methods = {
 	"frappe.desk.form.load.getdoc": "sirb.overrides.getdoc",
 	"frappe.desk.form.load.get_docinfo": "sirb.overrides.get_docinfo",
 	"frappe.client.set_value": "sirb.overrides.set_value",
+	"frappe.desk.reportview.get": "sirb.overrides.reportview_get",
+	"frappe.desk.reportview.get_list": "sirb.overrides.reportview_get_list",
+	"frappe.desk.reportview.export_query": "sirb.overrides.export_query",
+	"frappe.desk.listview.get_group_by_count": "sirb.overrides.get_group_by_count",
+	"frappe.client.get_list": "sirb.overrides.client_get_list",
+	"frappe.client.get_value": "sirb.overrides.client_get_value",
 }
 #
 # each overriding function accepts a `data` argument;

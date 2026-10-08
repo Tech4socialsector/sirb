@@ -11,7 +11,13 @@ import json
 import frappe
 
 from sirb.api import _get_irb_project_roles, get_project_students
-from sirb.permissions import hidden_project_fields, manages_project, person_masker, writable_permlevels
+from sirb.permissions import (
+	can_open_all_review_sections,
+	hidden_project_fields,
+	manages_project,
+	person_masker,
+	writable_permlevels,
+)
 from sirb.workflow import (
 	MENTOR_APPROVAL,
 	PROPOSAL,
@@ -88,6 +94,8 @@ def get_project_detail(project_name):
 			# Admin-style edits (reassign mentor/reviewers, set any status):
 			# admins, and programme managers on their programmes' projects.
 			"can_override": bool(STAFF_ROLES & set(frappe.get_roles())) or manages_project(frappe.session.user, doc),
+			# "Toggle All Sections", as on the Desk form.
+			"can_open_all_review_sections": can_open_all_review_sections(doc),
 		},
 		# Status changes this user may make right now — the server enforces
 		# exactly this set (sirb.workflow), so the UI shows only these.

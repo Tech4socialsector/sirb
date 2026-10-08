@@ -72,6 +72,8 @@ export interface ProjectDetailPayload {
     /** Whether the project has a secondary reviewer, for callers who
      * aren't shown the reviewer fields (its mentor). */
     has_secondary_reviewer?: boolean
+    /** May open every question's review notes at once ("Toggle All Sections"). */
+    can_open_all_review_sections?: boolean
     /** Permlevels this user's saves keep; fields at other levels are read-only. */
     writable_permlevels?: number[]
   }

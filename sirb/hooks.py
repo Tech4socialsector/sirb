@@ -13,14 +13,17 @@ app_license = "mit"
 # Each item in the list will be shown as an app in the apps page
 # Registering the app also makes Frappe's login send users to "/sirb"
 # (frappe.apps.get_default_path) instead of the Desk at "/app".
-add_to_apps_screen = [
-	{
-		"name": "sirb",
-		"logo": "/assets/sirb/frontend/favicon.svg",
-		"title": "SIRB",
-		"route": "/sirb",
-	}
-]
+# Disabled: login goes back to the Desk (/app) for everyone. The Vue portal
+# is still served at /sirb for anyone who opens that URL directly.
+# Uncomment to make login land on the portal again.
+# add_to_apps_screen = [
+# 	{
+# 		"name": "sirb",
+# 		"logo": "/assets/sirb/frontend/favicon.svg",
+# 		"title": "SIRB",
+# 		"route": "/sirb",
+# 	}
+# ]
 
 # Includes in <head>
 # ------------------
@@ -30,7 +33,8 @@ add_to_apps_screen = [
 # app_include_js = "/assets/sirb/js/sirb.js"
 app_include_js = [
 	"assets/sirb/js/hide_search_for_roles.js",
-	"assets/sirb/js/redirect_students_to_portal.js",
+	# Disabled with add_to_apps_screen above: students stay on the Desk.
+	# "assets/sirb/js/redirect_students_to_portal.js",
 ]
 
 

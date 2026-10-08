@@ -7,8 +7,10 @@ from frappe.utils import get_url
 from sirb.proposal_checks import format_issues, get_proposal_issues
 from sirb.workflow import validate_assignments, validate_status_change
 from sirb.permissions import (
+	can_open_all_review_sections,
 	hidden_project_fields,
 	manages_project,
+	readonly_project_fields,
 	restore_hidden_project_fields,
 	validate_project_field_writes,
 )
@@ -32,6 +34,11 @@ class IRBProject(Document):
 		# secondary reviewer without being sent who it is.
 		self.set_onload("hidden_fields", sorted(hidden_project_fields(self)))
 		self.set_onload("has_secondary_reviewer", bool(self.secondary_reviewer))
+		# Desk's editable fields follow global roles; the form narrows them
+		# to the user's role on this project (e.g. a secondary reviewer who
+		# is a primary reviewer elsewhere can't type primary reviewer notes).
+		self.set_onload("readonly_fields", sorted(readonly_project_fields(self)))
+		self.set_onload("can_open_all_review_sections", can_open_all_review_sections(self))
 
 	def apply_fieldlevel_read_permissions(self):
 		"""Frappe drops the permlevels the user's roles can't read; also drop
@@ -236,7 +243,9 @@ class IRBProject(Document):
 						to_students = True
 					# print("Recipient list ", recipient_list)
 					# Create a system notification
-					project_url = get_url(f"/sirb/projects/{self.name}")
+					# Emails link to the Desk form again; the portal link is kept for switching back.
+					# project_url = get_url(f"/sirb/projects/{self.name}")
+					project_url = get_url(f"/app/irb-project/{self.name}")
 					params = {
 						"project_status": self.status,
 						"project_name": self.title,

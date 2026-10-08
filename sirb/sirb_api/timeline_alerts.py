@@ -246,7 +246,7 @@ TEMPLATE_VARIABLES = [
 	("last_updated", "Date the project was last updated"),
 	("last_updated_ago", "\"today\", \"yesterday\" or \"14 days ago\""),
 	("days_since_update", "Days since the project was last updated (a number)"),
-	("project_url", "Link to the project in the portal"),
+	("project_url", "Link to the project in Desk"),
 ]
 
 
@@ -274,7 +274,9 @@ def _context(row):
 		"last_updated": frappe.utils.formatdate(modified) if modified else "",
 		"last_updated_ago": ("today" if days == 0 else "yesterday" if days == 1 else f"{days} days ago") if modified else "",
 		"days_since_update": days,
-		"project_url": get_url(f"/sirb/projects/{row.irb_project}"),
+		# Emails link to the Desk form again; the portal link is kept for switching back.
+		# "project_url": get_url(f"/sirb/projects/{row.irb_project}"),
+		"project_url": get_url(f"/app/irb-project/{row.irb_project}"),
 	}
 	# Names used by the existing status-change templates, so those can be
 	# reused here without editing.

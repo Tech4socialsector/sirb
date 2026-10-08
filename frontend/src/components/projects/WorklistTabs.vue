@@ -10,7 +10,7 @@ const emit = defineEmits<{ 'update:modelValue': [WorklistBucket] }>()
 
 const tabs: { label: string; value: WorklistBucket }[] = [
   { label: 'Pending', value: 'pending' },
-  { label: 'In Progress', value: 'unapproved' },
+  { label: 'Unapproved', value: 'unapproved' },
   { label: 'Approved', value: 'approved' },
 ]
 

@@ -4,7 +4,7 @@ import { Button, FeatherIcon } from 'frappe-ui'
 import SchemaFieldInput from './SchemaFieldInput.vue'
 import ReviewChannel from './ReviewChannel.vue'
 import type { SchemaField, SchemaSection } from '@/types/schema'
-import type { IrbProjectDoc } from '@/types/project'
+import type { FieldChangeEntry, IrbProjectDoc } from '@/types/project'
 
 const CHANNEL_SUFFIXES = ['_sc', '_mf', '_rf', '_prn', '_srn', '_fc']
 
@@ -25,6 +25,11 @@ const props = defineProps<{
   changedFields?: ReadonlySet<string>
   /** Permlevels this user may save; absent means no restriction known. */
   writableLevels?: ReadonlySet<number>
+  /** What others changed (sirb_api.project.get_review_highlights). */
+  fieldChanges?: Record<string, FieldChangeEntry[]>
+  /** Set by "Toggle All Sections": open (true) or close (false) every
+   * review section; null until it's first used. */
+  allReviewsOpen?: boolean | null
 }>()
 
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
@@ -61,32 +66,37 @@ const hasContent = computed(() => visibleColumns.value.some((c) => c.length))
 // (section `heq_s1` -> `heq_s1_rf`, `heq_s1_mf`, …), as in the Desk form.
 // Only the channels ReviewChannel shows count; `_fc` isn't one of them.
 const REVIEW_SUFFIXES = ['_sc', '_mf', '_rf', '_prn', '_srn']
-// The server leaves out the channels this user may not read.
+// The server leaves out the channels this user may not read, and some only
+// apply to some projects (reviewer notes need two reviewers).
 const hasReviewContent = computed(() =>
-  REVIEW_SUFFIXES.some((suffix) => props.section.fieldname + suffix in props.doc),
+  REVIEW_SUFFIXES.some((suffix) => {
+    const field = props.allFields.find((f) => f.fieldname === props.section.fieldname + suffix)
+    return Boolean(field && props.isFieldVisible(field))
+  }),
 )
+const sectionFields = computed(() => props.section.columns.flat().filter(isBaseField))
 
 // New review notes (e.g. reviewer feedback for a student) open by themselves,
 // so they can't be missed behind the "Show review notes" button.
 const hasNewNotes = computed(() =>
   REVIEW_SUFFIXES.some((suffix) => props.changedFields?.has(props.section.fieldname + suffix)),
 )
-const showReview = ref(hasNewNotes.value)
+const showReview = ref(hasNewNotes.value || props.allReviewsOpen === true)
 watch(hasNewNotes, (isNew) => {
   if (isNew) showReview.value = true
 })
+watch(
+  () => props.allReviewsOpen,
+  (open) => {
+    if (open !== null && open !== undefined) showReview.value = open
+  },
+)
 </script>
 
 <template>
   <div v-if="hasContent || hasReviewContent" class="rounded-lg border border-line bg-paper p-5">
-    <div v-if="section.label || hasReviewContent" class="mb-4 flex items-center justify-between">
-      <h3 v-if="section.label" class="text-sm font-semibold text-charcoal">{{ section.label }}</h3>
-      <div v-if="hasReviewContent" class="flex items-center gap-2">
-        <span v-if="hasNewNotes" class="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">New review notes</span>
-        <Button variant="ghost" size="sm" @click="showReview = !showReview">
-          {{ showReview ? 'Hide review notes' : 'Show review notes' }}
-        </Button>
-      </div>
+    <div v-if="section.label" class="mb-4">
+      <h3 class="text-sm font-semibold text-charcoal">{{ section.label }}</h3>
     </div>
 
     <div class="grid gap-x-6 gap-y-4" :class="visibleColumns.filter((c) => c.length).length > 1 ? 'md:grid-cols-2' : ''">
@@ -127,13 +137,25 @@ watch(hasNewNotes, (isNew) => {
       </template>
     </div>
 
+    <!-- Below the question, as on the Desk form. -->
+    <div v-if="hasReviewContent" class="mt-4 flex flex-wrap items-center gap-2">
+      <Button variant="subtle" size="sm" :aria-expanded="showReview" @click="showReview = !showReview">
+        Show/Hide Review Section
+      </Button>
+      <span v-if="hasNewNotes" class="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">New review notes</span>
+    </div>
+
     <ReviewChannel
       v-if="hasReviewContent && showReview"
       :base-fieldname="section.fieldname"
+      :section-label="section.label"
+      :section-fields="sectionFields"
       :all-fields="allFields"
       :doc="doc"
       :disabled="disabled"
+      :is-field-visible="isFieldVisible"
       :changed-fields="changedFields"
+      :field-changes="fieldChanges"
       :writable-levels="writableLevels"
       @update="(fn, v) => emit('update', fn, v)"
     />

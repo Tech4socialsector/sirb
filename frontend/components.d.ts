@@ -48,6 +48,7 @@ declare module 'vue' {
     RecipientList: typeof import('./src/components/alerts/RecipientList.vue')['default']
     ReminderDialog: typeof import('./src/components/alerts/ReminderDialog.vue')['default']
     ReviewChannel: typeof import('./src/components/projects/ReviewChannel.vue')['default']
+    RoleCountCard: typeof import('./src/components/dashboard/RoleCountCard.vue')['default']
     RoleWorkloadPanel: typeof import('./src/components/admin/RoleWorkloadPanel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { FeatherIcon } from 'frappe-ui'
 import AppShell from '@/components/layout/AppShell.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import ErrorState from '@/components/common/ErrorState.vue'
 import DashboardGreeting from '@/components/dashboard/DashboardGreeting.vue'
 import KpiCard from '@/components/dashboard/KpiCard.vue'
-import ProjectListTable from '@/components/projects/ProjectListTable.vue'
+import RoleCountCard from '@/components/dashboard/RoleCountCard.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRoles } from '@/composables/useRoles'
 import { ApiError } from '@/services/api'
@@ -33,10 +32,11 @@ async function load() {
 
 onMounted(load)
 
-const ROLE_COPY: Record<DashboardRoleSummary['key'], { title: string; pending: string; icon: string }> = {
-  mentor: { title: 'Mentor Review', pending: 'Awaiting Your Approval', icon: 'user-check' },
-  primary_reviewer: { title: 'Primary Review', pending: 'Awaiting Your Review', icon: 'eye' },
-  secondary_reviewer: { title: 'Secondary Review', pending: 'Awaiting Your Review', icon: 'eye' },
+// Column labels, in the Desk workspace's left-to-right order.
+const ROLE_LABEL: Record<DashboardRoleSummary['key'], string> = {
+  mentor: 'Mentor',
+  primary_reviewer: 'Primary Reviewer',
+  secondary_reviewer: 'Secondary Reviewer',
 }
 
 // The server only returns roles whose faculty record exists; the role
@@ -49,6 +49,16 @@ const roleVisible: Record<DashboardRoleSummary['key'], () => boolean> = {
 const roles = computed(() => (data.value?.roles ?? []).filter((r) => roleVisible[r.key]?.()))
 const student = computed(() => (isStudent.value ? data.value?.student ?? null : null))
 
+type Bucket = keyof DashboardRoleSummary['counts']
+// One row per bucket, as on the Desk "IRB Projects" workspace. Each bucket
+// matches the worklist tab of the same name, so a card's number always
+// equals the length of the list it opens.
+const ROWS: { bucket: Bucket; heading: string; suffix: string }[] = [
+  { bucket: 'pending', heading: 'Action needed!', suffix: 'action pending' },
+  { bucket: 'unapproved', heading: 'Unapproved - Action not needed', suffix: '- unapproved' },
+  { bucket: 'approved', heading: 'Approved', suffix: '- approved' },
+]
+
 const totalNeedsAction = computed(() => roles.value.reduce((a, r) => a + r.counts.pending, 0))
 const subtitle = computed(() => {
   if (loading.value || error.value || !roles.value.length) return "Here's an overview of your SIRB work."
@@ -59,7 +69,7 @@ const subtitle = computed(() => {
 
 const hasAnything = computed(() => roles.value.length > 0 || !!student.value || canViewAdminConsole.value || isAnchor.value)
 
-function tabLink(route: string, tab: 'pending' | 'unapproved' | 'approved') {
+function tabLink(route: string, tab: Bucket) {
   return tab === 'pending' ? route : { path: route, query: { tab } }
 }
 </script>
@@ -101,50 +111,27 @@ function tabLink(route: string, tab: 'pending' | 'unapproved' | 'approved') {
         </div>
       </section>
 
-      <!-- One section per mentor / reviewer role -->
-      <section v-for="role in roles" :key="role.key">
-        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 class="text-lg font-semibold text-charcoal">{{ ROLE_COPY[role.key].title }}</h2>
-          <RouterLink :to="role.route" class="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            Open worklist
-            <FeatherIcon name="arrow-right" class="h-3.5 w-3.5" />
-          </RouterLink>
+      <!-- Role based project counts (Desk "IRB Projects" workspace) -->
+      <section v-if="roles.length" class="rounded-xl border border-line bg-paper p-5 shadow-card sm:p-6">
+        <h2 class="text-lg font-semibold text-charcoal">Role based project counts</h2>
+        <p class="mt-2 text-sm leading-relaxed text-muted">
+          This section gives you access to all the projects assigned to you against each of your roles, based on
+          their status. Click on a card below to view the list of projects for that role, and open any project from
+          the list to view its details.
+        </p>
+        <div v-for="row in ROWS" :key="row.bucket" class="mt-6">
+          <h3 class="mb-3 text-base font-semibold text-charcoal">{{ row.heading }}</h3>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <RoleCountCard
+              v-for="role in roles"
+              :key="role.key"
+              :label="`${ROLE_LABEL[role.key]} ${row.suffix}`"
+              :value="role.counts[row.bucket]"
+              :tone="row.bucket"
+              :to="tabLink(role.route, row.bucket)"
+            />
+          </div>
         </div>
-        <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <KpiCard
-            :label="ROLE_COPY[role.key].pending"
-            :value="role.counts.pending"
-            :icon="ROLE_COPY[role.key].icon"
-            :tone="role.counts.pending ? 'warning' : 'default'"
-            :support="role.counts.pending ? 'Waiting on you' : 'All caught up'"
-            action-label="View Pending"
-            :to="tabLink(role.route, 'pending')"
-          />
-          <KpiCard
-            label="In Progress"
-            :value="role.counts.in_progress"
-            icon="clock"
-            tone="info"
-            support="Assigned to you, not yet approved"
-            action-label="View In Progress"
-            :to="tabLink(role.route, 'unapproved')"
-          />
-          <KpiCard
-            label="Approved"
-            :value="role.counts.approved"
-            icon="check-circle"
-            tone="success"
-            support="Fully approved projects"
-            action-label="View Approved"
-            :to="tabLink(role.route, 'approved')"
-          />
-        </div>
-        <h3 class="mb-2 text-sm font-semibold text-muted">Recently updated</h3>
-        <ProjectListTable
-          :rows="role.recent"
-          empty-title="No active projects"
-          empty-description="Projects assigned to you will appear here."
-        />
       </section>
 
       <div v-if="!hasAnything" class="rounded-lg border border-line bg-paper p-8 text-center text-sm text-muted">

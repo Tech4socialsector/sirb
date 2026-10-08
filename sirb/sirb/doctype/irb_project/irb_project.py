@@ -5,7 +5,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import get_url
 from sirb.proposal_checks import format_issues, get_proposal_issues
-from sirb.workflow import validate_assignments, validate_status_change
+from sirb.workflow import validate_assignments, validate_feedback_for_student, validate_status_change
 from sirb.permissions import (
 	can_open_all_review_sections,
 	hidden_project_fields,
@@ -66,6 +66,9 @@ class IRBProject(Document):
 		validate_status_change(self)
 		validate_assignments(self)
 		validate_project_field_writes(self)
+		# After the line above, which can put back fields this user may not
+		# change: judge what will be saved.
+		validate_feedback_for_student(self)
 
 		# Roles allowed to edit an existing IRB Project without filling the
 		# mandatory fields (e.g. status/reviewer/mentor changes on a project

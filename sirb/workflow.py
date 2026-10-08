@@ -170,3 +170,46 @@ def validate_assignments(doc):
 				f"Assign {' and '.join(missing)} before moving this project to “{doc.status}”.",
 				title="Missing assignment",
 			)
+
+
+# What the student reads when asked for corrections: each question's
+# feedback box (a <section>_rf / _mf field) and the overall comment.
+_FEEDBACK_FOR_STUDENT = {
+	STUDENT_FIX_REVIEWER: (
+		"_rf",
+		"reviewers_comments_to_student",
+		"in a question's “Reviewer feedback to student” box or in “Reviewer's comments to student” "
+		"on the General comments tab. Notes to the other reviewer aren't shown to the student.",
+	),
+	STUDENT_FIX_MENTOR: (
+		"_mf",
+		"mentor_comment_to_student",
+		"in a question's “Mentor Feedback” box or in “Mentor's comments to student” on the General comments tab. "
+		"Comments to the reviewers aren't shown to the student.",
+	),
+}
+
+
+def validate_feedback_for_student(doc):
+	"""Throw if `doc` is being sent back to its student for corrections
+	with nothing in it the student can read. Reviewers had written all their
+	feedback as notes to the secondary reviewer (_prn), which students
+	don't see, so the student was asked to correct without being told what.
+	Admins, programme managers, imports and system jobs are exempt."""
+	if doc.is_new() or doc.flags.ignore_permissions or doc.flags.script_created:
+		return
+	if doc.status not in _FEEDBACK_FOR_STUDENT or not doc.has_value_changed("status"):
+		return
+	if frappe.flags.in_import or frappe.flags.in_patch or frappe.flags.in_migrate or frappe.flags.in_install:
+		return
+	if _sets_status_directly(doc):
+		return
+
+	suffix, overall, where = _FEEDBACK_FOR_STUDENT[doc.status]
+	fields = [overall] + [df.fieldname for df in doc.meta.fields if df.fieldname.endswith(suffix)]
+	if any(str(doc.get(f) or "").strip() for f in fields):
+		return
+	frappe.throw(
+		f"The student wouldn't see any feedback. Before asking for corrections, write it {where}",
+		title="No feedback for the student",
+	)

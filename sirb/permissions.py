@@ -333,7 +333,12 @@ def hidden_project_fields(doc, user=None):
 	user = user or frappe.session.user
 	if _unrestricted(user) or manages_project(user, doc):
 		return set()
-	membership = project_membership(user, doc)
+	return _hidden_for_membership(doc.meta, project_membership(user, doc))
+
+
+def _hidden_for_membership(meta, membership):
+	"""hidden_project_fields for someone attached to a project as
+	`membership` (see project_membership)."""
 	if membership["is_primary_reviewer"] or membership["is_secondary_reviewer"]:
 		if membership["is_mentor"]:
 			return set()
@@ -344,11 +349,117 @@ def hidden_project_fields(doc, user=None):
 		names, suffixes = STUDENT_HIDDEN_FIELDS, STUDENT_HIDDEN_SUFFIXES
 	else:
 		return set()
+	return {df.fieldname for df in meta.fields if df.fieldname in names or df.fieldname.endswith(suffixes)}
+
+
+def hidden_project_fields_by_name(names, user=None):
+	"""hidden_project_fields for many projects at once, for list results:
+	{str(project name): fieldnames}, with a few queries in all rather than
+	several per project."""
+	user = user or frappe.session.user
+	names = list({str(n) for n in names if n not in (None, "")})
+	if not names or _unrestricted(user):
+		return {}
+
+	faculty = {str(f) for f in _faculty_ids(user)}
+	students = _student_ids(user)
+	managed = set(_managed_irb_units(user))
+	projects = frappe.get_all(
+		"IRB Project",
+		filters={"name": ("in", names)},
+		fields=["name", "faculty_mentor", "primary_reviewer", "secondary_reviewer", "irb_unit"],
+	)
+	student_projects = set()
+	if students:
+		student_projects = {
+			str(p)
+			for p in frappe.get_all(
+				"Student Project Mapping",
+				filters={"irb_project": ("in", names), "student": ("in", students)},
+				pluck="irb_project",
+			)
+		}
+
+	meta = frappe.get_meta("IRB Project")
+	by_membership, hidden = {}, {}
+	for project in projects:
+		name = str(project.name)
+		is_student = name in student_projects
+		# manages_project: their programme, and not one of its students.
+		if project.irb_unit and project.irb_unit in managed and not is_student:
+			hidden[name] = set()
+			continue
+		membership = {
+			"is_student": is_student,
+			"is_mentor": str(project.faculty_mentor or "") in faculty,
+			"is_primary_reviewer": str(project.primary_reviewer or "") in faculty,
+			"is_secondary_reviewer": str(project.secondary_reviewer or "") in faculty,
+		}
+		key = tuple(membership.values())
+		if key not in by_membership:
+			by_membership[key] = _hidden_for_membership(meta, membership)
+		hidden[name] = by_membership[key]
+	return hidden
+
+
+def hidden_on_any_project(user=None):
+	"""Fields `user` may not see on at least one project they can open —
+	for list results that don't say which project a value belongs to."""
+	user = user or frappe.session.user
+	if _unrestricted(user):
+		return set()
+	names = frappe.get_list("IRB Project", pluck="name", limit_page_length=0, user=user)
+	return set().union(*hidden_project_fields_by_name(names, user).values())
+
+
+def maskable_project_fields():
+	"""Every IRB Project field hidden_project_fields can hide from someone."""
+	names = set(REVIEWER_IDENTITY_FIELDS + MENTOR_IDENTITY_FIELDS + REVIEWER_COMMENT_FIELDS + STUDENT_HIDDEN_FIELDS)
+	suffixes = REVIEWER_COMMENT_SUFFIXES + STUDENT_HIDDEN_SUFFIXES
 	return {
 		df.fieldname
-		for df in doc.meta.fields
+		for df in frappe.get_meta("IRB Project").fields
 		if df.fieldname in names or df.fieldname.endswith(suffixes)
 	}
+
+
+def mask_project_rows(rows, keys=None):
+	"""Blank, row by row, what the session user may not see on each IRB
+	Project in a list result (Desk list / report view, get_list): `rows`
+	are dicts, or sequences of values in `keys` order. Rows without the
+	project's name are judged by every project the user can open. Returns
+	the rows, masked (sequences come back as lists)."""
+	if not rows or _unrestricted(frappe.session.user):
+		return rows
+	if keys is None:
+		keys = list(rows[0]) if isinstance(rows[0], dict) else []
+	maskable_fields = maskable_project_fields()
+	maskable = [k for k in keys if k in maskable_fields]
+	if not maskable:
+		return rows
+
+	if "name" in keys:
+		by_name = hidden_project_fields_by_name([_row_value(r, keys, "name") for r in rows])
+		# A row whose project wasn't found: hide everything that could be.
+		hidden_for = lambda row: by_name.get(str(_row_value(row, keys, "name")), set(maskable))  # noqa: E731
+	else:
+		anywhere = hidden_on_any_project()
+		hidden_for = lambda row: anywhere  # noqa: E731
+
+	masked = []
+	for row in rows:
+		hidden = [k for k in maskable if k in hidden_for(row)]
+		if isinstance(row, dict):
+			for k in hidden:
+				row[k] = None
+		else:
+			row = [None if k in hidden else v for k, v in zip(keys, row)]
+		masked.append(row)
+	return masked
+
+
+def _row_value(row, keys, key):
+	return row.get(key) if isinstance(row, dict) else row[keys.index(key)]
 
 
 def restore_hidden_project_fields(doc):

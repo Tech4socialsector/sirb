@@ -577,230 +577,81 @@ def set_project_status(project_id, status):
     frappe.db.commit()
     return {'message': "Success"}
 
-def get_mentor_project_count(type):
-    doc = get_logged_in_doc("Faculty Member")
-    #print("doc is ", doc)  
-    # print(type) 
-    if doc:
-        if type == "unapproved":
-            query = f'''select count(*) as count from tabStudent as s 
-            join `tabStudent Project Mapping` as sp join `tabIRB Project` as p join 
-            tabFaculty as f on s.name = sp.student and sp.irb_project = p.name  
-            and p.faculty_mentor = f.name 
-            where p.status not in ("Approved", "Awaiting Faculty mentor approval") and sp.status="active"
-            and f.system_user = "{doc.system_user}"'''
-            # print(query)
-            data = frappe.db.sql(
-                query, as_dict=1
-            )
-            # print(data)
-        elif type == "approved":
-            query = f'''select count(*) as count from tabStudent as s 
-            join `tabStudent Project Mapping` as sp join `tabIRB Project` as p join 
-            tabFaculty as f on s.name = sp.student and sp.irb_project = p.name  
-            and p.faculty_mentor = f.name 
-            where p.status = "Approved"
-            and f.system_user = "{doc.system_user}"'''
-            #print(query)
-            data = frappe.db.sql(
-                query, as_dict=1
-            )                
-        elif type == "pending":
-            query = f'''select count(*) as count from tabStudent as s 
-            join `tabStudent Project Mapping`
-            as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
-            and sp.irb_project = p.name  
-            and p.faculty_mentor = f.name
-            where p.status='Awaiting Faculty mentor approval'
-            and f.system_user = "{doc.system_user}"  and sp.status="active"'''
-        else:
-            return None
-    else:
-        return None
-    #print(query)
-    #print("aa")
-    data = frappe.db.sql(
-        query, as_dict=1
-    )
-    #print(data)
-    return data
+# Desk "IRB Projects" workspace number cards. Each counts distinct projects
+# with the same rule as the report it opens and the Vue portal's worklist
+# tabs (sirb.sirb_api.worklists), so a card's number always matches the
+# rows behind it. Cards link to their report even at 0.
+WORKSPACE_CARD_ROLES = {
+    "mentor": ("Faculty Mentor", "faculty_mentor"),
+    "primary": ("Primary Reviewer", "primary_reviewer"),
+    "secondary": ("Secondary Reviewer", "secondary_reviewer"),
+}
+WORKSPACE_CARD_REPORTS = {
+    ("mentor", "pending"): "Mentor's pending worklist",
+    ("mentor", "unapproved"): "All Un-approved Mentor Projects",
+    ("mentor", "approved"): "All Approved Mentor Projects",
+    ("primary", "pending"): "Primary Reviewer's pending worklist",
+    ("primary", "unapproved"): "All Un-approved Primary Reviewer Projects",
+    ("primary", "approved"): "All Approved Primary Reviewer Projects",
+    ("secondary", "pending"): "Secondary Reviewer's pending worklist",
+    ("secondary", "unapproved"): "All Un-approved Secondary Reviewer Projects",
+    ("secondary", "approved"): "All Approved Secondary Reviewer Pojects",
+}
+
+
+def _workspace_card(role, bucket):
+    from sirb.sirb_api import worklists
+
+    doc_key, field = WORKSPACE_CARD_ROLES[role]
+    pending_statuses = {
+        "mentor": [worklists.MENTOR_PENDING_STATUS],
+        "primary": worklists.PRIMARY_REVIEWER_PENDING_STATUSES,
+        "secondary": [worklists.SECONDARY_REVIEWER_PENDING_STATUS],
+    }[role]
+    doc = get_logged_in_doc(doc_key)
+    value = worklists._role_bucket_counts(field, doc, pending_statuses)[bucket] if doc else 0
+    return {
+        "value": value,
+        "fieldtype": "Int",
+        "route": ["app", "query-report", WORKSPACE_CARD_REPORTS[(role, bucket)]],
+    }
+
 
 @frappe.whitelist()
 def get_mentor_pending_project_count():
-    return_dict = {}
-    data = get_mentor_project_count("pending")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "Mentor's pending worklist"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"        
-    print(return_dict)
-    return return_dict
+    return _workspace_card("mentor", "pending")
 
 @frappe.whitelist()
 def get_mentor_unapproved_project_count():
-    return_dict = {}
-    data = get_mentor_project_count("unapproved")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Un-approved Mentor Projects"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
+    return _workspace_card("mentor", "unapproved")
 
 @frappe.whitelist()
 def get_mentor_approved_project_count():
-    return_dict = {}
-    data = get_mentor_project_count("approved")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Approved Mentor Projects"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
-
-def get_reviewer_project_count(type, role):
-    doc = get_logged_in_doc("Faculty")
-    if doc:
-        if type == "unapproved":
-            if role == "Primary Reviewer":
-                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
-                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
-                and sp.irb_project = p.name  
-                and f.name  = p.primary_reviewer
-                where p.status not in ("Approved", "Awaiting primary reviewer comments to secondary reviewer", "Awaiting reviewer feedback to student", "Awaiting final approval") and sp.status="active"
-                and f.system_user = "{doc.system_user}"'''
-            elif role == "Secondary Reviewer":
-                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
-                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student
-                and sp.irb_project = p.name  
-                and f.name  = p.secondary_reviewer
-                where p.status not in ("Approved", "Awaiting secondary reviewer comments to primary reviewer") and sp.status="active"
-                and f.system_user = "{doc.system_user}"'''
-        elif type == "approved":
-            if role == "Primary Reviewer":
-                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
-                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
-                and sp.irb_project = p.name  
-                and f.name  = p.primary_reviewer
-                where p.status ='Approved'
-                and f.system_user = "{doc.system_user}"'''
-            elif role == "Secondary Reviewer":
-                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
-                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student
-                and sp.irb_project = p.name  
-                and f.name  = p.secondary_reviewer
-                where p.status ='Approved'
-                and f.system_user = "{doc.system_user}"'''                                
-        elif type == "pending":
-            if role == "Primary Reviewer":            
-                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
-                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
-                and sp.irb_project = p.name  
-                and f.name  = p.primary_reviewer
-                where p.status in ("Awaiting primary reviewer comments to secondary reviewer", "Awaiting reviewer feedback to student", "Awaiting final approval")
-                and f.system_user = "{doc.system_user}" and sp.status="active"'''
-            elif role == "Secondary Reviewer":
-                query = f'''select count(*) as count from tabStudent as s join `tabStudent Project Mapping`
-                as sp join `tabIRB Project` as p join tabFaculty as f on s.name = sp.student 
-                and sp.irb_project = p.name  
-                and f.name  = p.secondary_reviewer
-                where p.status='Awaiting secondary reviewer comments to primary reviewer' and sp.status="active"
-                and f.system_user = "{doc.system_user}"'''                
-        else:
-            return None
-    else:
-        return None
-    #print(query)
-    data = frappe.db.sql(
-        query, as_dict=1
-    )
-    return data
-
-    
-@frappe.whitelist()
-def get_primary_reviewer_unapproved_project_count():
-    return_dict = {}
-    data = get_reviewer_project_count("unapproved", "Primary Reviewer")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Un-approved Primary Reviewer Projects"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
-
-@frappe.whitelist()
-def get_primary_reviewer_approved_project_count():
-    return_dict = {}
-    data = get_reviewer_project_count("approved", "Primary Reviewer")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Approved Primary Reviewer Projects"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
-
-@frappe.whitelist()
-def get_secondary_reviewer_unapproved_project_count():
-    return_dict = {}
-    data = get_reviewer_project_count("unapproved", "Secondary Reviewer")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Un-approved Secondary Reviewer Projects"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
-
-@frappe.whitelist()
-def get_secondary_reviewer_approved_project_count():
-    return_dict = {}
-    data = get_reviewer_project_count("approved", "Secondary Reviewer")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "All Approved Secondary Reviewer Pojects"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
+    return _workspace_card("mentor", "approved")
 
 @frappe.whitelist()
 def get_primary_reviewer_pending_project_count():
-    return_dict = {}
-    data = get_reviewer_project_count("pending", "Primary Reviewer")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "Primary Reviewer's pending worklist"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
+    return _workspace_card("primary", "pending")
+
+@frappe.whitelist()
+def get_primary_reviewer_unapproved_project_count():
+    return _workspace_card("primary", "unapproved")
+
+@frappe.whitelist()
+def get_primary_reviewer_approved_project_count():
+    return _workspace_card("primary", "approved")
 
 @frappe.whitelist()
 def get_secondary_reviewer_pending_project_count():
-    return_dict = {}
-    data = get_reviewer_project_count("pending", "Secondary Reviewer")
-    if data:
-        return_dict["value"] = data[0]["count"]
-        return_dict["fieldtype"] = "Int"
-        return_dict["route"] = ["app", "query-report", "Secondary Reviewer's pending worklist"]
-    else:
-        return_dict["value"] = 0
-        return_dict["fieldtype"] = "Int"
-    return return_dict
+    return _workspace_card("secondary", "pending")
+
+@frappe.whitelist()
+def get_secondary_reviewer_unapproved_project_count():
+    return _workspace_card("secondary", "unapproved")
+
+@frappe.whitelist()
+def get_secondary_reviewer_approved_project_count():
+    return _workspace_card("secondary", "approved")
 
 def _get_irb_project_roles(user, project_name):
     """The roles `user` (an email) holds on `project_name`, counting only

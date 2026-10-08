@@ -35,27 +35,34 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-05-13 11:53:12.139784",
+ "modified": "2026-10-08 17:58:41.465502",
  "modified_by": "Administrator",
  "module": "Sirb",
  "name": "All Approved Secondary Reviewer Pojects",
  "owner": "Administrator",
  "prepared_report": 0,
+ "query": "",
  "ref_doctype": "IRB Project",
  "report_name": "All Approved Secondary Reviewer Pojects",
  "report_type": "Script Report",
  "roles": [
   {
+   "role": "Administrator"
+  },
+  {
    "role": "System Manager"
   },
   {
-   "role": "Administrator"
+   "role": "Anchor"
   },
   {
    "role": "Faculty Member"
   },
   {
-   "role": "Anchor"
+   "role": "Faculty Mentor"
+  },
+  {
+   "role": "Primary IRB Reviewer"
   },
   {
    "role": "Secondary IRB Reviewer"

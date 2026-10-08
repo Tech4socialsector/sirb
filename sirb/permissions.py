@@ -166,6 +166,35 @@ def writable_permlevels(doc, user=None):
 	return levels & allowed
 
 
+def can_open_all_review_sections(doc, user=None):
+	"""Whether the "Toggle All Sections" button (open every question's
+	review notes at once) is offered: admins and the project's reviewers."""
+	user = user or frappe.session.user
+	if _unrestricted(user):
+		return True
+	membership = project_membership(user, doc)
+	return membership["is_primary_reviewer"] or membership["is_secondary_reviewer"]
+
+
+def readonly_project_fields(doc, user=None):
+	"""Fields Desk would let `user` edit on `doc` (their global roles write
+	that permlevel) that a save would put back, because their role on THIS
+	project doesn't — e.g. the primary reviewer's notes for someone who is
+	only the secondary reviewer here. Desk shows them read-only."""
+	user = user or frappe.session.user
+	role_writable = set(doc.get_permlevel_access("write"))
+	blocked = role_writable - writable_permlevels(doc, user) - {0}
+	if not blocked:
+		return set()
+	# Programme managers edit these on their programmes' projects.
+	allowed = set(PROGRAMME_MANAGER_FIELDS) if manages_project(user, doc) else set()
+	return {
+		df.fieldname
+		for df in doc.meta.fields
+		if df.permlevel in blocked and df.fieldname not in allowed
+	}
+
+
 def _normalized(df, value):
 	"""Compare values the way they're stored, so a client sending "" for a
 	NULL (or "1" for 1, or a browser's \n line endings for stored \r\n)

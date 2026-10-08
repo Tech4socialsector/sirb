@@ -14,6 +14,7 @@ import ProposalIssues from '@/components/projects/ProposalIssues.vue'
 import { useProject } from '@/composables/useProject'
 import { useProjectActions } from '@/composables/useProjectActions'
 import { useRoles } from '@/composables/useRoles'
+import { setProjectRoles } from '@/composables/useRoleLabel'
 import { useTimelineDrawer } from '@/composables/useTimelineDrawer'
 import { ApiError } from '@/services/api'
 import { fetchProposalIssues } from '@/services/projects'
@@ -53,7 +54,10 @@ watch(
   { immediate: true },
 )
 
-onUnmounted(() => clearContext())
+onUnmounted(() => {
+  clearContext()
+  setProjectRoles(null)
+})
 
 // Clearer than the generic API messages for the two cases people hit by
 // following an old link or typing an ID into "Go to project".
@@ -70,23 +74,31 @@ const projectError = computed(() => {
 })
 
 const roles = computed(() => detail.value?.roles ?? null)
+// The user menu shows the role held on this project (see useRoleLabel).
+watch(roles, (r) => setProjectRoles(r), { immediate: true })
 // The mentor isn't sent the reviewer fields, so fall back to the server's flag.
 const hasSecondaryReviewer = computed(() =>
   Boolean(localDoc.value?.secondary_reviewer || detail.value?.meta.has_secondary_reviewer),
 )
-// Students and the mentor must not see who is reviewing the project; the
-// server also strips the reviewer fields from their payload (sirb_api.project).
-const showReviewer = computed(() => Boolean(localDoc.value && 'primary_reviewer' in localDoc.value && !roles.value?.is_student))
-// Likewise reviewers aren't shown (or sent) who the mentor is.
+// The people cards show the mentor only, not the reviewers. Reviewers
+// aren't shown (or sent) who the mentor is, so they see just the students.
 const showMentor = computed(() => Boolean(localDoc.value && 'faculty_mentor' in localDoc.value))
-const peopleColumns = computed(() => 1 + Number(showMentor.value) + Number(showReviewer.value))
 const docRef = computed(() => localDoc.value)
+// As on the Desk form, a student "talks to the reviewer" (the _sc review
+// channels) only while correcting for reviewer feedback.
+const questionnaireDoc = computed(() => {
+  const doc = localDoc.value
+  if (!doc || !roles.value?.is_student || doc.status === 'Awaiting student correction for reviewer feedback') return doc
+  return Object.fromEntries(Object.entries(doc).filter(([fieldname]) => !fieldname.endsWith('_sc'))) as IrbProjectDoc
+})
 
 const allowedStatuses = computed(() => detail.value?.allowed_statuses)
 
 // What others changed since this user last had the project — for a student,
 // the mentor's / reviewer's feedback (sirb_api.project.get_review_highlights).
 const changedFields = computed<ReadonlySet<string>>(() => new Set(Object.keys(highlights.value)))
+// "Toggle All Sections" (as on Desk): null until used, then open/closed.
+const allReviewsOpen = ref<boolean | null>(null)
 const FEEDBACK_FIELDS = ['reviewers_comments_to_student', 'mentor_comment_to_student']
 const newFeedbackCount = computed(
   () => [...changedFields.value].filter((f) => /_(rf|mf)$/.test(f) || FEEDBACK_FIELDS.includes(f)).length,
@@ -250,7 +262,12 @@ const correctionNoticeStatuses = [
     <LoadingState v-if="loading && !detail" label="Loading project…" />
     <ErrorState v-else-if="error" :error="projectError ?? error" @retry="load" />
     <template v-else-if="detail && localDoc && roles">
-      <ProjectHeader :doc="localDoc" :roles="roles" />
+      <ProjectHeader
+        :doc="localDoc"
+        :roles="roles"
+        :can-toggle-reviews="Boolean(detail.meta.can_open_all_review_sections)"
+        @toggle-reviews="allReviewsOpen = !allReviewsOpen"
+      />
 
       <div
         v-if="roles.is_student && correctionNoticeStatuses.includes(String(localDoc.status))"
@@ -265,23 +282,13 @@ const correctionNoticeStatuses = [
         "Submit corrections" below once you're done.
       </div>
 
-      <div
-        class="mb-4 grid grid-cols-1 gap-4"
-        :class="{ 'md:grid-cols-2': peopleColumns === 2, 'md:grid-cols-3': peopleColumns === 3 }"
-      >
+      <div class="mb-4 grid grid-cols-1 gap-4" :class="{ 'md:grid-cols-2': showMentor }">
         <StudentInformation :students="detail.students" />
         <PersonCard
           v-if="showMentor"
           label="Faculty Mentor"
           :name="localDoc.faculty_mentor"
           :display-name="detail.link_titles?.faculty_mentor"
-          :can-edit-link="false"
-        />
-        <PersonCard
-          v-if="showReviewer"
-          label="Primary Reviewer"
-          :name="localDoc.primary_reviewer"
-          :display-name="detail.link_titles?.primary_reviewer"
           :can-edit-link="false"
         />
       </div>
@@ -297,12 +304,14 @@ const correctionNoticeStatuses = [
       <div class="mb-4">
         <EthicsQuestionnaire
           ref="questionnaire"
-          :doc="localDoc"
+          :doc="questionnaireDoc ?? localDoc"
           :issue-messages="issueMessages"
           :link-titles="detail.link_titles"
           :disabled="!canEdit"
           :override-editable="overrideEditable"
           :changed-fields="changedFields"
+          :field-changes="highlights"
+          :all-reviews-open="allReviewsOpen"
           :writable-levels="writableLevels"
           @update="updateField"
         />

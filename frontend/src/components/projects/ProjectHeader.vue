@@ -1,8 +1,15 @@
 <script setup lang="ts">
+import { Button } from 'frappe-ui'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import type { IrbProjectDoc, ProjectRoles } from '@/types/project'
 
-const props = defineProps<{ doc: IrbProjectDoc; roles: ProjectRoles }>()
+const props = defineProps<{
+  doc: IrbProjectDoc
+  roles: ProjectRoles
+  /** Offer "Toggle All Sections" (admins and this project's reviewers, as on Desk). */
+  canToggleReviews?: boolean
+}>()
+const emit = defineEmits<{ 'toggle-reviews': [] }>()
 
 function introRole() {
   if (props.roles.is_mentor) return 'faculty mentor'
@@ -19,7 +26,12 @@ function introRole() {
         <h1 class="text-xl font-semibold text-charcoal">{{ doc.title || 'Untitled Project' }}</h1>
         <p class="mt-0.5 text-sm text-muted">{{ doc.name }} · Cycle {{ doc.irb_cycle || '—' }}</p>
       </div>
-      <StatusBadge :status="doc.status" />
+      <div class="flex flex-wrap items-center gap-3">
+        <Button v-if="canToggleReviews" variant="subtle" size="sm" @click="emit('toggle-reviews')">
+          Toggle All Sections
+        </Button>
+        <StatusBadge :status="doc.status" />
+      </div>
     </div>
     <div
       v-if="introRole()"

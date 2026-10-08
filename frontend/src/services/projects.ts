@@ -28,8 +28,7 @@ export function fetchSecondaryReviewerProjects(bucket: WorklistBucket = 'pending
 export interface DashboardRoleSummary {
   key: 'mentor' | 'primary_reviewer' | 'secondary_reviewer'
   route: string
-  counts: { pending: number; in_progress: number; approved: number }
-  recent: (ProjectListRow & { needs_action: boolean })[]
+  counts: { pending: number; unapproved: number; approved: number }
 }
 
 export interface DashboardPayload {

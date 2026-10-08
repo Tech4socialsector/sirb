@@ -3,7 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { Tabs } from 'frappe-ui'
 import QuestionnaireSection from './QuestionnaireSection.vue'
 import { useProjectSchema } from '@/composables/useProjectSchema'
-import type { IrbProjectDoc } from '@/types/project'
+import type { FieldChangeEntry, IrbProjectDoc } from '@/types/project'
 import type { SchemaTab } from '@/types/schema'
 
 const props = defineProps<{
@@ -16,6 +16,10 @@ const props = defineProps<{
   changedFields?: ReadonlySet<string>
   /** Permlevels this user may save; absent means no restriction known. */
   writableLevels?: ReadonlySet<number>
+  /** What others changed (sirb_api.project.get_review_highlights). */
+  fieldChanges?: Record<string, FieldChangeEntry[]>
+  /** "Toggle All Sections": see QuestionnaireSection. */
+  allReviewsOpen?: boolean | null
 }>()
 
 const emit = defineEmits<{ update: [fieldname: string, value: unknown] }>()
@@ -89,6 +93,8 @@ defineExpose({ focusField })
             :override-editable="overrideEditable"
             :changed-fields="changedFields"
             :writable-levels="writableLevels"
+            :field-changes="fieldChanges"
+            :all-reviews-open="allReviewsOpen"
             @update="(fn, v) => emit('update', fn, v)"
           />
         </div>

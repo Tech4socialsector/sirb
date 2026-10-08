@@ -32,7 +32,9 @@ class StudentProjectMapping(Document):
 				student_email_list.append(n["student_email"])
 			# full_name is optional on Student; a blank one must not break the insert.
 			student_names = ",".join(n for n in student_name_list if n)
-			project_url = get_url(f"/sirb/projects/{self.irb_project}")
+			# Emails link to the Desk form again; the portal link is kept for switching back.
+			# project_url = get_url(f"/sirb/projects/{self.irb_project}")
+			project_url = get_url(f"/app/irb-project/{self.irb_project}")
 			params = {
 				"project_status": notification_info[0]["status"],
 				"project_name": notification_info[0]["title"],

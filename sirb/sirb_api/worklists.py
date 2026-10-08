@@ -61,6 +61,17 @@ def _role_scoped_projects(role_field, doc, status_clause, status_params=None):
 	return frappe.db.sql(query, params, as_dict=True)
 
 
+def _unapproved_projects(role_field, doc, pending_statuses):
+	"""Not approved and not waiting on this user — the "Unapproved - Action
+	not needed" bucket of the Desk IRB Projects workspace, so the Pending /
+	Unapproved / Approved tabs never overlap."""
+	placeholders = {f"status{i}": s for i, s in enumerate(pending_statuses)}
+	clause = "and p.status != 'Approved' and p.status not in (%s)" % ", ".join(
+		f"%({k})s" for k in placeholders
+	)
+	return _role_scoped_projects(role_field, doc, clause, placeholders)
+
+
 @frappe.whitelist()
 def get_student_projects():
 	"""Student's own active (or approved) projects — mirrors the
@@ -99,11 +110,7 @@ def get_mentor_projects(bucket="pending"):
 	if bucket == "approved":
 		clause = "and p.status = 'Approved'"
 		return _role_scoped_projects("faculty_mentor", doc, clause)
-	# "unapproved" == "all still in progress" (matches All Mentor Projects / All
-	# Un-approved Mentor Projects, which are functionally identical in the
-	# original reports).
-	clause = "and p.status != 'Approved'"
-	return _role_scoped_projects("faculty_mentor", doc, clause)
+	return _unapproved_projects("faculty_mentor", doc, [MENTOR_PENDING_STATUS])
 
 
 @frappe.whitelist()
@@ -117,8 +124,7 @@ def get_primary_reviewer_projects(bucket="pending"):
 	if bucket == "approved":
 		clause = "and p.status = 'Approved'"
 		return _role_scoped_projects("primary_reviewer", doc, clause)
-	clause = "and p.status != 'Approved'"
-	return _role_scoped_projects("primary_reviewer", doc, clause)
+	return _unapproved_projects("primary_reviewer", doc, PRIMARY_REVIEWER_PENDING_STATUSES)
 
 
 @frappe.whitelist()
@@ -133,8 +139,7 @@ def get_secondary_reviewer_projects(bucket="pending"):
 	if bucket == "approved":
 		clause = "and p.status = 'Approved'"
 		return _role_scoped_projects("secondary_reviewer", doc, clause)
-	clause = "and p.status != 'Approved'"
-	return _role_scoped_projects("secondary_reviewer", doc, clause)
+	return _unapproved_projects("secondary_reviewer", doc, [SECONDARY_REVIEWER_PENDING_STATUS])
 
 
 @frappe.whitelist()
@@ -207,7 +212,7 @@ DASHBOARD_ROLES = [
 
 
 def _role_bucket_counts(role_field, doc, pending_statuses):
-	"""Pending / in-progress / approved counts in one query. Same joins and
+	"""Pending / unapproved / approved counts in one query. Same joins and
 	scoping as _role_scoped_projects, so each number equals the length of
 	the matching worklist tab."""
 	placeholders = {f"status{i}": s for i, s in enumerate(pending_statuses)}
@@ -215,7 +220,8 @@ def _role_bucket_counts(role_field, doc, pending_statuses):
 	row = frappe.db.sql(
 		f"""select
 			count(distinct case when p.status in ({pending_in}) then p.name end) as pending,
-			count(distinct case when p.status != 'Approved' then p.name end) as in_progress,
+			count(distinct case when p.status != 'Approved' and p.status not in ({pending_in})
+				then p.name end) as unapproved,
 			count(distinct case when p.status = 'Approved' then p.name end) as approved
 		from tabStudent as s
 		join `tabStudent Project Mapping` as sp on sp.student = s.name
@@ -225,17 +231,16 @@ def _role_bucket_counts(role_field, doc, pending_statuses):
 		{"system_user": doc.system_user, **placeholders},
 		as_dict=True,
 	)[0]
-	return {k: int(row[k] or 0) for k in ("pending", "in_progress", "approved")}
+	return {k: int(row[k] or 0) for k in ("pending", "unapproved", "approved")}
 
 
 @frappe.whitelist()
-def get_my_dashboard(recent_limit=5):
+def get_my_dashboard():
 	"""Everything the Dashboard shows, in one request: for each mentor /
-	reviewer role the user holds, the three worklist-tab counts plus their
-	most recently updated in-progress projects (each flagged with whether
-	it is waiting on *this* user), and the student's own project counts.
+	reviewer role the user holds, the pending / unapproved / approved counts
+	(the Desk IRB Projects workspace cards), and the student's own project
+	counts.
 	"""
-	recent_limit = max(1, min(int(recent_limit or 5), 20))
 	user_roles = set(frappe.get_roles())
 	roles = []
 
@@ -245,13 +250,7 @@ def get_my_dashboard(recent_limit=5):
 		doc = get_logged_in_doc(doc_key)
 		if not doc:
 			continue
-		recent = _role_scoped_projects(field, doc, "and p.status != 'Approved'")
-		for row in recent:
-			row["needs_action"] = row.project_status in pending_statuses
-		# Projects waiting on this user first; the stable sort keeps the
-		# query's most-recently-updated order within each group.
-		recent = sorted(recent, key=lambda r: not r["needs_action"])[:recent_limit]
-		roles.append({"key": key, "route": route, "counts": _role_bucket_counts(field, doc, pending_statuses), "recent": recent})
+		roles.append({"key": key, "route": route, "counts": _role_bucket_counts(field, doc, pending_statuses)})
 
 	student = None
 	if get_logged_in_doc("Student"):

@@ -7,7 +7,7 @@ import type { WorklistBucket } from '@/services/projects'
 const BUCKETS: WorklistBucket[] = ['pending', 'unapproved', 'approved']
 
 /**
- * Loads all three worklist buckets (pending/in-progress/approved) once, in
+ * Loads all three worklist buckets (pending/unapproved/approved) once, in
  * parallel, instead of re-fetching every time the active tab changes —
  * this is what makes it possible to show a real count on every tab
  * up front, and switching tabs afterwards is instant/local.

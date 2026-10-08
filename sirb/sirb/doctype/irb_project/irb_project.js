@@ -150,7 +150,6 @@ function get_sections_in_tab(frm, tab_fieldname) {
 }
 
 function handle_toggle_all_comment_sections(frm){
-    const allowed_open_all_comment_section_roles = ['Administrator', 'System Manager', "Primary IRB Reviewer", "Secondary IRB Reviewer"];
     const sectionsToToggle = [];
     // console.log("IN!")
     frm.remove_custom_button(__('Toggle All Sections'));
@@ -183,7 +182,8 @@ function handle_toggle_all_comment_sections(frm){
         }
     }
     //console.log(sectionsToToggle);
-    if (frappe.user_roles.some(role => allowed_open_all_comment_section_roles.includes(role))) {
+    // Admins and this project's reviewers — not everyone who reviews some project.
+    if ((frm.doc.__onload || {}).can_open_all_review_sections) {
         if (["Humans", "Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain)) {
             frm.add_custom_button(__('Toggle All Sections'), () => {
                 frm._toggleAddonsState = !frm._toggleAddonsState;
@@ -429,6 +429,11 @@ frappe.ui.form.on("IRB Project", {
         const hidden_fields = (frm.doc.__onload || {}).hidden_fields || [];
         if (hidden_fields.length)
             frm.toggle_display(hidden_fields, false);
+        // Fields the user's global roles could edit but their role on this
+        // project can't (a save would put them back), e.g. primary reviewer
+        // notes for someone who is only the secondary reviewer here.
+        for (const fieldname of (frm.doc.__onload || {}).readonly_fields || [])
+            frm.set_df_property(fieldname, 'read_only', 1);
         // Get the roles of the currently logged in user
         const [is_student, is_mentor, is_primary_reviewer, is_secondary_reviewer] = await get_logged_in_role(frm);
         if (is_student && ["Humans","Non Human Species", "BOTH Humans AND Non Humans"].includes(frm.doc.project_domain) && frm.doc.status !== "Awaiting proposal completion by student")

@@ -21,7 +21,7 @@ STATUS_EMAIL_VARIABLES = [
 	("student_names", "Comma-separated names of the project's students"),
 	("project_name", "Project title"),
 	("project_status", "Project status (the new one, on a status change)"),
-	("project_url", "Link to the project in the IRB portal"),
+	("project_url", "Link to the project in Desk"),
 ]
 
 

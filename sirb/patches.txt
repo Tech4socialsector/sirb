@@ -12,3 +12,4 @@ sirb.patches.v1_0.create_programme_manager_role
 sirb.patches.v1_0.add_programme_manager_custom_perms
 sirb.patches.v1_0.rename_heq_s18_mentor_feedback
 sirb.patches.v1_0.point_status_email_to_portal
+sirb.patches.v1_0.create_status_update_email_template

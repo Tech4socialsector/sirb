@@ -3,7 +3,13 @@
   "name": "Status Change Email Template",
   "subject": "IRB Project \"{{project_name}}\" requires your action",
   "use_html": 1,
-  "response_html": "<p>\nThe status of IRB Project proposal named <strong>\"{{ project_name }}\"</strong>\nhas changed to <strong>\"{{ project_status }}\"</strong> and requires your action.\n</p>\n\n<p>\nKindly review the project and questionnaire and act on it as soon as possible\nif it has not been granted its final approval.\n</p>\n\n<p>\n<a href=\"{{ project_url }}\" target=\"_blank\">\nPlease click here to review\n</a>\n</p>\n\n<p>\nThank you.<br>\nIRB Team\n</p>"
+  "response_html": "<p>\nThe status of IRB Project proposal named <strong>\"{{ project_name }}\"</strong>\nhas changed to <strong>\"{{ project_status }}\"</strong> and requires your action.\n</p>\n\n<p>\nKindly review the project and questionnaire and act on it as soon as possible.\n</p>\n\n<p>\n<a href=\"{{ project_url }}\" target=\"_blank\">\nPlease click here to review\n</a>\n</p>\n\n<p>\nThank you.<br>\nIRB Team\n</p>"
+ },
+ {
+  "name": "Status Update Email Template",
+  "subject": "IRB project \"{{ project_name }}\" approved",
+  "use_html": 1,
+  "response_html": "<p>The IRB project <strong>\"{{ project_name }}\"</strong> has been approved.</p>\n<p>Thank you,<br>IRB Team</p>"
  },
  {
   "name": "New IRB Project Template",

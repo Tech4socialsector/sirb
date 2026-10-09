@@ -209,6 +209,9 @@ class IRBProject(Document):
 					student_names = ",".join(n for n in student_name_list if n)
 					mentor_email = notification_info[0]["mentor_email"]
 					faculty_recipient_list = []
+					# Faculty who must act get the review link; on an approval the
+					# mentor is only being told the final outcome.
+					faculty_template = "Status Change Email Template"
 					to_students = to_faculty = False
 					print("Statis is ", self.status)
 					if self.status == "Awaiting Faculty mentor approval":
@@ -235,6 +238,7 @@ class IRBProject(Document):
 						to_faculty = True
 					elif self.status == "Approved":
 						template = "Project Approved Template"
+						faculty_template = "Status Update Email Template"
 						faculty_recipient_list.append(mentor_email)
 						to_students = True
 						to_faculty = True
@@ -255,8 +259,10 @@ class IRBProject(Document):
 						"student_names": student_names,
 						"project_url": project_url,
 					}
-					if to_faculty:
-						send_email_if_configured("Status Change Email Template", params, faculty_recipient_list)
+					# A Faculty record without a login has no e-mail address.
+					faculty_recipient_list = [r for r in faculty_recipient_list if r]
+					if to_faculty and faculty_recipient_list:
+						send_email_if_configured(faculty_template, params, faculty_recipient_list)
 					if to_students:
 						send_email_if_configured(template, params, student_email_list)
 					# for u in recipient_list:

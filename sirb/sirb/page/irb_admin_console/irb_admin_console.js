@@ -323,9 +323,16 @@ class IRBAdminConsole {
 
 		const cards = [
 			{
+				label: "Total Projects",
+				value: data.total_projects,
+				drill: {},
+				kind: "total",
+				icon: CARD_ICONS.total,
+			},
+			{
 				label: "Total Students",
 				value: data.total_students,
-				drill: {},
+				drill: { students: true },
 				kind: "total",
 				icon: CARD_ICONS.total,
 			},
@@ -392,7 +399,8 @@ class IRBAdminConsole {
 		$c.find(".awd-clickable").on("click", (e) => {
 			const drill = JSON.parse($(e.currentTarget).attr("data-drill"));
 			const title = $(e.currentTarget).find(".awd-card-label").text();
-			this.open_drilldown(drill, drill && Object.keys(drill).length ? undefined : "All Students");
+			const forced = drill.students ? "All Students" : Object.keys(drill).length ? undefined : "All Projects";
+			this.open_drilldown(drill, forced);
 		});
 	}
 
@@ -685,7 +693,9 @@ class IRBAdminConsole {
 
 	async open_drilldown(drill, forced_title) {
 		const filters = Object.assign({}, this.filters, drill.irb_unit ? { irb_unit: drill.irb_unit } : {});
-		const args = { filters };
+		// One row per project, so the row count matches the project counts the
+		// cards and table show; only the Total Students card lists members.
+		const args = { filters, per_project: drill.students ? 0 : 1 };
 		const title_parts = [];
 
 		if (drill.irb_unit) {

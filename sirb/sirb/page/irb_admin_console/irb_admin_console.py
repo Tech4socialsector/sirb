@@ -190,18 +190,22 @@ def _build_filters_clause(filters):
 	return clause, params
 
 
-BASE_JOIN = """
-	from `tabStudent Project Mapping` as sp
-	join `tabIRB Project` as p on sp.irb_project = p.name
-	join `tabStudent` as s on sp.student = s.name
+# Driven from IRB Project so every project counts, as in the Desk list.
+# Starting from Student Project Mapping silently dropped projects with no
+# active member (created without a student, or every student removed), so
+# the console's totals came out lower than the IRB Project list's. Projects
+# with no member have s.* null, so student-based filters (academic_year)
+# still narrow them out.
+BASE_FROM = """
+	from `tabIRB Project` as p
 	join `tabIRB Unit` as iu on p.irb_unit = iu.name
-	join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
-	left join `tabAcademic Organizational Unit` as campus_ao
-		on campus_ao.ao_type = "Campus"
-		and campus_ao.lft <= ao_unit.lft
-		and campus_ao.rgt >= ao_unit.rgt
-	where (sp.status = "active" or p.status = "Approved")
+	left join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
+	left join `tabStudent Project Mapping` as sp
+		on sp.irb_project = p.name
+		and (sp.status = "active" or p.status = "Approved")
+	left join `tabStudent` as s on sp.student = s.name
 """
+BASE_JOIN = BASE_FROM + " where 1=1 "
 
 
 @frappe.whitelist()
@@ -255,8 +259,12 @@ def get_dashboard_data(filters=None):
 		if status_key:
 			status_counts[status_key] += r["cnt"]
 
-	# Student-project memberships (a student on two projects counts twice).
-	total_students = frappe.db.sql(f"""select count(*) {BASE_JOIN}{where_extra}""", params)[0][0]
+	# Student-project memberships (a student on two projects counts twice),
+	# the same rows the "Total Students" drill-down lists. Projects with no
+	# member add nothing.
+	total_students = frappe.db.sql(
+		f"""select count(distinct sp.name) {BASE_JOIN}{where_extra}""", params
+	)[0][0]
 
 	# ---- Pending action groups -------------------------------------------------------
 	pending_actions = {}
@@ -467,18 +475,9 @@ def get_role_workload(filters=None):
 		rows = frappe.db.sql(
 			f"""
 			select f.name as faculty_id, f.full_name as faculty_name, count(distinct p.name) as pending_count
-			from `tabStudent Project Mapping` as sp
-			join `tabIRB Project` as p on sp.irb_project = p.name
-			join `tabStudent` as s on sp.student = s.name
-			join `tabIRB Unit` as iu on p.irb_unit = iu.name
-			join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
-			left join `tabAcademic Organizational Unit` as campus_ao
-				on campus_ao.ao_type = "Campus"
-				and campus_ao.lft <= ao_unit.lft
-				and campus_ao.rgt >= ao_unit.rgt
+			{BASE_FROM}
 			join `tabFaculty` as f on p.{role_field} = f.name
-			where sp.status = "active"
-			and p.status in ({','.join(placeholders)})
+			where p.status in ({','.join(placeholders)})
 			{where_extra}
 			group by f.name
 			order by pending_count desc
@@ -582,6 +581,8 @@ def get_drilldown_students(
 	else:
 		student_fields = "s.name as student_id, s.full_name as student_name, 1 as student_count"
 		group_by = ""
+		# One row per membership, so a project with no member has no row.
+		extra_clause += " and sp.name is not null"
 
 	rows = frappe.db.sql(
 		f"""
@@ -595,19 +596,11 @@ def get_drilldown_students(
 			pr.full_name as primary_reviewer,
 			sr.full_name as secondary_reviewer,
 			p.modified as last_updated
-		from `tabStudent Project Mapping` as sp
-		join `tabIRB Project` as p on sp.irb_project = p.name
-		join `tabStudent` as s on sp.student = s.name
-		join `tabIRB Unit` as iu on p.irb_unit = iu.name
-		join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
-		left join `tabAcademic Organizational Unit` as campus_ao
-			on campus_ao.ao_type = "Campus"
-			and campus_ao.lft <= ao_unit.lft
-			and campus_ao.rgt >= ao_unit.rgt
+		{BASE_FROM}
 		left join `tabFaculty` as fm on p.faculty_mentor = fm.name
 		left join `tabFaculty` as pr on p.primary_reviewer = pr.name
 		left join `tabFaculty` as sr on p.secondary_reviewer = sr.name
-		where (sp.status = "active" or p.status = "Approved")
+		where 1=1
 		{where_extra}{extra_clause}
 		{group_by}
 		order by p.modified desc

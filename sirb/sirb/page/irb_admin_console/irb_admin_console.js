@@ -744,18 +744,23 @@ class IRBAdminConsole {
 
 		let html = `<div class="awd-modal-table-wrap"><table class="awd-table">
 			<thead><tr>
-				<th>Student Name</th><th>Student ID</th><th>Programme</th>
+				<th>Project</th><th>Student Name</th><th>Student ID</th><th>Programme</th>
 				<th>Current Status</th><th>Faculty Mentor</th><th>Primary Reviewer</th>
 				<th>Secondary Reviewer</th><th>Last Updated</th>
 			</tr></thead><tbody>`;
 
 		if (!rows.length) {
-			html += `<tr><td colspan="8" class="text-muted text-center">No matching students.</td></tr>`;
+			html += `<tr><td colspan="9" class="text-muted text-center">No matching records.</td></tr>`;
 		}
 
 		rows.forEach((r) => {
 			html += `<tr class="awd-modal-row" data-project="${frappe.utils.escape_html(r.project_id)}">
-				<td>${frappe.utils.escape_html(r.student_name || "-")}</td>
+				<td>${frappe.utils.escape_html(project_label(r))}</td>
+				<td>${
+					r.student_name
+						? frappe.utils.escape_html(r.student_name)
+						: `<span class="text-muted">${__("No student linked")}</span>`
+				}</td>
 				<td>${frappe.utils.escape_html(r.student_id || "-")}</td>
 				<td>${frappe.utils.escape_html(r.programme || "-")}</td>
 				<td>${frappe.utils.escape_html(r.status || "-")}</td>
@@ -784,6 +789,7 @@ class IRBAdminConsole {
 		}
 
 		const header = [
+			"Project",
 			"Student Name",
 			"Student ID",
 			"Programme",
@@ -797,7 +803,8 @@ class IRBAdminConsole {
 
 		rows.forEach((r) => {
 			csv_rows.push([
-				r.student_name || "-",
+				project_label(r),
+				r.student_name || "No student linked",
 				r.student_id || "-",
 				r.programme || "-",
 				r.status || "-",
@@ -939,4 +946,10 @@ function safe_filename(title) {
 		.replace(/\s+/g, " ")
 		.trim()
 		.slice(0, 120);
+}
+
+// "644 — Exploring Teachers' …" for a drill-down row; untitled drafts show
+// the id alone so the row can still be found in the IRB Project list.
+function project_label(r) {
+	return [r.project_id, r.project_title].filter(Boolean).join(" — ") || "-";
 }

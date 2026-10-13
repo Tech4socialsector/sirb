@@ -573,13 +573,31 @@ def get_drilldown_students(
 			params["role_person_id"] = role_person["faculty"]
 			extra_clause = f" and p.{field} = %(role_person_id)s and p.status in ({','.join(placeholders)})"
 
+	# A blank full_name (it's optional on Student) shows the Student id
+	# rather than nothing.
+	member_name = "coalesce(nullif(s.full_name, ''), sp.student)"
 	if per_project:
-		student_fields = """min(s.name) as student_id,
-			group_concat(distinct s.full_name order by s.full_name separator ', ') as student_name,
-			count(distinct s.name) as student_count"""
+		# Every member's id, not just the first. A project whose students
+		# are all inactive (removed, but the project isn't Approved) has no
+		# member row in BASE_FROM; list those students, marked, so the row
+		# isn't blank.
+		student_fields = f"""coalesce(
+				group_concat(distinct sp.student order by sp.student separator ', '),
+				(select group_concat(distinct m.student order by m.student separator ', ')
+					from `tabStudent Project Mapping` as m where m.irb_project = p.name)
+			) as student_id,
+			coalesce(
+				group_concat(distinct {member_name} order by {member_name} separator ', '),
+				(select group_concat(distinct concat(coalesce(nullif(o.full_name, ''), m.student), ' (inactive)')
+						separator ', ')
+					from `tabStudent Project Mapping` as m
+					left join `tabStudent` as o on o.name = m.student
+					where m.irb_project = p.name)
+			) as student_name,
+			count(distinct sp.student) as student_count"""
 		group_by = "group by p.name"
 	else:
-		student_fields = "s.name as student_id, s.full_name as student_name, 1 as student_count"
+		student_fields = f"sp.student as student_id, {member_name} as student_name, 1 as student_count"
 		group_by = ""
 		# One row per membership, so a project with no member has no row.
 		extra_clause += " and sp.name is not null"

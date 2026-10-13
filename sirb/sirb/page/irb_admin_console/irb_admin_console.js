@@ -742,11 +742,12 @@ class IRBAdminConsole {
 			secondary_action: () => this.export_drilldown_rows(title, rows),
 		});
 
-		let html = `<div class="awd-modal-table-wrap"><table class="awd-table">
+		let html = `<div class="awd-modal-table-wrap"><table class="awd-table awd-modal-table">
 			<thead><tr>
-				<th>Project</th><th>Student Name</th><th>Student ID</th><th>Programme</th>
-				<th>Current Status</th><th>Faculty Mentor</th><th>Primary Reviewer</th>
-				<th>Secondary Reviewer</th><th>Last Updated</th>
+				<th class="awd-col-name">Student Name</th><th class="awd-col-id">Student ID</th>
+				<th class="awd-col-mid">Programme</th><th class="awd-col-mid">Current Status</th>
+				<th>Faculty Mentor</th><th>Primary Reviewer</th><th>Secondary Reviewer</th>
+				<th>Last Updated</th><th class="awd-col-project">Project</th>
 			</tr></thead><tbody>`;
 
 		if (!rows.length) {
@@ -755,19 +756,19 @@ class IRBAdminConsole {
 
 		rows.forEach((r) => {
 			html += `<tr class="awd-modal-row" data-project="${frappe.utils.escape_html(r.project_id)}">
-				<td>${frappe.utils.escape_html(project_label(r))}</td>
-				<td>${
+				<td class="awd-col-name">${
 					r.student_name
 						? frappe.utils.escape_html(r.student_name)
 						: `<span class="text-muted">${__("No student linked")}</span>`
 				}</td>
-				<td>${frappe.utils.escape_html(r.student_id || "-")}</td>
-				<td>${frappe.utils.escape_html(r.programme || "-")}</td>
-				<td>${frappe.utils.escape_html(r.status || "-")}</td>
+				<td class="awd-col-id">${frappe.utils.escape_html(r.student_id || "-")}</td>
+				<td class="awd-col-mid">${frappe.utils.escape_html(r.programme || "-")}</td>
+				<td class="awd-col-mid">${frappe.utils.escape_html(r.status || "-")}</td>
 				<td>${frappe.utils.escape_html(r.faculty_mentor || "-")}</td>
 				<td>${frappe.utils.escape_html(r.primary_reviewer || "-")}</td>
 				<td>${frappe.utils.escape_html(r.secondary_reviewer || "-")}</td>
 				<td>${frappe.datetime.comment_when(r.last_updated)}</td>
+				<td class="awd-col-project">${frappe.utils.escape_html(project_label(r))}</td>
 			</tr>`;
 		});
 		html += "</tbody></table></div>";
@@ -789,7 +790,6 @@ class IRBAdminConsole {
 		}
 
 		const header = [
-			"Project",
 			"Student Name",
 			"Student ID",
 			"Programme",
@@ -798,12 +798,12 @@ class IRBAdminConsole {
 			"Primary Reviewer",
 			"Secondary Reviewer",
 			"Last Updated",
+			"Project",
 		];
 		const csv_rows = [header];
 
 		rows.forEach((r) => {
 			csv_rows.push([
-				project_label(r),
 				r.student_name || "No student linked",
 				r.student_id || "-",
 				r.programme || "-",
@@ -812,6 +812,7 @@ class IRBAdminConsole {
 				r.primary_reviewer || "-",
 				r.secondary_reviewer || "-",
 				r.last_updated || "-",
+				project_label(r),
 			]);
 		});
 
@@ -925,6 +926,15 @@ class IRBAdminConsole {
 			.awd-activity-row:hover { background: var(--subtle-fg, #f8f9fa); }
 			.awd-empty { padding: 8px 2px; }
 			.awd-modal-table-wrap { max-height: 60vh; overflow: auto; }
+			/* Long names, group member lists and titles wrap inside a capped
+			   width instead of stretching the row; short columns stay on one line. */
+			.awd-modal-table th, .awd-modal-table td { text-align: left; vertical-align: top; }
+			.awd-modal-table td.awd-col-name, .awd-modal-table td.awd-col-id,
+			.awd-modal-table td.awd-col-mid, .awd-modal-table td.awd-col-project { white-space: normal; }
+			.awd-modal-table .awd-col-name { min-width: 180px; max-width: 260px; }
+			.awd-modal-table .awd-col-id { min-width: 110px; max-width: 160px; }
+			.awd-modal-table .awd-col-mid { min-width: 120px; max-width: 200px; }
+			.awd-modal-table .awd-col-project { min-width: 220px; max-width: 320px; }
 		</style>`).appendTo("head");
 	}
 }

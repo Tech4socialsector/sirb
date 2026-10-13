@@ -734,15 +734,22 @@ class IRBAdminConsole {
 	}
 
 	show_drilldown_dialog(title, rows) {
+		// Rows matching the search box; Export CSV exports just these.
+		let visible = rows;
 		const dialog = new frappe.ui.Dialog({
 			title: `${title} (${rows.length})`,
 			size: "extra-large",
 			fields: [{ fieldname: "table_html", fieldtype: "HTML" }],
 			secondary_action_label: __("Export CSV"),
-			secondary_action: () => this.export_drilldown_rows(title, rows),
+			secondary_action: () => this.export_drilldown_rows(title, visible),
 		});
 
-		let html = `<div class="awd-modal-table-wrap"><table class="awd-table awd-modal-table">
+		let html = `<div class="awd-modal-toolbar">
+			<input type="search" class="form-control form-control-sm awd-modal-search"
+				placeholder="${__("Search student, ID, status, mentor, reviewer, project...")}"
+				${rows.length ? "" : "disabled"}>
+		</div>
+		<div class="awd-modal-table-wrap"><table class="awd-table awd-modal-table">
 			<thead><tr>
 				<th class="awd-col-name">Student Name</th><th class="awd-col-id">Student ID</th>
 				<th class="awd-col-mid">Programme</th><th class="awd-col-mid">Current Status</th>
@@ -754,8 +761,8 @@ class IRBAdminConsole {
 			html += `<tr><td colspan="9" class="text-muted text-center">No matching records.</td></tr>`;
 		}
 
-		rows.forEach((r) => {
-			html += `<tr class="awd-modal-row" data-project="${frappe.utils.escape_html(r.project_id)}">
+		rows.forEach((r, i) => {
+			html += `<tr class="awd-modal-row" data-idx="${i}" data-project="${frappe.utils.escape_html(r.project_id)}">
 				<td class="awd-col-name">${
 					r.student_name
 						? frappe.utils.escape_html(r.student_name)
@@ -771,16 +778,57 @@ class IRBAdminConsole {
 				<td class="awd-col-project">${frappe.utils.escape_html(project_label(r))}</td>
 			</tr>`;
 		});
+		if (rows.length) {
+			html += `<tr class="awd-modal-no-match" style="display:none;">
+				<td colspan="9" class="text-muted text-center">${__("No records match your search.")}</td>
+			</tr>`;
+		}
 		html += "</tbody></table></div>";
 
-		dialog.fields_dict.table_html.$wrapper.html(html);
-		dialog.$wrapper.find(".awd-modal-row").on("click", function () {
+		const $wrap = dialog.fields_dict.table_html.$wrapper;
+		$wrap.html(html);
+		$wrap.find(".awd-modal-row").on("click", function () {
 			const project = $(this).data("project");
 			dialog.hide();
 			frappe.set_route("app", "irb-project", project);
 		});
 
+		// Every word must appear somewhere in the row, in any column and order,
+		// so "miriam provisionally" finds Miriam's provisionally approved projects.
+		const haystacks = rows.map((r) =>
+			[
+				r.student_name,
+				r.student_id,
+				r.programme,
+				r.status,
+				r.faculty_mentor,
+				r.primary_reviewer,
+				r.secondary_reviewer,
+				r.project_id,
+				r.project_title,
+			]
+				.filter((v) => v !== null && v !== undefined)
+				.join(" ")
+				.toLowerCase()
+		);
+		const $rows = $wrap.find(".awd-modal-row");
+		$wrap.find(".awd-modal-search").on("input", (e) => {
+			const terms = ($(e.currentTarget).val() || "").toLowerCase().split(/\s+/).filter(Boolean);
+			visible = [];
+			$rows.each(function () {
+				const idx = Number($(this).attr("data-idx"));
+				const match = terms.every((t) => haystacks[idx].includes(t));
+				$(this).toggle(match);
+				if (match) visible.push(rows[idx]);
+			});
+			$wrap.find(".awd-modal-no-match").toggle(!visible.length);
+			dialog.set_title(
+				terms.length ? `${title} (${visible.length} of ${rows.length})` : `${title} (${rows.length})`
+			);
+		});
+
 		dialog.show();
+		dialog.$wrapper.one("shown.bs.modal", () => $wrap.find(".awd-modal-search").trigger("focus"));
 	}
 
 	export_drilldown_rows(title, rows) {
@@ -925,6 +973,8 @@ class IRBAdminConsole {
 			.awd-activity-row { cursor: pointer; }
 			.awd-activity-row:hover { background: var(--subtle-fg, #f8f9fa); }
 			.awd-empty { padding: 8px 2px; }
+			.awd-modal-toolbar { margin-bottom: 10px; }
+			.awd-modal-search { max-width: 420px; }
 			.awd-modal-table-wrap { max-height: 60vh; overflow: auto; }
 			/* Long names, group member lists and titles wrap inside a capped
 			   width instead of stretching the row; short columns stay on one line. */

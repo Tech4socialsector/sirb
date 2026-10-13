@@ -192,17 +192,19 @@ def _build_filters_clause(filters):
 
 # Driven from IRB Project so every project counts, as in the Desk list.
 # Starting from Student Project Mapping silently dropped projects with no
-# active member (created without a student, or every student removed), so
-# the console's totals came out lower than the IRB Project list's. Projects
-# with no member have s.* null, so student-based filters (academic_year)
-# still narrow them out.
+# active member, so the console's totals came out lower than the IRB
+# Project list's. Projects with no member have s.* null, so student-based
+# filters (academic_year) still narrow them out.
+#
+# Every mapping is a member, whatever its status: the only thing that marks
+# one inactive is approval (IRBProject.on_change), and a project moved back
+# from Approved keeps its inactive mappings, which made its students vanish
+# from the console.
 BASE_FROM = """
 	from `tabIRB Project` as p
 	join `tabIRB Unit` as iu on p.irb_unit = iu.name
 	left join `tabAcademic Organizational Unit` as ao_unit on iu.ao_unit = ao_unit.name
-	left join `tabStudent Project Mapping` as sp
-		on sp.irb_project = p.name
-		and (sp.status = "active" or p.status = "Approved")
+	left join `tabStudent Project Mapping` as sp on sp.irb_project = p.name
 	left join `tabStudent` as s on sp.student = s.name
 """
 BASE_JOIN = BASE_FROM + " where 1=1 "
@@ -577,23 +579,9 @@ def get_drilldown_students(
 	# rather than nothing.
 	member_name = "coalesce(nullif(s.full_name, ''), sp.student)"
 	if per_project:
-		# Every member's id, not just the first. A project whose students
-		# are all inactive (removed, but the project isn't Approved) has no
-		# member row in BASE_FROM; list those students, marked, so the row
-		# isn't blank.
-		student_fields = f"""coalesce(
-				group_concat(distinct sp.student order by sp.student separator ', '),
-				(select group_concat(distinct m.student order by m.student separator ', ')
-					from `tabStudent Project Mapping` as m where m.irb_project = p.name)
-			) as student_id,
-			coalesce(
-				group_concat(distinct {member_name} order by {member_name} separator ', '),
-				(select group_concat(distinct concat(coalesce(nullif(o.full_name, ''), m.student), ' (inactive)')
-						separator ', ')
-					from `tabStudent Project Mapping` as m
-					left join `tabStudent` as o on o.name = m.student
-					where m.irb_project = p.name)
-			) as student_name,
+		# Every member's id, not just the first.
+		student_fields = f"""group_concat(distinct sp.student order by sp.student separator ', ') as student_id,
+			group_concat(distinct {member_name} order by {member_name} separator ', ') as student_name,
 			count(distinct sp.student) as student_count"""
 		group_by = "group by p.name"
 	else:
@@ -698,11 +686,10 @@ def get_recent_activity(filters=None, limit=25):
 	details = frappe.db.sql(
 		f"""
 		select p.name as project_id, p.title as project_title, iu.ao_name as programme,
-			group_concat(s.full_name separator ', ') as student_names
+			group_concat(distinct coalesce(nullif(s.full_name, ''), sp.student) separator ', ') as student_names
 		from `tabIRB Project` as p
 		join `tabIRB Unit` as iu on p.irb_unit = iu.name
 		left join `tabStudent Project Mapping` as sp on sp.irb_project = p.name
-			and (sp.status = "active" or p.status = "Approved")
 		left join `tabStudent` as s on sp.student = s.name
 		where p.name in %(names)s
 		group by p.name

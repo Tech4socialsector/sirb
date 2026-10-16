@@ -27,6 +27,27 @@ STUDENT_DRAFT_STATUSES = (
 class ProposalIncompleteError(frappe.ValidationError):
 	pass
 
+
+def reactivate_student_mappings(project_name):
+	"""Undo approval's "inactive" flag on `project_name`'s Student Project
+	Mappings. Worklists, reports and project roles (sirb.api
+	._get_irb_project_roles) only count a mapping that is active or whose
+	project is Approved, so a project moved back from Approved vanished
+	from its mentor's, reviewers' and students' lists, and none of them
+	could act on it."""
+	reactivated = []
+	for name in frappe.get_all(
+		"Student Project Mapping",
+		filters={"irb_project": project_name, "status": ["!=", "active"]},
+		pluck="name",
+	):
+		sp_doc = frappe.get_doc("Student Project Mapping", name)
+		sp_doc.status = "active"
+		sp_doc.flags.ignore_permissions = True
+		sp_doc.save()
+		reactivated.append(name)
+	return reactivated
+
 class IRBProject(Document):
 	def onload(self):
 		# The Desk form hides these per project (sirb.permissions); the
@@ -184,16 +205,18 @@ class IRBProject(Document):
 			if doc_before.status != self.status:
 				# Status change so need to send a notification on status change
 
+				# Left join on the mentor: a project in an IRB Unit that needs no
+				# mentor has none, and an inner join sent no e-mail at all for it.
 				notification_info = frappe.db.sql(
-					f'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
+					'''select s.system_user as student_email, s.name as student_id, s.full_name as student_name,
 					f.name as mentor_id,
 					f.system_user as mentor_email, p.primary_reviewer as pr_id,
 					p.secondary_reviewer as sr_id
-					from tabStudent as s join `tabStudent Project Mapping` as sp join
-					`tabIRB Project` as p
-					join tabFaculty as f on s.name = sp.student and
-					sp.irb_project = p.name  and p.faculty_mentor=f.name where
-					p.name="{self.name}"''', as_dict=1
+					from tabStudent as s
+					join `tabStudent Project Mapping` as sp on s.name = sp.student
+					join `tabIRB Project` as p on sp.irb_project = p.name
+					left join tabFaculty as f on p.faculty_mentor = f.name
+					where p.name = %(project)s''', {"project": self.name}, as_dict=1
 				)
 				print("NOTIFICATION INFO ", notification_info)
 				#[{'student_email': 'student1@apu.in', 'student_id': 17, 'mentor_id': 4, 'faculty_email': 'f1@apu.in', 'pr_id': '4', 'sr_id': None}]
@@ -220,7 +243,10 @@ class IRBProject(Document):
 						template = "Awaiting Mentor Approval Template"
 						to_faculty = True
 						to_students = True
-					elif self.status in ["Awaiting reviewer feedback to student", "Awaiting primary reviewer comments to secondary reviewer"]:
+					# "Awaiting final approval": a provisionally approved student has
+					# uploaded the missing documents; only the primary reviewer can
+					# grant final approval (sirb.workflow), and wasn't being told.
+					elif self.status in ["Awaiting reviewer feedback to student", "Awaiting primary reviewer comments to secondary reviewer", "Awaiting final approval"]:
 						if notification_info[0]["pr_id"]:
 							pr_email = frappe.get_value("Faculty", notification_info[0]["pr_id"], "system_user")
 							faculty_recipient_list.append(pr_email)
@@ -281,6 +307,8 @@ class IRBProject(Document):
 					# 		{"js": f"frappe.show_alert('Task {self.name} status changed to {self.status}');"},
 					# 		user=u
 					# 	)
+		if doc_before and doc_before.status == "Approved" and self.status != "Approved":
+			reactivate_student_mappings(self.name)
 		if self.status == "Approved":
 			sp_mappings = frappe.get_all("Student Project Mapping", filters = {
 				"irb_project": self.name,
